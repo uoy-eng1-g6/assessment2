@@ -1,7 +1,7 @@
 # ENG1 Project
 
 ## Website
-<https://therealemissions.github.io/uoy-eng1/>
+<https://uoy-eng1-g6.github.io/assessment2/>
 
 ## Contributors
 (Assessment 1)
