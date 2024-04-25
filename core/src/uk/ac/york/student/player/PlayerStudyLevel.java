@@ -34,7 +34,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * This is a float value between 0 and 1, where 0 represents not studied and 1 represents very studied.
      * By default, the study level is set to 0.1.
      */
-    private @Range(from=0, to=1) float studyLevel = 0.1f;
+    private @Range(from = 0, to = 1) float studyLevel = 0.1f;
 
     /**
      * The total amount of study accumulated by the player across all days of the game.
@@ -97,7 +97,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * @return the study level of the player
      */
     @Override
-    public @Range(from=0, to=1) float get() {
+    public @Range(from = 0, to = 1) float get() {
         return studyLevel;
     }
 
@@ -109,7 +109,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * @param studyLevel the new study level of the player
      */
     @Override
-    public void set(@Range(from=0, to=1) float studyLevel) {
+    public void set(@Range(from = 0, to = 1) float studyLevel) {
         this.studyLevel = Math.max(PROGRESS_BAR_MINIMUM, Math.min(1, studyLevel));
         this.progressBar.setValue(this.studyLevel);
     }

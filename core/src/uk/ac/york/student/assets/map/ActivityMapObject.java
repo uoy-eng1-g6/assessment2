@@ -2,16 +2,15 @@ package uk.ac.york.student.assets.map;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import uk.ac.york.student.game.activities.Activity;
 import uk.ac.york.student.player.Player;
 import uk.ac.york.student.player.PlayerMetrics;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class extends MapObject and implements ActionMapObject.
@@ -86,19 +85,24 @@ public final class ActivityMapObject extends MapObject implements ActionMapObjec
         // Retrieves the properties of the given MapObject and assigns them to the properties of the ActivityMapObject
         properties = object.getProperties();
 
-        // Retrieves the "activityStr" property from the properties of the ActivityMapObject and assigns it to the str field
+        // Retrieves the "activityStr" property from the properties of the ActivityMapObject and assigns it to the str
+        // field
         str = properties.get("activityStr", String.class);
 
-        // Retrieves the "activityType" property from the properties of the ActivityMapObject, converts it to uppercase, and assigns it to the type field
+        // Retrieves the "activityType" property from the properties of the ActivityMapObject, converts it to uppercase,
+        // and assigns it to the type field
         type = Activity.valueOf(properties.get("activityType", String.class).toUpperCase());
 
-        // Retrieves the "activityTime" property from the properties of the ActivityMapObject and assigns it to the time field
+        // Retrieves the "activityTime" property from the properties of the ActivityMapObject and assigns it to the time
+        // field
         time = properties.get("activityTime", Integer.class);
 
-        // Retrieves the "changeAmount" property from the properties of the ActivityMapObject, splits it into an array of strings, converts each string to a float, and collects them into an unmodifiable list
-        changeAmounts = Arrays.stream(properties.get("changeAmount", String.class).split(","))
-            .map(Float::parseFloat)
-            .collect(Collectors.toUnmodifiableList());
+        // Retrieves the "changeAmount" property from the properties of the ActivityMapObject, splits it into an array
+        // of strings, converts each string to a float, and collects them into an unmodifiable list
+        changeAmounts = Arrays.stream(
+                        properties.get("changeAmount", String.class).split(","))
+                .map(Float::parseFloat)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     /**

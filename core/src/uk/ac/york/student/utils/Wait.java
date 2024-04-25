@@ -1,12 +1,11 @@
 package uk.ac.york.student.utils;
 
 import com.badlogic.gdx.Gdx;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class for handling synchronous and asynchronous waits.
@@ -41,12 +40,10 @@ public final class Wait {
      */
     @Contract("_, _ -> new")
     public static @NotNull CompletableFuture<Void> async(long time, @NotNull TimeUnit timeUnit) {
-        return CompletableFuture
-            .runAsync(() -> sync(time, timeUnit))
-            .exceptionally(e -> {
-                Gdx.app.error("Wait", "Async Exception", e);
-                return null;
-            });
+        return CompletableFuture.runAsync(() -> sync(time, timeUnit)).exceptionally(e -> {
+            Gdx.app.error("Wait", "Async Exception", e);
+            return null;
+        });
     }
 
     /**

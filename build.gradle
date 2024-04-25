@@ -1,6 +1,4 @@
 buildscript {
-    
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -9,8 +7,30 @@ buildscript {
         google()
     }
     dependencies {
+    }
+}
 
+plugins {
+    id "com.diffplug.spotless" version "6.25.0"
+}
 
+spotless {
+    format 'misc', {
+        target '**/*.gradle', '.gitattributes', '.gitignore'
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        target 'core/src/**/*.java', 'desktop/src/**/*.java'
+        toggleOffOn()
+
+        importOrder()
+        removeUnusedImports()
+        palantirJavaFormat('2.40.0')
+        formatAnnotations()
+        endWithNewline()
     }
 }
 
@@ -22,8 +42,6 @@ allprojects {
         appName = "ENG1"
         gdxVersion = '1.12.1'
         roboVMVersion = '2.3.20'
-        box2DLightsVersion = '1.5'
-        ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
         lombokVersion = '1.18.30'
@@ -43,7 +61,6 @@ allprojects {
 project(":desktop") {
     apply plugin: "java-library"
 
-
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -56,26 +73,21 @@ project(":desktop") {
         testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
         implementation 'org.jetbrains:annotations:24.0.0'
         implementation 'com.github.blueboxware:libgdxplugin:1.23.1'
-        
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
 
-
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-        api "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compileOnly "org.projectlombok:lombok:$lombokVersion"
         annotationProcessor "org.projectlombok:lombok:$lombokVersion"
         testCompileOnly "org.projectlombok:lombok:$lombokVersion"
         testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
         implementation 'org.jetbrains:annotations:24.0.0'
         implementation 'com.github.blueboxware:libgdxplugin:1.23.1'
-        
     }
 }

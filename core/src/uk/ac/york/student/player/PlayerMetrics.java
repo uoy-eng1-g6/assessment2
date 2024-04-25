@@ -1,11 +1,10 @@
 package uk.ac.york.student.player;
 
+import java.util.List;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-
-import java.util.List;
 
 /**
  * The PlayerMetrics class encapsulates the metrics related to a player.
@@ -21,9 +20,9 @@ public final class PlayerMetrics {
      */
     @Getter
     public enum MetricType {
-        ENERGY,       // Represents the energy level of the player
-        HAPPINESS,    // Represents the happiness level of the player
-        STUDY_LEVEL;  // Represents the study level of the player
+        ENERGY, // Represents the energy level of the player
+        HAPPINESS, // Represents the happiness level of the player
+        STUDY_LEVEL; // Represents the study level of the player
     }
 
     /**
@@ -31,9 +30,9 @@ public final class PlayerMetrics {
      * It includes {@link MetricEffect#INCREASE}, {@link MetricEffect#DECREASE}, and {@link MetricEffect#RESET}.
      */
     public enum MetricEffect {
-        INCREASE,    // Represents an increase in a player's metric
-        DECREASE,    // Represents a decrease in a player's metric
-        RESET;       // Represents resetting a player's metric to its initial value
+        INCREASE, // Represents an increase in a player's metric
+        DECREASE, // Represents a decrease in a player's metric
+        RESET; // Represents resetting a player's metric to its initial value
     }
 
     /**
@@ -59,7 +58,8 @@ public final class PlayerMetrics {
      * @param changeAmount The amount by which to change the player metric. This is used when the effect is either {@link MetricEffect#INCREASE} or {@link MetricEffect#DECREASE}.
      * @throws IllegalArgumentException If an invalid metric type or effect is provided.
      */
-    public void changeMetric(@NotNull MetricType type, MetricEffect effect, float changeAmount) throws IllegalArgumentException {
+    public void changeMetric(@NotNull MetricType type, MetricEffect effect, float changeAmount)
+            throws IllegalArgumentException {
         PlayerMetric metric;
         // Determine the metric to change based on the provided type
         switch (type) {

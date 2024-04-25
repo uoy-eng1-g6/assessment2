@@ -33,9 +33,7 @@ public class LoadingScreen extends BaseScreen {
      * It is empty in the LoadingScreen class.
      */
     @Override
-    public void show() {
-
-    }
+    public void show() {}
 
     /**
      * This method is called by the game's render loop.
@@ -54,43 +52,33 @@ public class LoadingScreen extends BaseScreen {
      * @param i1 the new height in pixels
      */
     @Override
-    public void resize(int i, int i1) {
-
-    }
+    public void resize(int i, int i1) {}
 
     /**
      * This method is called when the game is paused.
      * It is empty in the LoadingScreen class.
      */
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     /**
      * This method is called when the game is resumed from a paused state.
      * It is empty in the LoadingScreen class.
      */
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     /**
      * This method is called when the screen is no longer the current screen for the game.
      * It is empty in the LoadingScreen class.
      */
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     /**
      * This method is called when the screen should release all resources.
      * It is empty in the LoadingScreen class.
      */
     @Override
-    public void dispose() {
-
-    }
+    public void dispose() {}
 }

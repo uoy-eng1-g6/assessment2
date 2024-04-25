@@ -52,10 +52,12 @@ public class TransitionMapObject extends MapObject implements ActionMapObject {
         // Retrieves the properties of the given MapObject and assigns them to the properties of the TransitionMapObject
         properties = object.getProperties();
 
-        // Retrieves the "newMap" property from the properties of the TransitionMapObject and assigns it to the type field
+        // Retrieves the "newMap" property from the properties of the TransitionMapObject and assigns it to the type
+        // field
         type = properties.get("newMap", String.class);
 
-        // Retrieves the "newMapStr" property from the properties of the TransitionMapObject and assigns it to the str field
+        // Retrieves the "newMapStr" property from the properties of the TransitionMapObject and assigns it to the str
+        // field
         str = properties.get("newMapStr", String.class);
     }
 

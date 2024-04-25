@@ -1,13 +1,12 @@
 package uk.ac.york.student.game.activities;
 
+import java.util.List;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import uk.ac.york.student.player.Player;
 import uk.ac.york.student.player.PlayerMetrics;
 import uk.ac.york.student.utils.Pair;
-
-import java.util.List;
 
 /**
  * The {@link Activity} enum represents the different activities a player can perform.
@@ -21,36 +20,29 @@ public enum Activity {
      * The {@link Activity#STUDY} activity increases the {@link Player}'s {@link PlayerMetrics#getStudyLevel()} and decreases their {@link PlayerMetrics#getEnergy()} and {@link PlayerMetrics#getHappiness()}.
      */
     STUDY(
-        Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.INCREASE),
-        Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.DECREASE),
-        Pair.of(PlayerMetrics.MetricType.HAPPINESS, PlayerMetrics.MetricEffect.DECREASE)
-    ),
+            Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.INCREASE),
+            Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.DECREASE),
+            Pair.of(PlayerMetrics.MetricType.HAPPINESS, PlayerMetrics.MetricEffect.DECREASE)),
     /**
      * The {@link Activity#SLEEP} activity resets the {@link Player}'s {@link PlayerMetrics#getEnergy()} and {@link PlayerMetrics#getStudyLevel()}.
      */
     SLEEP(
-        Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.RESET),
-        Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.RESET)
-    ),
+            Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.RESET),
+            Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.RESET)),
     /**
      * The {@link Activity#NAP} activity increases the {@link Player}'s {@link PlayerMetrics#getEnergy()}.
      */
-    NAP(
-        Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.INCREASE)
-    ),
+    NAP(Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.INCREASE)),
     /**
      * The {@link Activity#EAT} activity increases the {@link Player}'s {@link PlayerMetrics#getHappiness()}.
      */
-    EAT(
-        Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.INCREASE)
-    ),
+    EAT(Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.INCREASE)),
     /**
      * The {@link Activity#ENTERTAIN} activity increases the {@link Player}'s {@link PlayerMetrics#getHappiness()} and decreases their {@link PlayerMetrics#getEnergy()}.
      */
     ENTERTAIN(
-        Pair.of(PlayerMetrics.MetricType.HAPPINESS, PlayerMetrics.MetricEffect.INCREASE),
-        Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.DECREASE)
-    );
+            Pair.of(PlayerMetrics.MetricType.HAPPINESS, PlayerMetrics.MetricEffect.INCREASE),
+            Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.DECREASE));
 
     /**
      * The effects of the activity on the {@link Player}'s metrics.
@@ -64,7 +56,7 @@ public enum Activity {
      * @param effects the effects of the activity on the {@link Player}'s metrics
      */
     @SafeVarargs
-    Activity(Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect> ... effects) {
+    Activity(Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect>... effects) {
         this.effects = List.of(effects);
     }
 

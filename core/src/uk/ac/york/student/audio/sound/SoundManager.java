@@ -1,12 +1,11 @@
 package uk.ac.york.student.audio.sound;
 
+import java.util.EnumMap;
+import java.util.function.Supplier;
 import lombok.Getter;
 import uk.ac.york.student.audio.AudioManager;
 import uk.ac.york.student.audio.sound.elements.ButtonClickSound;
 import uk.ac.york.student.utils.EnumMapOfSuppliers;
-
-import java.util.EnumMap;
-import java.util.function.Supplier;
 
 /**
  * Singleton class that manages the sound for the game.
@@ -49,18 +48,14 @@ public class SoundManager implements AudioManager {
      * Private constructor to prevent instantiation.
      * As this is a singleton class, the constructor is private.
      */
-    private SoundManager() {
-
-    }
+    private SoundManager() {}
 
     /**
      * Called when the game is started.
      * This method is part of the AudioManager interface.
      */
     @Override
-    public void onEnable() {
-
-    }
+    public void onEnable() {}
 
     /**
      * Called when the game is stopped.

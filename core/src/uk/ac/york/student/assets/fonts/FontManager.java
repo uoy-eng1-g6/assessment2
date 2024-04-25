@@ -30,7 +30,8 @@ public class FontManager {
      */
     private FontManager() {
         // The FreeTypeFontGenerator object is used to generate a BitmapFont object
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PixelifySans-Regular.ttf"));
+        FreeTypeFontGenerator generator =
+                new FreeTypeFontGenerator(Gdx.files.internal("fonts/PixelifySans-Regular.ttf"));
         // The FreeTypeFontParameter object is used to set the parameters for the BitmapFont object
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         // Set the font size

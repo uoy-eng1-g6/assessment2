@@ -1,13 +1,12 @@
 package uk.ac.york.student.utils;
 
-import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Iterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class for working with {@link Stream}s and {@link Iterator}s.

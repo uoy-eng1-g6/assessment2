@@ -40,7 +40,7 @@ public abstract class GameSound implements Sound {
      * @return The sound id
      */
     @Override
-    public long play(@Range(from=0, to=1) final float volume) {
+    public long play(@Range(from = 0, to = 1) final float volume) {
         return sound.play(volume);
     }
 
@@ -51,7 +51,8 @@ public abstract class GameSound implements Sound {
      * @return the id of the sound instance if successful, or -1 on failure.
      */
     @Override
-    public long play(@Range(from=0, to=1) final float volume, final float pitch, @Range(from=-1, to=1) final float pan) {
+    public long play(
+            @Range(from = 0, to = 1) final float volume, final float pitch, @Range(from = -1, to = 1) final float pan) {
         return sound.play(volume, pitch, pan);
     }
 
@@ -70,7 +71,7 @@ public abstract class GameSound implements Sound {
      * @return The sound id
      */
     @Override
-    public long loop(@Range(from=0, to=1) final float volume) {
+    public long loop(@Range(from = 0, to = 1) final float volume) {
         return sound.loop(volume);
     }
 
@@ -82,7 +83,8 @@ public abstract class GameSound implements Sound {
      * @return The sound id
      */
     @Override
-    public long loop(@Range(from=0, to=1) final float volume, final float pitch, @Range(from=-1, to=1) final float pan) {
+    public long loop(
+            @Range(from = 0, to = 1) final float volume, final float pitch, @Range(from = -1, to = 1) final float pan) {
         return sound.loop(volume, pitch, pan);
     }
 
@@ -145,7 +147,7 @@ public abstract class GameSound implements Sound {
      * @param volume The volume to set the sound to [0, 1]
      */
     @Override
-    public void setVolume(final long soundId, @Range(from=0, to=1) final float volume) {
+    public void setVolume(final long soundId, @Range(from = 0, to = 1) final float volume) {
         sound.setVolume(soundId, volume);
     }
 
@@ -156,7 +158,10 @@ public abstract class GameSound implements Sound {
      * @param volume The volume to set the sound to
      */
     @Override
-    public void setPan(final long soundId, @Range(from=-1, to=1) final float pan, @Range(from=0, to=1) final float volume) {
+    public void setPan(
+            final long soundId,
+            @Range(from = -1, to = 1) final float pan,
+            @Range(from = 0, to = 1) final float volume) {
         sound.setPan(soundId, pan, volume);
     }
 }

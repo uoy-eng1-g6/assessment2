@@ -1,10 +1,9 @@
 package uk.ac.york.student.screens;
 
 import com.badlogic.gdx.Gdx;
+import java.lang.reflect.Field;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.Field;
 
 /**
  * This is a utility class that holds references to all the screen classes in the game.
@@ -48,7 +47,10 @@ public final class Screens {
         for (Field field : fields) {
             // Get the generic type of the field and convert it to a string
             // Remove the "java.lang.Class<" and ">" from the string to get the class path
-            String path = field.getGenericType().getTypeName().replace("java.lang.Class<", "").replace(">", "");
+            String path = field.getGenericType()
+                    .getTypeName()
+                    .replace("java.lang.Class<", "")
+                    .replace(">", "");
 
             try {
                 // Set the value of the field to the Class object of the class at the path

@@ -6,15 +6,13 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.york.student.GdxGame;
 import uk.ac.york.student.player.Player;
-import uk.ac.york.student.player.PlayerMetric;
 import uk.ac.york.student.player.PlayerMetrics;
-
-import java.util.List;
 
 @Getter
 public class EndScreen extends BaseScreen {
     private final Stage processor;
     private final Player player;
+
     public EndScreen(GdxGame game) {
         super(game);
         throw new UnsupportedOperationException("This constructor is not supported (must pass in object args!)");
@@ -33,45 +31,31 @@ public class EndScreen extends BaseScreen {
         float studyLevelMax = metrics.getStudyLevel().getMaxTotal();
         float happinessMax = metrics.getHappiness().getMaxTotal();
 
-        float score = player.calculateScore(energyTotal, energyMax, studyLevelTotal, studyLevelMax, happinessTotal, happinessMax);
+        float score = player.calculateScore(
+                energyTotal, energyMax, studyLevelTotal, studyLevelMax, happinessTotal, happinessMax);
         System.out.println(score);
         String scoreString = player.convertScoreToString(score);
         System.out.println(scoreString);
-
     }
 
     @Override
-    public void show() {
-
-    }
+    public void show() {}
 
     @Override
-    public void render(float v) {
-
-    }
+    public void render(float v) {}
 
     @Override
-    public void resize(int i, int i1) {
-
-    }
+    public void resize(int i, int i1) {}
 
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     @Override
-    public void dispose() {
-
-    }
+    public void dispose() {}
 }

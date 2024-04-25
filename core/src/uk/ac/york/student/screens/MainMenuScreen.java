@@ -1,7 +1,8 @@
 package uk.ac.york.student.screens;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -18,6 +19,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.york.student.GdxGame;
@@ -30,14 +36,6 @@ import uk.ac.york.student.settings.DebugScreenPreferences;
 import uk.ac.york.student.settings.GamePreferences;
 import uk.ac.york.student.settings.MainMenuCloudsPreferences;
 import uk.ac.york.student.utils.Wait;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 
 /**
  * The MainMenuScreen class extends the BaseScreen class and represents the main menu screen of the game.
@@ -115,14 +113,16 @@ public class MainMenuScreen extends BaseScreen {
      * This value is retrieved from the {@link MainMenuCloudsPreferences} in the {@link GamePreferences}.
      * If true, the clouds will be displayed on the {@link MainMenuScreen}; if false, they will not.
      */
-    private final boolean cloudsEnabled = ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).isEnabled();
+    private final boolean cloudsEnabled =
+            ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).isEnabled();
 
     /**
      * The speed of the clouds on the {@link MainMenuScreen}.
      * This value is retrieved from the {@link MainMenuCloudsPreferences} in the {@link GamePreferences}.
      * It represents the speed at which the clouds move across the {@link MainMenuScreen}.
      */
-    private final float cloudsSpeed = ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed();
+    private final float cloudsSpeed =
+            ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed();
     /**
      * Constructor for the {@link MainMenuScreen} class.
      * This constructor initializes the {@link MainMenuScreen} with the provided game.
@@ -167,7 +167,10 @@ public class MainMenuScreen extends BaseScreen {
      * It is used in the {@link MainMenuScreen} class to specify the direction of certain animations and movements.
      */
     public enum Direction {
-        UP, DOWN, LEFT, RIGHT
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
     }
 
     /**
@@ -213,9 +216,9 @@ public class MainMenuScreen extends BaseScreen {
 
         // Add the zoom and move actions to the actor. These actions will be performed simultaneously.
         actor.addAction(Actions.parallel(
-            Actions.scaleTo(scale, scale, duration),  // Scale the actor to the specified scale factor.
-            Actions.moveBy(vector.x, vector.y, duration)  // Move the actor by the specified vector.
-        ));
+                Actions.scaleTo(scale, scale, duration), // Scale the actor to the specified scale factor.
+                Actions.moveBy(vector.x, vector.y, duration) // Move the actor by the specified vector.
+                ));
     }
 
     /**
@@ -242,8 +245,9 @@ public class MainMenuScreen extends BaseScreen {
         // Set the duration of the fade out effect in seconds.
         int duration = 1;
 
-        // Calculate the total number of reductions in the alpha value that will be performed during the fade out effect.
-        long totalReductions = (long) (1/0.01);
+        // Calculate the total number of reductions in the alpha value that will be performed during the fade out
+        // effect.
+        long totalReductions = (long) (1 / 0.01);
 
         // Calculate the period between each reduction in the alpha value in milliseconds.
         long period = (duration * 1000) / totalReductions;
@@ -253,7 +257,8 @@ public class MainMenuScreen extends BaseScreen {
 
         // Schedule a task to be executed at fixed intervals that reduces the alpha value by 0.01.
         // The task is scheduled to start immediately and to be executed every 'period' milliseconds.
-        ScheduledFuture<?> scheduledFuture = executorService.scheduleAtFixedRate(() -> alpha.updateAndGet(v -> v <= 0 ? 0 : v - 0.01f), 0, period, TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> scheduledFuture = executorService.scheduleAtFixedRate(
+                () -> alpha.updateAndGet(v -> v <= 0 ? 0 : v - 0.01f), 0, period, TimeUnit.MILLISECONDS);
 
         // Schedule a task to be executed after the specified duration that cancels the updates to the alpha value.
         executorService.schedule(() -> scheduledFuture.cancel(true), duration, timeUnit);
@@ -311,15 +316,15 @@ public class MainMenuScreen extends BaseScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
-                Wait.async(400, TimeUnit.MILLISECONDS)
-                    .thenRun(() -> {
-                        buttonClick.dispose();
-                        Gdx.app.exit();
-                    });
+                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(() -> {
+                    buttonClick.dispose();
+                    Gdx.app.exit();
+                });
             }
         });
 
-        // The play button plays the button click sound, moves all elements, fades out, and then switches to the game screen after a delay of 1500 milliseconds.
+        // The play button plays the button click sound, moves all elements, fades out, and then switches to the game
+        // screen after a delay of 1500 milliseconds.
         playButton.addListener(new ChangeListener() {
             /**
              * This method is triggered when a change event occurs on the actor, in this case, when the play button is clicked.
@@ -341,7 +346,7 @@ public class MainMenuScreen extends BaseScreen {
                 zoomAndMove(cookeLogoImage, Direction.UP);
                 fadeOut();
                 Wait.async(1500, TimeUnit.MILLISECONDS)
-                    .thenRun(() -> Gdx.app.postRunnable(() -> game.setScreen(Screens.GAME)));
+                        .thenRun(() -> Gdx.app.postRunnable(() -> game.setScreen(Screens.GAME)));
             }
         });
 
@@ -506,9 +511,7 @@ public class MainMenuScreen extends BaseScreen {
      * For example, this can happen when the user switches to another application or when a system dialog is shown.
      */
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     /**
      * This method is called when the application is resumed from a paused state, typically when it regains focus.
@@ -516,18 +519,14 @@ public class MainMenuScreen extends BaseScreen {
      * The application should resume all processes that were stopped in the pause() method in this method.
      */
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     /**
      * This method is called when the current screen is being hidden or replaced by another screen.
      * The application should stop all processes related to the current screen in this method to save resources.
      */
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     /**
      * This method is called when the {@link MainMenuScreen} is being disposed of.

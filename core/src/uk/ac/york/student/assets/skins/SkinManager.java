@@ -2,11 +2,10 @@ package uk.ac.york.student.assets.skins;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import uk.ac.york.student.utils.EnumMapOfSuppliers;
-
-import java.util.function.Supplier;
 
 /**
  * This utility class manages the loading and storage of Skin objects.
@@ -17,7 +16,8 @@ public class SkinManager {
     /**
      * Supplier for the Craftacular skin
      */
-    private static final Supplier<Skin> craftacular = () -> new Skin(Gdx.files.internal("skins/craftacular/skin/craftacular-ui.json"));
+    private static final Supplier<Skin> craftacular =
+            () -> new Skin(Gdx.files.internal("skins/craftacular/skin/craftacular-ui.json"));
 
     /**
      * EnumMapOfSuppliers that maps from Skins enum to Skin objects

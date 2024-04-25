@@ -15,14 +15,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The Player class extends the Actor class and implements the PlayerScore and InputProcessor interfaces.
@@ -54,6 +53,7 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
      *</p>
      */
     private final TextureAtlas.AtlasRegion SPRITETOWARDSREGION;
+
     private final TextureAtlas.AtlasRegion SPRITEAWAYREGION;
     private final TextureAtlas.AtlasRegion SPRITELEFTREGION;
     /**
@@ -155,7 +155,11 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
      */
     @Getter
     private enum Movement {
-        UP, DOWN, LEFT, RIGHT, BOOST;
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT,
+        BOOST;
 
         /**
          * Boolean state of the movement.
@@ -244,7 +248,8 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
      * ACTIVITY is used when the player does an activity on the map.
      */
     public enum Transition {
-        NEW_MAP, ACTIVITY
+        NEW_MAP,
+        ACTIVITY
     }
 
     /**
@@ -277,7 +282,8 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
 
         // Create two Vector3 objects representing the bottom-left and top-right corners of the bounding box
         Vector3 pos1 = new Vector3(xScaled, yScaled, 0); // bottom-left corner of the bounding box
-        Vector3 pos2 = new Vector3(xScaled + widthScaled, yScaled + heightScaled, 0); // top-right corner of the bounding box
+        Vector3 pos2 =
+                new Vector3(xScaled + widthScaled, yScaled + heightScaled, 0); // top-right corner of the bounding box
 
         // Return a new BoundingBox object representing the bounding box of the map object
         return new BoundingBox(pos1, pos2);

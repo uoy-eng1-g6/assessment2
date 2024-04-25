@@ -34,7 +34,7 @@ public class PlayerEnergy implements PlayerMetric {
      * This is a float value between 0 and 1, where 0 represents no energy and 1 represents full energy.
      * By default, the energy level is set to 1 (full energy).
      */
-    private @Range(from=0, to=1) float energy = getDefault();
+    private @Range(from = 0, to = 1) float energy = getDefault();
     /**
      * The total amount of energy accumulated by the player across all days of the game.
      * This is a float value that starts at 0 and increases as the player gains more energy.
@@ -94,7 +94,7 @@ public class PlayerEnergy implements PlayerMetric {
      * @return the energy level of the player
      */
     @Override
-    public @Range(from=0, to=1) float get() {
+    public @Range(from = 0, to = 1) float get() {
         return energy;
     }
 
@@ -106,7 +106,7 @@ public class PlayerEnergy implements PlayerMetric {
      * @param energy the new energy level of the player
      */
     @Override
-    public void set(@Range(from=0, to=1) float energy) {
+    public void set(@Range(from = 0, to = 1) float energy) {
         this.energy = Math.max(PROGRESS_BAR_MINIMUM, Math.min(1, energy));
         this.progressBar.setValue(this.energy);
     }

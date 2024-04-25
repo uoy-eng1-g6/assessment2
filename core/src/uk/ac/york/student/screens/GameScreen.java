@@ -21,16 +21,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.york.student.GdxGame;
-import uk.ac.york.student.assets.skins.SkinManager;
-import uk.ac.york.student.assets.skins.Skins;
 import uk.ac.york.student.assets.map.ActionMapObject;
 import uk.ac.york.student.assets.map.ActivityMapObject;
 import uk.ac.york.student.assets.map.MapManager;
 import uk.ac.york.student.assets.map.TransitionMapObject;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
 import uk.ac.york.student.game.GameTime;
 import uk.ac.york.student.game.activities.Activity;
 import uk.ac.york.student.player.Player;
@@ -39,11 +43,6 @@ import uk.ac.york.student.player.PlayerMetrics;
 import uk.ac.york.student.utils.MapOfSuppliers;
 import uk.ac.york.student.utils.Pair;
 import uk.ac.york.student.utils.StreamUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * The {@link GameScreen} class extends the {@link BaseScreen} class and implements the {@link InputProcessor} interface.
@@ -127,19 +126,21 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Set up the tilemap
         // Note: cannot extract into a method because class variables are set as final
 
-        //#region Load Tilemap
+        // #region Load Tilemap
         // Get the first layer of the map
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         // Get the width and height of a tile
         int tileWidth = layer.getTileWidth();
         int tileHeight = layer.getTileHeight();
         // Calculate the scale of the map based on the screen size and tile size
-        mapScale = Math.max(Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth), Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
+        mapScale = Math.max(
+                Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth),
+                Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
         // Initialize the game time
         gameTime = new GameTime(mapScale);
         // Initialize the map renderer
         renderer = new OrthogonalTiledMapRenderer(map, mapScale);
-        //#endregion
+        // #endregion
 
         // Initialize the starting point of the player
         Vector2 startingPoint = new Vector2(25, 25);
@@ -205,7 +206,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             int tileWidth = layer.getTileWidth();
             int tileHeight = layer.getTileHeight();
             // Calculate the scale of the new map based on the screen size and tile size
-            mapScale = Math.max(Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth), Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
+            mapScale = Math.max(
+                    Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth),
+                    Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
             // Initialize the map renderer for the new map
             renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
@@ -278,8 +281,10 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         metricsTable.setWidth(500);
         processor.addActor(metricsTable);
         PlayerMetrics metrics = player.getMetrics();
-        List<ProgressBar> playerMetrics = metrics.getMetrics().stream().map(PlayerMetric::getProgressBar).collect(Collectors.toList());
-        List<String> metricLabels = metrics.getMetrics().stream().map(PlayerMetric::getLabel).collect(Collectors.toList());
+        List<ProgressBar> playerMetrics =
+                metrics.getMetrics().stream().map(PlayerMetric::getProgressBar).collect(Collectors.toList());
+        List<String> metricLabels =
+                metrics.getMetrics().stream().map(PlayerMetric::getLabel).collect(Collectors.toList());
         for (int i = 0; i < playerMetrics.size(); i++) {
             ProgressBar progressBar = playerMetrics.get(i);
             String label = metricLabels.get(i);
@@ -318,8 +323,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      *
      * @return A string representing the current hour in the game.
      */
-    @NotNull
-    private String getCurrentHourString() {
+    @NotNull private String getCurrentHourString() {
         int currentHourNum = gameTime.getCurrentHour(); // Get the current hour number from the game time
         final int startHour = 8; // Define the start hour of the game
         final int midday = 12 - startHour; // Calculate the hour number for midday
@@ -327,8 +331,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         String currentHour; // Initialize the string to hold the current hour
         if (!gameTime.isEndOfDay()) { // If it's not the end of the day
             // Calculate the current hour based on whether it's AM or PM
-            currentHour = String.valueOf(isAm || currentHourNum == midday ? currentHourNum + startHour : currentHourNum - (12 - startHour)); // 9am start
-            if (currentHour.length() == 1) currentHour = "0" + currentHour; // Add a leading zero if the hour is a single digit
+            currentHour = String.valueOf(
+                    isAm || currentHourNum == midday
+                            ? currentHourNum + startHour
+                            : currentHourNum - (12 - startHour)); // 9am start
+            if (currentHour.length() == 1)
+                currentHour = "0" + currentHour; // Add a leading zero if the hour is a single digit
             currentHour += ":00"; // Add the minutes (always 00)
             if (isAm) { // If it's AM
                 currentHour += " AM"; // Add " AM" to the current hour
@@ -357,7 +365,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     @Override
     public void render(float v) {
-        // Set the blend function for the OpenGL context. This determines how new pixels are combined with existing pixels.
+        // Set the blend function for the OpenGL context. This determines how new pixels are combined with existing
+        // pixels.
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         // Clear the screen. This wipes out all previous drawings and sets the screen to a blank state.
@@ -369,14 +378,18 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Set the clear color to black. This is the color that the screen is cleared to when glClear is called.
         Gdx.gl.glClearColor(0, 0, 0, 1);
 
-        // Move the player. This updates the player's position based on their current velocity and the elapsed time since the last frame.
+        // Move the player. This updates the player's position based on their current velocity and the elapsed time
+        // since the last frame.
         player.move();
 
-        // Set the opacity of the player. This determines how transparent the player is. A value of 1 means fully opaque, and a value of 0 means fully transparent.
+        // Set the opacity of the player. This determines how transparent the player is. A value of 1 means fully
+        // opaque, and a value of 0 means fully transparent.
         player.setOpacity(processor.getRoot().getColor().a);
 
-        // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1 means fully opaque, and a value of 0 means fully transparent.
-        StreamUtils.parallelFromIterator(map.getLayers().iterator()).forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
+        // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1 means
+        // fully opaque, and a value of 0 means fully transparent.
+        StreamUtils.parallelFromIterator(map.getLayers().iterator())
+                .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
 
         // Get the first layer of the map. This is typically the background layer.
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -391,17 +404,29 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Calculate the minimum and maximum x and y coordinates for the camera
         float cameraMinX = camera.viewportWidth / 2;
         float cameraMinY = camera.viewportHeight / 2;
-        float cameraMaxX = (map.getProperties().get("width", Integer.class) * layer.getTileWidth() * mapScale) - cameraMinX;
-        float cameraMaxY = (map.getProperties().get("height", Integer.class) * layer.getTileHeight() * mapScale) - cameraMinY;
+        float cameraMaxX =
+                (map.getProperties().get("width", Integer.class) * layer.getTileWidth() * mapScale) - cameraMinX;
+        float cameraMaxY =
+                (map.getProperties().get("height", Integer.class) * layer.getTileHeight() * mapScale) - cameraMinY;
 
-        // Set the camera's position to the player's position, but constrained within the minimum and maximum x and y coordinates
-        camera.position.set(Math.min(Math.max(playerCenterX, cameraMinX), cameraMaxX), Math.min(Math.max(playerCenterY, cameraMinY), cameraMaxY), 0);
+        // Set the camera's position to the player's position, but constrained within the minimum and maximum x and y
+        // coordinates
+        camera.position.set(
+                Math.min(Math.max(playerCenterX, cameraMinX), cameraMaxX),
+                Math.min(Math.max(playerCenterY, cameraMinY), cameraMaxY),
+                0);
         camera.update();
 
-        // Set the positions of the action, metrics, and time tables. These are UI elements that display information to the player.
-        actionTable.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
-        metricsTable.setPosition(camera.position.x + camera.viewportWidth / 2 - metricsTable.getWidth(), camera.position.y - camera.viewportHeight / 2);
-        timeTable.setPosition(camera.position.x - camera.viewportWidth / 2, camera.position.y + camera.viewportHeight / 2 - timeTable.getHeight());
+        // Set the positions of the action, metrics, and time tables. These are UI elements that display information to
+        // the player.
+        actionTable.setPosition(
+                camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2);
+        metricsTable.setPosition(
+                camera.position.x + camera.viewportWidth / 2 - metricsTable.getWidth(),
+                camera.position.y - camera.viewportHeight / 2);
+        timeTable.setPosition(
+                camera.position.x - camera.viewportWidth / 2,
+                camera.position.y + camera.viewportHeight / 2 - timeTable.getHeight());
 
         // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the screen.
         renderer.setView(camera);
@@ -417,7 +442,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         player.draw(batch, processor.getRoot().getColor().a);
         batch.end();
 
-        // Check if the player is in a transition tile. If they are, update the action label to reflect the possible action.
+        // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
+        // action.
         Player.Transition transitionTile = player.isInTransitionTile();
         if (transitionTile != null) {
             setActionLabel(transitionTile);
@@ -430,7 +456,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Draw the stage. This renders all actors added to the stage, including the player and UI elements.
         processor.draw();
 
-        // Update the stage. This updates the state of all actors added to the stage, including the player and UI elements.
+        // Update the stage. This updates the state of all actors added to the stage, including the player and UI
+        // elements.
         processor.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
     }
 
@@ -465,9 +492,10 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
             // Get a list of negative effects from the activity's effects
             // Negative effects are those that decrease a player metric
-            List<Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect>> negativeEffects = activity.getEffects()
-                .stream().filter(x -> x.getRight().equals(PlayerMetrics.MetricEffect.DECREASE))
-                .collect(Collectors.toList());
+            List<Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect>> negativeEffects =
+                    activity.getEffects().stream()
+                            .filter(x -> x.getRight().equals(PlayerMetrics.MetricEffect.DECREASE))
+                            .collect(Collectors.toList());
 
             // Initialize a boolean to track if the player has enough resources for the activity
             boolean hasEnough = true;
@@ -495,31 +523,38 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                     hasEnough = tempEnough;
                 }
 
-                // If the player does not have enough of the metric, add the metric's label to the list of negative effect names
+                // If the player does not have enough of the metric, add the metric's label to the list of negative
+                // effect names
                 if (!tempEnough) {
                     negativeEffectNames.add(metric.getLabel());
                 }
             }
 
             // Check if the player does not have enough time or resources to perform the activity
-            // If it's the end of the day and the activity is not sleeping, set the action text to "Night owl, it's time to sleep!"
+            // If it's the end of the day and the activity is not sleeping, set the action text to "Night owl, it's time
+            // to sleep!"
             if (gameTime.isEndOfDay() && !activity.equals(Activity.SLEEP)) {
                 actionText = new StringBuilder("Night owl, it's time to sleep!");
             }
-            // If the current hour plus the required time for the activity is greater than the length of the day and the activity is not sleeping,
+            // If the current hour plus the required time for the activity is greater than the length of the day and the
+            // activity is not sleeping,
             // set the action text to "You don't have enough time to do this activity."
-            else if (gameTime.getCurrentHour() + requiredTime > GameTime.getDayLength() && !activity.equals(Activity.SLEEP)) {
+            else if (gameTime.getCurrentHour() + requiredTime > GameTime.getDayLength()
+                    && !activity.equals(Activity.SLEEP)) {
                 actionText = new StringBuilder("You don't have enough time to do this activity.");
             }
-            // If there are negative effects and the player does not have enough resources and the activity is not sleeping,
+            // If there are negative effects and the player does not have enough resources and the activity is not
+            // sleeping,
             // set the action text to "You don't have enough [resource] to do this activity."
             else if (!negativeEffects.isEmpty() && !hasEnough && !activity.equals(Activity.SLEEP)) {
                 actionText = new StringBuilder("You don't have enough ");
-                // If there is only one resource the player does not have enough of, append the name of that resource to the action text
+                // If there is only one resource the player does not have enough of, append the name of that resource to
+                // the action text
                 if (negativeEffectNames.size() == 1) {
                     actionText.append(negativeEffectNames.get(0));
                 }
-                // If there are multiple resources the player does not have enough of, append each resource name to the action text,
+                // If there are multiple resources the player does not have enough of, append each resource name to the
+                // action text,
                 // separated by commas and an "and" before the last resource
                 else {
                     for (int i = 0; i < negativeEffectNames.size(); i++) {
@@ -563,8 +598,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * @param actionMapObject The {@link ActionMapObject} for which to construct the action text.
      * @return A {@link String} representing the action text for the given {@link ActionMapObject}.
      */
-    @NotNull
-    private String getActionText(@NotNull ActionMapObject actionMapObject) {
+    @NotNull private String getActionText(@NotNull ActionMapObject actionMapObject) {
         String actionText = "Press " + Input.Keys.toString(ACTION_KEY) + " to ";
         actionText += actionMapObject.getStr();
         return actionText;
@@ -581,8 +615,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * @return An {@link ActionMapObject} based on the transition tile and map object.
      * @throws IllegalStateException If the transition tile is neither an {@link Player.Transition#ACTIVITY} nor a {@link Player.Transition#NEW_MAP}.
      */
-    @NotNull
-    private static ActionMapObject getActionMapObject(Player.@NotNull Transition transitionTile, MapObject tileObject) {
+    @NotNull private static ActionMapObject getActionMapObject(Player.@NotNull Transition transitionTile, MapObject tileObject) {
         ActionMapObject actionMapObject;
         if (transitionTile.equals(Player.Transition.ACTIVITY)) {
             actionMapObject = new ActivityMapObject(tileObject);
@@ -611,7 +644,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         int tileWidth = layer.getTileWidth();
         int tileHeight = layer.getTileHeight();
         // Calculate the scale of the map based on the screen size and tile size
-        mapScale = Math.max(Gdx.graphics.getWidth() / (float)(layer.getWidth() * tileWidth), Gdx.graphics.getHeight() / (float)(layer.getHeight() * tileHeight));
+        mapScale = Math.max(
+                Gdx.graphics.getWidth() / (float) (layer.getWidth() * tileWidth),
+                Gdx.graphics.getHeight() / (float) (layer.getHeight() * tileHeight));
         // Initialize the map renderer with the new map scale
         renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
@@ -631,11 +666,17 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Calculate the minimum and maximum x and y coordinates for the camera
         float cameraMinX = camera.viewportWidth / 2;
         float cameraMinY = camera.viewportHeight / 2;
-        float cameraMaxX = (map.getProperties().get("width", Integer.class) * layer.getTileWidth() * mapScale) - cameraMinX;
-        float cameraMaxY = (map.getProperties().get("height", Integer.class) * layer.getTileHeight() * mapScale) - cameraMinY;
+        float cameraMaxX =
+                (map.getProperties().get("width", Integer.class) * layer.getTileWidth() * mapScale) - cameraMinX;
+        float cameraMaxY =
+                (map.getProperties().get("height", Integer.class) * layer.getTileHeight() * mapScale) - cameraMinY;
 
-        // Set the camera's position to the player's position, but constrained within the minimum and maximum x and y coordinates
-        camera.position.set(Math.min(Math.max(playerCenterX, cameraMinX), cameraMaxX), Math.min(Math.max(playerCenterY, cameraMinY), cameraMaxY), 0);
+        // Set the camera's position to the player's position, but constrained within the minimum and maximum x and y
+        // coordinates
+        camera.position.set(
+                Math.min(Math.max(playerCenterX, cameraMinX), cameraMaxX),
+                Math.min(Math.max(playerCenterY, cameraMinY), cameraMaxY),
+                0);
         // Update the camera
         camera.update();
 
@@ -651,27 +692,21 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * Currently, it does not perform any actions when the game is paused.
      */
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     /**
      * This method is called when the game is resumed from a paused state.
      * Currently, it does not perform any actions when the game is resumed.
      */
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     /**
      * This method is called when the game screen is hidden or minimized.
      * Currently, it does not perform any actions when the game screen is hidden.
      */
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     /**
      * This method is called when the game screen is being disposed of.
@@ -757,7 +792,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Check if the current hour plus the required time for the activity is greater than the length of the day
         // and if the activity is not sleeping
         // If it is, return false to indicate that the activity cannot be performed
-        if (gameTime.getCurrentHour() + requiredTime > GameTime.getDayLength() && !type.equals(Activity.SLEEP)) return false;
+        if (gameTime.getCurrentHour() + requiredTime > GameTime.getDayLength() && !type.equals(Activity.SLEEP))
+            return false;
 
         // Get the effects of the activity from the ActivityMapObject
         // These effects represent how the activity will change the player's metrics
@@ -765,7 +801,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
         // Filter the effects to get only the negative effects
         // Negative effects are those that decrease a player metric
-        List<Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect>> negativeEffects = effects.stream().filter(x -> x.getRight().equals(PlayerMetrics.MetricEffect.DECREASE)).collect(Collectors.toList());
+        List<Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect>> negativeEffects = effects.stream()
+                .filter(x -> x.getRight().equals(PlayerMetrics.MetricEffect.DECREASE))
+                .collect(Collectors.toList());
 
         // Get the player's current metrics
         PlayerMetrics metrics = player.getMetrics();

@@ -18,7 +18,6 @@ public class SoundPreferences implements Preference {
     private static final String VOLUME = "volume";
     private static final float DEFAULT_VOLUME = 1f;
 
-
     /**
      * This is the constructor for the {@link SoundPreferences} class.
      * It sets the default values for the {@link SoundPreferences#ENABLED} and {@link SoundPreferences#VOLUME} preferences in the game's preferences file.

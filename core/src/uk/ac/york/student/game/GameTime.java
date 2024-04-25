@@ -69,8 +69,7 @@ public final class GameTime {
      * @param scaledHeight The height of the {@link ProgressBar}, scaled according to the game's scale factor.
      * @return A new {@link ProgressBar} instance.
      */
-    @NotNull
-    private ProgressBar getProgressBar(int scaledWidth, int scaledHeight) {
+    @NotNull private ProgressBar getProgressBar(int scaledWidth, int scaledHeight) {
         // Create a new ProgressBarStyle instance
         ProgressBar.ProgressBarStyle style = new ProgressBar.ProgressBarStyle();
 

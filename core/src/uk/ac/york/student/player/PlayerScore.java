@@ -22,7 +22,8 @@ public interface PlayerScore {
      * @param maxHappiness The maximum possible happiness level.
      * @return The player's score, calculated based on the provided parameters and weightings.
      */
-    default float calculateScore(float energy, float maxEnergy, float studyLevel, float maxStudyLevel, float happiness, float maxHappiness) {
+    default float calculateScore(
+            float energy, float maxEnergy, float studyLevel, float maxStudyLevel, float happiness, float maxHappiness) {
         float energyWeighting = 1.2f;
         float studyWeighting = 2f;
         float happinessWeighting = 1f;
@@ -36,7 +37,6 @@ public interface PlayerScore {
 
         return (totalScore / maxPossibleScore) * 100;
     }
-
 
     /**
      * Calculate a score for the player based on their energy, study time, and the game's difficulty level.
@@ -53,9 +53,8 @@ public interface PlayerScore {
      * @return The player's score, calculated based on the provided parameters.
      */
     @Deprecated(forRemoval = true)
-    default int calculateScore(float energy, float maxEnergy, float studyTime,
-                               float maxStudyTime, int difficulty,
-                               int maxDifficulty) {
+    default int calculateScore(
+            float energy, float maxEnergy, float studyTime, float maxStudyTime, int difficulty, int maxDifficulty) {
         // Calculate the energy score, study score, and difficulty score.
         float energyScore = Math.min(energy / maxEnergy, 1.0f) * 100;
         float studyScore = Math.min(studyTime / maxStudyTime, 1.0f) * 100;
@@ -63,11 +62,9 @@ public interface PlayerScore {
 
         // Calculate the final score using the algorithm.
         double percentScoreDouble = Math.min(
-            (200.0f * (1.0f
-                - 10.0f * (1.0f / (energyScore + 20.0f)
-                + 1.0f / (studyScore + 20.0f))))
-                / (1.4 + difficultyScore * (0.26f))
-            , 100.0f);
+                (200.0f * (1.0f - 10.0f * (1.0f / (energyScore + 20.0f) + 1.0f / (studyScore + 20.0f))))
+                        / (1.4 + difficultyScore * (0.26f)),
+                100.0f);
 
         // Return the final score as an integer.
         return (int) Math.round(percentScoreDouble);
@@ -102,13 +99,10 @@ public interface PlayerScore {
      * @return The player's score, calculated based on the provided parameters.
      */
     @Deprecated(forRemoval = true)
-    default int calculateScore(int energy, int maxEnergy, int studyTime,
-                               int maxStudyTime, int difficulty,
-                               int maxDifficulty) {
+    default int calculateScore(
+            int energy, int maxEnergy, int studyTime, int maxStudyTime, int difficulty, int maxDifficulty) {
         return calculateScore(
-            (float) energy, (float) maxEnergy, (float) studyTime,
-            (float) maxStudyTime, difficulty, maxDifficulty
-        );
+                (float) energy, (float) maxEnergy, (float) studyTime, (float) maxStudyTime, difficulty, maxDifficulty);
     }
 
     /**

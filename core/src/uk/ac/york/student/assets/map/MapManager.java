@@ -5,13 +5,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import java.io.File;
+import java.util.List;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import uk.ac.york.student.utils.MapOfSuppliers;
-
-import java.io.File;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * This utility class manages the loading and storage of TiledMap objects.
@@ -43,7 +41,8 @@ public final class MapManager {
             // Only load files with the ".tmx" extension
             if (file.getName().endsWith(".tmx")) {
                 // Add the map to the MapOfSuppliers, using a lambda to allow for lazy loading
-                MapManager.maps.put(file.getName().replace(".tmx", ""), () -> new TmxMapLoader().load("map/" + file.getName(), parameter));
+                MapManager.maps.put(file.getName().replace(".tmx", ""), () -> new TmxMapLoader()
+                        .load("map/" + file.getName(), parameter));
             }
         }
     }

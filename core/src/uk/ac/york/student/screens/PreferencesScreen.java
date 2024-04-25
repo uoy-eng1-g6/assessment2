@@ -1,5 +1,7 @@
 package uk.ac.york.student.screens;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import java.util.function.Supplier;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.york.student.GdxGame;
@@ -20,10 +23,6 @@ import uk.ac.york.student.audio.sound.GameSound;
 import uk.ac.york.student.audio.sound.SoundManager;
 import uk.ac.york.student.audio.sound.Sounds;
 import uk.ac.york.student.settings.*;
-
-import java.util.function.Supplier;
-
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 
 /**
  * This class represents the preferences screen of the game. It extends the {@link BaseScreen} class.
@@ -344,13 +343,15 @@ public class PreferencesScreen extends BaseScreen {
         // Add a listener to the slider
         cloudsSpeedSlider.addListener(event -> {
             // Get the main menu clouds preferences
-            MainMenuCloudsPreferences preference = (MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference();
+            MainMenuCloudsPreferences preference =
+                    (MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference();
 
             // Update the speed in the preferences
             preference.setSpeed(cloudsSpeedSlider.getValue());
 
             // Update the label text with the current speed
-            cloudsSpeedLabel.setText(Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(cloudsSpeedSlider.getValue() * 100) + "%"));
+            cloudsSpeedLabel.setText(
+                    Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(cloudsSpeedSlider.getValue() * 100) + "%"));
 
             // Return true to indicate the event has been handled successfully
             return true;
@@ -364,7 +365,9 @@ public class PreferencesScreen extends BaseScreen {
      * The label is created with the {@link PreferencesScreen#craftacularSkin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
      */
     private void createCloudsSpeedLabel() {
-        screenData.cloudsSpeedLabel = new Label(Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(screenData.cloudsSpeedSlider.getValue() * 100) + "%"), craftacularSkin);
+        screenData.cloudsSpeedLabel = new Label(
+                Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(screenData.cloudsSpeedSlider.getValue() * 100) + "%"),
+                craftacularSkin);
     }
 
     /**
@@ -380,8 +383,10 @@ public class PreferencesScreen extends BaseScreen {
      */
     private void createCloudsSpeedSlider() {
         screenData.cloudsSpeedSlider = new Slider(0f, 3f, 0.01f, false, craftacularSkin);
-        screenData.cloudsSpeedSlider.setVisualPercent(((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());
-        screenData.cloudsSpeedSlider.setValue(((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());
+        screenData.cloudsSpeedSlider.setVisualPercent(
+                ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());
+        screenData.cloudsSpeedSlider.setValue(
+                ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());
     }
 
     /**
@@ -409,7 +414,8 @@ public class PreferencesScreen extends BaseScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
-                MainMenuCloudsPreferences preference = (MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference();
+                MainMenuCloudsPreferences preference =
+                        (MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference();
                 boolean nowEnabled = !preference.isEnabled();
                 preference.setEnabled(nowEnabled);
                 cloudsToggleButton.setText(Labels.MAIN_MENU_CLOUDS_ENABLED.getLabel(nowEnabled ? "ON" : "OFF"));
@@ -426,7 +432,12 @@ public class PreferencesScreen extends BaseScreen {
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createCloudsToggleButton() {
-        screenData.cloudsToggleButton = new TextButton(Labels.MAIN_MENU_CLOUDS_ENABLED.getLabel(((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).isEnabled() ? "ON" : "OFF"), craftacularSkin);
+        screenData.cloudsToggleButton = new TextButton(
+                Labels.MAIN_MENU_CLOUDS_ENABLED.getLabel(
+                        ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).isEnabled()
+                                ? "ON"
+                                : "OFF"),
+                craftacularSkin);
     }
 
     /**
@@ -448,7 +459,12 @@ public class PreferencesScreen extends BaseScreen {
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createDebugScreenToggleButton() {
-        screenData.debugScreenToggleButton = new TextButton(Labels.DEBUG_SCREEN_ENABLED.getLabel(((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled() ? "ON" : "OFF"), craftacularSkin);
+        screenData.debugScreenToggleButton = new TextButton(
+                Labels.DEBUG_SCREEN_ENABLED.getLabel(
+                        ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled()
+                                ? "ON"
+                                : "OFF"),
+                craftacularSkin);
     }
 
     /**
@@ -459,7 +475,9 @@ public class PreferencesScreen extends BaseScreen {
      * The label is created with the {@link PreferencesScreen#craftacularSkin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
      */
     private void createSoundVolumeLabel() {
-        screenData.soundVolumeLabel = new Label(Labels.SOUND_VOLUME.getLabel(Math.round(screenData.soundVolumeSlider.getValue() * 100) + "%"), craftacularSkin);
+        screenData.soundVolumeLabel = new Label(
+                Labels.SOUND_VOLUME.getLabel(Math.round(screenData.soundVolumeSlider.getValue() * 100) + "%"),
+                craftacularSkin);
     }
 
     /**
@@ -475,7 +493,8 @@ public class PreferencesScreen extends BaseScreen {
      */
     private void createSoundVolumeSlider() {
         screenData.soundVolumeSlider = new Slider(0f, 1f, 0.01f, false, craftacularSkin);
-        screenData.soundVolumeSlider.setVisualPercent(((SoundPreferences) GamePreferences.SOUND.getPreference()).getVolume());
+        screenData.soundVolumeSlider.setVisualPercent(
+                ((SoundPreferences) GamePreferences.SOUND.getPreference()).getVolume());
     }
 
     /**
@@ -487,7 +506,10 @@ public class PreferencesScreen extends BaseScreen {
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createSoundToggleButton() {
-        screenData.soundToggleButton = new TextButton(Labels.SOUND_ENABLED.getLabel(((SoundPreferences) GamePreferences.SOUND.getPreference()).isEnabled() ? "ON" : "OFF"), craftacularSkin);
+        screenData.soundToggleButton = new TextButton(
+                Labels.SOUND_ENABLED.getLabel(
+                        ((SoundPreferences) GamePreferences.SOUND.getPreference()).isEnabled() ? "ON" : "OFF"),
+                craftacularSkin);
     }
 
     /**
@@ -498,7 +520,9 @@ public class PreferencesScreen extends BaseScreen {
      * The label is created with the {@link PreferencesScreen#craftacularSkin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
      */
     private void createMusicVolumeLabel() {
-        screenData.musicVolumeLabel = new Label(Labels.MUSIC_VOLUME.getLabel(Math.round(screenData.musicVolumeSlider.getValue() * 100) + "%"), craftacularSkin);
+        screenData.musicVolumeLabel = new Label(
+                Labels.MUSIC_VOLUME.getLabel(Math.round(screenData.musicVolumeSlider.getValue() * 100) + "%"),
+                craftacularSkin);
     }
 
     /**
@@ -514,7 +538,8 @@ public class PreferencesScreen extends BaseScreen {
      */
     private void createMusicVolumeSlider() {
         screenData.musicVolumeSlider = new Slider(0f, 1f, 0.01f, false, craftacularSkin);
-        screenData.musicVolumeSlider.setVisualPercent(((MusicPreferences) GamePreferences.MUSIC.getPreference()).getVolume());
+        screenData.musicVolumeSlider.setVisualPercent(
+                ((MusicPreferences) GamePreferences.MUSIC.getPreference()).getVolume());
     }
 
     /**
@@ -526,7 +551,10 @@ public class PreferencesScreen extends BaseScreen {
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createMusicToggleButton() {
-        screenData.musicToggleButton = new TextButton(Labels.MUSIC_ENABLED.getLabel(((MusicPreferences) GamePreferences.MUSIC.getPreference()).isEnabled() ? "ON" : "OFF"), craftacularSkin);
+        screenData.musicToggleButton = new TextButton(
+                Labels.MUSIC_ENABLED.getLabel(
+                        ((MusicPreferences) GamePreferences.MUSIC.getPreference()).isEnabled() ? "ON" : "OFF"),
+                craftacularSkin);
     }
 
     /**
@@ -539,14 +567,14 @@ public class PreferencesScreen extends BaseScreen {
         TextButton backButton = screenData.backButton;
         backButton.addListener(new ChangeListener() {
             /**
-            * This method is triggered when the back button is clicked.
-            * It plays a button click sound and transitions the game to the main menu screen.
-            * The button click sound is obtained from the {@link SoundManager#getSounds()} method with the {@link Sounds#BUTTON_CLICK} parameter.
-            * The transition to the main menu screen is performed by calling the {@link GdxGame#transitionScreen(Class)} method with the {@link Screens#MAIN_MENU} parameter.
-            *
-            * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
-            * @param actor The {@link Actor} that was clicked.
-            */
+             * This method is triggered when the back button is clicked.
+             * It plays a button click sound and transitions the game to the main menu screen.
+             * The button click sound is obtained from the {@link SoundManager#getSounds()} method with the {@link Sounds#BUTTON_CLICK} parameter.
+             * The transition to the main menu screen is performed by calling the {@link GdxGame#transitionScreen(Class)} method with the {@link Screens#MAIN_MENU} parameter.
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 SoundManager.getSounds().get(Sounds.BUTTON_CLICK).play();
@@ -599,7 +627,11 @@ public class PreferencesScreen extends BaseScreen {
         // Add the music toggle button to the table
         table.add(musicToggleButton).fillX().uniformX();
         // Add the clouds toggle button to the table
-        table.add(cloudsToggleButton).fillX().minWidth(cloudsToggleButton.getWidth()*1.1f).uniformX().pad(0, 50, 0, 0);
+        table.add(cloudsToggleButton)
+                .fillX()
+                .minWidth(cloudsToggleButton.getWidth() * 1.1f)
+                .uniformX()
+                .pad(0, 50, 0, 0);
         // Add a new row to the table
         table.row();
 
@@ -614,7 +646,7 @@ public class PreferencesScreen extends BaseScreen {
         // Add the music volume label to the stack
         stack.add(musicVolumeLabel);
         // Add the stack to the table
-        table.add(stack).center().fillX().uniformX().pad(0, 0, 25 ,0);
+        table.add(stack).center().fillX().uniformX().pad(0, 0, 25, 0);
 
         // Create a stack for the clouds speed slider and label
         stack = new Stack();
@@ -673,19 +705,20 @@ public class PreferencesScreen extends BaseScreen {
         TextButton debugScreenToggleButton = screenData.debugScreenToggleButton;
         debugScreenToggleButton.addListener(new ChangeListener() {
             /**
-            * This method is triggered when the debug screen toggle button is clicked.
-            * It plays a button click sound, retrieves the current state of the debug screen from the {@link GamePreferences#DEBUG_SCREEN},
-            * toggles the enabled state of the debug screen, and transitions the game to the preferences screen.
-            * The new state is obtained by negating the current state (i.e., if the debug screen was enabled, it is now disabled, and vice versa).
-            * The transition to the preferences screen is performed by calling the {@link GdxGame#setScreen(Class)} method with the {@link Screens#PREFERENCES} parameter.
-            *
-            * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
-            * @param actor The {@link Actor} that was clicked.
-            */
+             * This method is triggered when the debug screen toggle button is clicked.
+             * It plays a button click sound, retrieves the current state of the debug screen from the {@link GamePreferences#DEBUG_SCREEN},
+             * toggles the enabled state of the debug screen, and transitions the game to the preferences screen.
+             * The new state is obtained by negating the current state (i.e., if the debug screen was enabled, it is now disabled, and vice versa).
+             * The transition to the preferences screen is performed by calling the {@link GdxGame#setScreen(Class)} method with the {@link Screens#PREFERENCES} parameter.
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
-                DebugScreenPreferences preference = (DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference();
+                DebugScreenPreferences preference =
+                        (DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference();
                 boolean nowEnabled = !preference.isEnabled();
                 preference.setEnabled(nowEnabled);
                 game.setScreen(Screens.PREFERENCES);
@@ -705,7 +738,8 @@ public class PreferencesScreen extends BaseScreen {
         soundVolumeSlider.addListener(event -> {
             SoundPreferences preference = (SoundPreferences) GamePreferences.SOUND.getPreference();
             preference.setVolume(soundVolumeSlider.getValue());
-            soundVolumeLabel.setText(Labels.SOUND_VOLUME.getLabel(Math.round(soundVolumeSlider.getValue() * 100) + "%"));
+            soundVolumeLabel.setText(
+                    Labels.SOUND_VOLUME.getLabel(Math.round(soundVolumeSlider.getValue() * 100) + "%"));
             return false;
         });
     }
@@ -758,7 +792,8 @@ public class PreferencesScreen extends BaseScreen {
             MusicPreferences preference = (MusicPreferences) GamePreferences.MUSIC.getPreference();
             preference.setVolume(musicVolumeSlider.getValue());
             MusicManager.BACKGROUND_MUSIC.setVolume(musicVolumeSlider.getValue());
-            musicVolumeLabel.setText(Labels.MUSIC_VOLUME.getLabel(Math.round(musicVolumeSlider.getValue() * 100) + "%"));
+            musicVolumeLabel.setText(
+                    Labels.MUSIC_VOLUME.getLabel(Math.round(musicVolumeSlider.getValue() * 100) + "%"));
             return false;
         });
     }
@@ -869,27 +904,21 @@ public class PreferencesScreen extends BaseScreen {
      * Currently, this method is empty and does not perform any actions when the game is paused.
      */
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     /**
      * This method is called when the game is resumed from a paused state.
      * Currently, this method is empty and does not perform any actions when the game is resumed.
      */
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     /**
      * This method is called when the game screen is hidden.
      * Currently, this method is empty and does not perform any actions when the game screen is hidden.
      */
     @Override
-    public void hide() {
-
-    }
+    public void hide() {}
 
     /**
      * This method is called when the game screen is disposed.

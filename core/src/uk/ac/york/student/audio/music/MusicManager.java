@@ -28,9 +28,7 @@ public class MusicManager implements AudioManager {
      * Private constructor to prevent instantiation.
      * As this is a singleton class, the constructor is private.
      */
-    private MusicManager() {
-
-    }
+    private MusicManager() {}
 
     /**
      * Called when the game is started.

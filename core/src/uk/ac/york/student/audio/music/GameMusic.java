@@ -21,7 +21,7 @@ public abstract class GameMusic implements Music {
      * It initialises the object with the given path to the music file.
      * @param path The internal path to the music file (in assets folder)
      */
-    protected GameMusic(final String path)  {
+    protected GameMusic(final String path) {
         music = Gdx.audio.newMusic(Gdx.files.internal(path));
     }
 
@@ -81,7 +81,7 @@ public abstract class GameMusic implements Music {
      * @param volume The volume in range [0.0, 1.0]
      */
     @Override
-    public void setVolume(@Range(from=0, to=1) final float volume) {
+    public void setVolume(@Range(from = 0, to = 1) final float volume) {
         music.setVolume(volume);
     }
 
@@ -90,7 +90,7 @@ public abstract class GameMusic implements Music {
      * @return The volume in range [0.0, 1.0]
      */
     @Override
-    public @Range(from=0, to=1) float getVolume() {
+    public @Range(from = 0, to = 1) float getVolume() {
         return music.getVolume();
     }
 
@@ -100,7 +100,7 @@ public abstract class GameMusic implements Music {
      * @param volume the volume in the range [0,1].
      */
     @Override
-    public void setPan(@Range(from=-1, to=1) final float pan, @Range(from=0,to=1) final float volume) {
+    public void setPan(@Range(from = -1, to = 1) final float pan, @Range(from = 0, to = 1) final float volume) {
         music.setPan(pan, volume);
     }
 

@@ -33,7 +33,7 @@ public class PlayerHappiness implements PlayerMetric {
      * This is a float value ranging from 0 to 1, where 0 represents not happy and 1 represents very happy.
      * It is initially set to 1, indicating that the player starts the game being very happy.
      */
-    private @Range(from=0, to=1) float happiness = getDefault();
+    private @Range(from = 0, to = 1) float happiness = getDefault();
     /**
      * The total amount of happiness accumulated by the player across all days of the game.
      * This is a float value that starts at 0 and increases as the player becomes happier.
@@ -95,10 +95,9 @@ public class PlayerHappiness implements PlayerMetric {
      * @return the current happiness level of the player.
      */
     @Override
-    public @Range(from=0, to=1) float get() {
+    public @Range(from = 0, to = 1) float get() {
         return happiness;
     }
-
 
     /**
      * Set the happiness level of the player.
@@ -108,11 +107,10 @@ public class PlayerHappiness implements PlayerMetric {
      * @param happiness the new happiness level of the player
      */
     @Override
-    public void set(@Range(from=0, to=1) float happiness) {
+    public void set(@Range(from = 0, to = 1) float happiness) {
         this.happiness = Math.max(PROGRESS_BAR_MINIMUM, Math.min(1, happiness));
         this.progressBar.setValue(this.happiness);
     }
-
 
     /**
      * Increase the happiness level of the player.
@@ -125,7 +123,6 @@ public class PlayerHappiness implements PlayerMetric {
     public void increase(float amount) {
         set(Math.min(1, happiness + amount));
     }
-
 
     /**
      * Decrease the happiness level of the player.
