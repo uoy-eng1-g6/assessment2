@@ -44,7 +44,7 @@ allprojects {
         roboVMVersion = '2.3.20'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
-        lombokVersion = '1.18.30'
+        lombokVersion = '1.18.32'
     }
 
     repositories {
