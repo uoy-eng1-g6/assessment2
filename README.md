@@ -4,6 +4,7 @@
 <https://therealemissions.github.io/uoy-eng1/>
 
 ## Contributors
+(Assessment 1)
 - [Liam](https://github.com/TheRealEmissions)
 - [Lucy](https://github.com/lc2353)
 - [Tim](https://github.com/tgorst)
@@ -11,6 +12,15 @@
 - [Zac](https://github.com/Zr695)
 - [Kai]()
 - [Lia]()
+
+(Assessment 2)
+- [Oliver C](https://github.com/KEKEK375)
+- [Cooper](https://github.com/cooperjl)
+- [Anna](https://github.com/satesilka)
+- [Mikolaj](https://github.com/SlimJunky)
+- [Oliver T](https://github.com/tandemdude)
+- [Freya](https://github.com/red-fisher14)
+- [Barnaby](https://github.com/barnaby-matthews)
 
 ## Let Ron Cooke
 Let Ron Cooke is a single-player student simulator, where the player controls Ron, and takes him through a week at University. Will he survive? Will he pass his exams? Will he get alcohol poisoning? Who knows!
