@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="13" nextobjectid="30">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="61">
  <tileset firstgid="1" source="cosy_town_tiles.tsx"/>
  <tileset firstgid="3016" source="buildings.tsx"/>
  <tileset firstgid="8488" source="interior.tsx"/>
@@ -197,8 +197,75 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="11" name="gameObjects">
-  <object id="16" name="startingPoint" x="0.624064" y="255.866" width="16" height="16">
+ <objectgroup color="#ff0000" id="13" name="collisions">
+  <object id="35" x="41.6364" y="98.5455">
+   <polygon points="0,0 5.09091,-6.36364 5.27273,-14.3636 8.54545,-19.4545 22.5455,-18.9091 22.5455,12.9091 0.181818,13.2727"/>
+  </object>
+  <object id="36" x="119.273" y="98.7273">
+   <polygon points="0,0 -5.09091,-6.36364 -5.27273,-14.3636 -8.54545,-19.4545 -22.5455,-18.9091 -22.5455,12.9091 -0.181818,13.2727"/>
+  </object>
+  <object id="37" x="8.54545" y="78.5134">
+   <polygon points="0,0 42.5455,-0.171123 42.7273,0.684492 55.8182,0.941176 55.4545,-6.33155 0,-6.16043"/>
+  </object>
+  <object id="38" x="152.909" y="79.0118">
+   <polygon points="0,0 -42.5455,-0.179678 -42.7273,0.718717 -55.8182,0.988232 -55.4545,-6.64809 0,-6.46843"/>
+  </object>
+  <object id="39" x="10" y="72">
+   <polygon points="0,0 0,-51.2727 9.63636,-61.0909 131.818,-60.9091 140.909,-50.9091 141.455,-0.181818"/>
+  </object>
+  <object id="40" x="101.182" y="283.273">
+   <polygon points="0,0 6.72727,0.0909091 6.72727,4.63636 -0.181818,4.63636"/>
+  </object>
+  <object id="41" x="245.188" y="235.478">
+   <polygon points="0,0 6.72727,0.0909091 6.72727,4.63636 -0.181818,4.63636"/>
+  </object>
+  <object id="42" x="456.25" y="187.188">
+   <polygon points="0,0 6.72727,0.0909091 6.72727,4.63636 -0.181818,4.63636"/>
+  </object>
+  <object id="45" x="65.0625" y="139.25">
+   <polygon points="0,0 6.72727,0.0909091 6.72727,4.63636 -0.181818,4.63636"/>
+  </object>
+  <object id="46" x="168.125" y="123.313">
+   <polygon points="0,0 6.72727,0.0909091 6.72727,4.63636 -0.181818,4.63636"/>
+  </object>
+  <object id="48" x="424.125" y="159.875">
+   <polygon points="0,0 -26.5714,-0.25 -30.8735,-39.875 -31,-68.125 -24.4204,-76.875 0,-76.875"/>
+  </object>
+  <object id="49" x="444.125" y="159.875">
+   <polygon points="0,0 26.5714,-0.25 30.8735,-39.875 31,-68.125 24.4204,-76.875 0,-76.875"/>
+  </object>
+  <object id="50" x="424.125" y="83" width="19.75" height="47.375"/>
+  <object id="51" x="0" y="163.273">
+   <polygon points="0,0 160,0 159.818,56.3636 140.182,56.1818 127.091,40.3636 0.181818,40.3636"/>
+  </object>
+  <object id="52" x="208.182" y="217.455">
+   <polygon points="0,0 32.9091,-34 32,-103.818 23.0909,-94.1818 22.1818,-60.9091 15.2727,-50.5455 -0.181818,-50.9091"/>
+  </object>
+  <object id="53" x="240.125" y="113.5">
+   <polygon points="0,0 21.75,-23.625 22.875,70.375 1.125,70.125"/>
+  </object>
+  <object id="54" x="261.75" y="90.5">
+   <polygon points="0,0 0.125,-60.375 98.25,-60 65.75,-25.25 64.5,-3 49.75,8 49.5,29"/>
+  </object>
+  <object id="55" x="262" y="90">
+   <polygon points="0,0 0.5,52.5 27.75,29.5 48.75,29"/>
+  </object>
+  <object id="56" x="359.25" y="30.75">
+   <polygon points="0,0 30,-23.75 30,-31.25 -112.75,-30.6875 -112.75,-11.25 -97.5,-1"/>
+  </object>
+  <object id="57" x="341.727" y="224">
+   <polygon points="0,0 -29.7273,-0.0909091 -29.3636,-61 0.181818,-60.9091"/>
+  </object>
+  <object id="58" x="362.182" y="224">
+   <polygon points="0,0 29.7273,-0.0909091 29.3636,-61 -0.181818,-60.9091"/>
+  </object>
+  <object id="59" x="342" y="200.273">
+   <polygon points="0,0 20,0.0909091 20,-37.4545 -0.0909091,-37.3636"/>
+  </object>
+  <object id="60" x="226" y="48.9091" width="12.6364" height="30.9091"/>
+ </objectgroup>
+ <objectgroup color="#00ff00" id="11" name="gameObjects">
+  <object id="16" name="startingPoint" x="176" y="256" width="16" height="16">
    <properties>
     <property name="spawnpoint" type="bool" value="true"/>
    </properties>
@@ -219,7 +286,7 @@
     <property name="newMapStr" value="go into your house"/>
    </properties>
   </object>
-  <object id="21" name="enterPub" x="424.988" y="144.159" width="30.5" height="41.75">
+  <object id="21" name="enterPub" x="424.147" y="130.784" width="20.375" height="41.375">
    <properties>
     <property name="activityStr" value="go for drinks"/>
     <property name="activityTime" type="int" value="2"/>
