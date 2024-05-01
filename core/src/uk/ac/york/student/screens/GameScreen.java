@@ -5,12 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.*;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -30,6 +32,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -45,6 +48,8 @@ import uk.ac.york.student.assets.skins.Skins;
 import uk.ac.york.student.debug.DebugRenderer;
 import uk.ac.york.student.game.GameTime;
 import uk.ac.york.student.game.activities.Activity;
+import uk.ac.york.student.interactables.AnimatedInteractable;
+import uk.ac.york.student.interactables.Interactable;
 import uk.ac.york.student.player.Player;
 import uk.ac.york.student.player.PlayerMetric;
 import uk.ac.york.student.player.PlayerMetrics;
@@ -75,6 +80,26 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * The player of the game. This is the main character that the user controls.
      */
     private final Player player;
+
+    /**
+     * The name of the map which is currently active.
+     */
+    private String currentMapName;
+
+    /**
+     * {@link Interactable} objects.
+     */
+    private final AnimatedInteractable pubDoor;
+
+    private final AnimatedInteractable homeDoor;
+
+    private final AnimatedInteractable libraryDoor;
+
+    private final Interactable bench;
+
+    private final Interactable busStop;
+
+    private Interactable currentInteractable;
 
     /**
      * The game time. This keeps track of the current time in the game.
@@ -145,8 +170,39 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
         // Initialize the game time
         gameTime = new GameTime();
-
+        // Initialize the current map name.
+        currentMapName = "map";
         world = new World(new Vector2(0, 0), true);
+
+        // Load the TextureAtlas which contains the textures for the interactable objects.
+        TextureAtlas interactableAtlas = new TextureAtlas(Gdx.files.internal("sprite-atlases/interactable.atlas"));
+        // Initialize the default color of the outline.
+        Vector4 defaultOutlineColor = new Vector4(255.0F, 255.0F, 0.0F, 0.8F);
+        // Initialize the pubDoor interactable.
+        pubDoor = new AnimatedInteractable(418, 155, 32, 32, 4, 0.33f);
+        pubDoor.setAnimationRegions(interactableAtlas.findRegions("pubdoor"));
+        pubDoor.setCamera(gameCamera);
+        pubDoor.setDefaultOutlineColor(defaultOutlineColor);
+        // Initialize the homeDoor interactable.
+        homeDoor = new AnimatedInteractable(336, 91, 32, 32, 4, 0.33f);
+        homeDoor.setAnimationRegions(interactableAtlas.findRegions("homedoor"));
+        homeDoor.setCamera(gameCamera);
+        homeDoor.setDefaultOutlineColor(defaultOutlineColor);
+        // Initialize the libraryDoor interactable.
+        libraryDoor = new AnimatedInteractable(65, 221, 32, 32, 4, 0.33f);
+        libraryDoor.setAnimationRegions(interactableAtlas.findRegions("librarydoor"));
+        libraryDoor.setCamera(gameCamera);
+        libraryDoor.setDefaultOutlineColor(defaultOutlineColor);
+        // Initialize the bench interactable.
+        bench = new Interactable(217, 239, 32, 33, 4);
+        bench.setRegion(interactableAtlas.findRegion("bench"));
+        bench.setCamera(gameCamera);
+        bench.setDefaultOutlineColor(defaultOutlineColor);
+        // Initialize the busStop interactable.
+        busStop = new Interactable(56, 79, 32, 34, 4);
+        busStop.setRegion(interactableAtlas.findRegion("busstop"));
+        busStop.setCamera(gameCamera);
+        busStop.setDefaultOutlineColor(defaultOutlineColor);
 
         // Initialize the player
         player = new Player(world);
@@ -300,7 +356,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
     /**
      * This method is called when this screen becomes the current screen for the {@link GdxGame}.
-     * It sets up the game UI, including the action table, metrics table, and time table.
+     * It sets up the game UI, including the action table, metrics table, and timetable.
      * It also updates the viewport of the stage.
      */
     @Override
@@ -340,7 +396,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         metricsTable.padBottom(2);
         metricsTable.padRight(2);
 
-        // Set up the time table
+        // Set up the timetable
         ProgressBar timeBar = gameTime.getProgressBar();
         String currentHour = getCurrentHourString();
         String currentDay = "Day " + (gameTime.getCurrentDay() + 1);
@@ -464,16 +520,39 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 box2dDebugRenderer.render(world, gameCamera.combined);
             }
 
-            // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
-            // action.
-            Player.Transition transitionTile = player.isInTransitionTile();
-            if (transitionTile != null) {
-                setActionLabel(transitionTile);
-            } else {
-                // If the player is not in a transition tile, hide the action label.
-                currentActionMapObject.set(null);
-                actionLabel.setVisible(false);
+        // Draw interactable objects.
+        if (Objects.equals(currentMapName, "map")) {
+            pubDoor.draw();
+            homeDoor.draw();
+            libraryDoor.draw();
+            bench.draw();
+            busStop.draw();
+        }
+
+        // Set alpha of the interactable objects, allowing them to be faded in and out properly.
+        pubDoor.setAlpha(processor.getRoot().getColor().a);
+        homeDoor.setAlpha(processor.getRoot().getColor().a);
+        libraryDoor.setAlpha(processor.getRoot().getColor().a);
+        bench.setAlpha(processor.getRoot().getColor().a);
+        busStop.setAlpha(processor.getRoot().getColor().a);
+        // Animate the currentInteractable if it is animated and should currently be animating.
+        if (currentInteractable instanceof AnimatedInteractable) {
+            AnimatedInteractable animatedInteractable = (AnimatedInteractable) currentInteractable;
+            if (Objects.equals(currentMapName, currentInteractable.getMap()) && animatedInteractable.isAnimating()) {
+                animatedInteractable.animate();
             }
+        }
+
+        // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
+        // action.
+        Player.Transition transitionTile = player.isInTransitionTile();
+        if (transitionTile != null) {
+            setActionLabel(transitionTile);
+            // setCurrentInteractable();
+        } else {
+            // If the player is not in a transition tile, hide the action label.
+            currentActionMapObject.set(null);
+            actionLabel.setVisible(false);
         }
 
         // Draw the stage. This renders all actors added to the stage, including the player and UI elements.
@@ -504,8 +583,14 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Construct the action text based on the type of the ActionMapObject
         StringBuilder actionText = new StringBuilder(getActionText(actionMapObject));
 
+        // Initialize the vector for the outline color.
+        Vector4 outlineColor = new Vector4(0.0F, 255.0F, 0F, processor.getRoot().getColor().a);
+
         // Check if the ActionMapObject is an instance of ActivityMapObject
         if (actionMapObject instanceof ActivityMapObject) {
+            // Set the outline color to red by default, and we will make it green if it passes checks.
+            outlineColor.x = 255.0F;
+            outlineColor.y = 0.0F;
             // Cast the ActionMapObject to an ActivityMapObject
             ActivityMapObject activityMapObject = (ActivityMapObject) actionMapObject;
 
@@ -593,10 +678,14 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                     actionText.append(" to do this activity.");
                 }
             } else {
+                // Checks passed, set the outline color to green.
+                outlineColor.x = 0.0F;
+                outlineColor.y = 255.0F;
                 // If the player has enough resources and time to perform the activity
                 if (!activity.equals(Activity.SLEEP)) {
                     // If the activity is not sleeping, append the required time for the activity to the action text
                     actionText.append(" (").append(requiredTime).append(" hours)");
+
                 } else {
                     // If the activity is sleeping
                     if (gameTime.isEndOfDays()) {
@@ -609,10 +698,15 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 }
             }
         }
-
         // Set the action text as the text of the action label, and make the action label visible
         actionLabel.setText(actionText.toString());
         actionLabel.setVisible(true);
+
+        setCurrentInteractable();
+
+        if (currentInteractable != null && Objects.equals(currentInteractable.getMap(), currentMapName)) {
+            currentInteractable.setOutlineColor(outlineColor);
+        }
     }
 
     /**
@@ -650,6 +744,36 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             throw new IllegalStateException("Unexpected value: " + transitionTile);
         }
         return actionMapObject;
+    }
+
+    /**
+     * Sets the current interactable object to match the current action.
+     */
+    private void setCurrentInteractable() {
+        // Useful for finding out the name of the current object.
+        // System.out.println(Objects.requireNonNull(currentActionMapObject.get()).getStr());
+        Vector4 vec = new Vector4(0F, 255.0F, 0.0F, processor.getRoot().getColor().a);
+        switch (Objects.requireNonNull(currentActionMapObject.get()).getStr()) {
+            case "go for drinks":
+                currentInteractable = pubDoor;
+                break;
+            case "go into your house":
+            case "go outside": // This allows homeDoor to be reset when exiting the house.
+                currentInteractable = homeDoor;
+                break;
+            case "study at the library":
+                currentInteractable = libraryDoor;
+                break;
+            case "head to town":
+                currentInteractable = busStop;
+                break;
+            case "feed the ducks":
+                currentInteractable = bench;
+                break;
+            default:
+                currentInteractable = null;
+                break;
+        }
     }
 
     /**
@@ -747,6 +871,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     private boolean doMapChange(@NotNull TransitionMapObject actionMapObject) {
         changeMap(actionMapObject.getType(), false);
+
+        // Trigger the current interactable object's animation if it is animated.
+        if (currentInteractable instanceof AnimatedInteractable) {
+            ((AnimatedInteractable) currentInteractable).setAnimating(true);
+        }
+
         return true;
     }
 
@@ -863,6 +993,11 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
         // Set the text of the timeLabel to the constructed time string
         timeLabel.setText(time);
+
+        // Trigger the current interactable object's animation if it is animated.
+        if (currentInteractable instanceof AnimatedInteractable) {
+            ((AnimatedInteractable) currentInteractable).setAnimating(true);
+        }
 
         // Return true indicating the operation was successful
         return true;
