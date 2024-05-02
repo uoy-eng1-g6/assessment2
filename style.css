@@ -41,6 +41,10 @@ nav ul li a:hover {
     color: orangered;
 }
 
+nav ul li a:visited {
+    color: black;
+}
+
 a {
     margin: 5px;
 }
