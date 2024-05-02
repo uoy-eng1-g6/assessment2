@@ -45,6 +45,10 @@ a {
     margin: 5px;
 }
 
+a:visited {
+    color: blue;
+}
+
 /* Main content styling */
 .main-content {
     padding: 20px;
