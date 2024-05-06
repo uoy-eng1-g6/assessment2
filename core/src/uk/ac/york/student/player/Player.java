@@ -1,6 +1,5 @@
 package uk.ac.york.student.player;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,16 +29,11 @@ import org.jetbrains.annotations.Range;
  * It also manages the player's score and the player's sprite on the screen.
  */
 @Getter
-public class Player extends Actor implements PlayerScore, InputProcessor {
+public class Player implements PlayerScore, InputProcessor {
     /**
      * PlayerMetrics object to store and manage player-specific metrics.
      */
     private final PlayerMetrics metrics = new PlayerMetrics();
-
-    /**
-     * Scale of the map relative to the screen size.
-     */
-    private float mapScale;
 
     /**
      * Sprite object representing the player's character on the screen.
@@ -65,40 +60,32 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
      * TextureAtlas object containing the textures for the player's sprite.
      */
     private final TextureAtlas textureAtlas = new TextureAtlas("sprite-atlases/character-sprites.atlas");
+
+    private final Vector2 velocity = new Vector2();
+    private final Fixture fixture;
+
     /**
      * Constructor for the Player class.
      *
      * @param map The TiledMap object representing the current game map.
-     * @param startPosition The Vector2 object representing the starting position of the player on the map.
      */
-    public Player(@NotNull TiledMap map, @NotNull Vector2 startPosition) {
-        super(); // Call to the parent class constructor
+    public Player(@NotNull TiledMap map, @NotNull Fixture fixture) {
         this.map = map; // Assign the provided map to the player's map
-
-        // Get the first layer of the map (the bottom layer)
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-
-        // Calculate the maximum height and width of the map
-        final int maxHeight = layer.getHeight() * layer.getTileHeight();
-        final int maxWidth = layer.getWidth() * layer.getTileWidth();
-
-        // Calculate the scale of the map relative to the screen size
-        mapScale = Math.max(Gdx.graphics.getWidth() / maxWidth, Gdx.graphics.getHeight() / maxHeight);
+        this.fixture = fixture;
 
         // Create a sprite for the player and set its position, opacity, and size
         SPRITETOWARDSREGION = textureAtlas.findRegion("char3_towards");
         SPRITEAWAYREGION = textureAtlas.findRegion("char3_away");
         SPRITELEFTREGION = textureAtlas.findRegion("char3_left");
         sprite = textureAtlas.createSprite("char3_towards");
-        sprite.setPosition(startPosition.x, startPosition.y);
         sprite.setAlpha(1);
-        sprite.setSize(sprite.getWidth() * mapScale, sprite.getHeight() * mapScale);
-
-        // Set the bounds of the player
-        setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
 
         // Load the bounding boxes of the map objects
         loadMapObjectBoundingBoxes();
+    }
+
+    public Vector2 getTilePosition() {
+        return fixture.getBody().getPosition();
     }
 
     /**
@@ -109,42 +96,15 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
     public void setMap(@NotNull TiledMap map) {
         this.map = map; // Assign the provided map to the player's map
 
-        // Get the first layer of the map (the bottom layer)
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-
-        // Calculate the maximum height and width of the map
-        final int maxHeight = layer.getHeight() * layer.getTileHeight();
-        final int maxWidth = layer.getWidth() * layer.getTileWidth();
-
-        // Calculate the scale of the map relative to the screen size
-        mapScale = Math.max(Gdx.graphics.getWidth() / maxWidth, Gdx.graphics.getHeight() / maxHeight);
-
         // Create a sprite for the player and set its position, opacity, and size
         sprite = textureAtlas.createSprite("char3_towards");
         sprite.setAlpha(1);
-
-        // Scale the sprite according to the map scale
-        sprite.setSize(sprite.getWidth() * mapScale, sprite.getHeight() * mapScale);
-
-        // Set the bounds of the player
-        setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
 
         // Clear the existing bounding boxes of the map objects
         tileObjectBoundingBoxes.clear();
 
         // Load the bounding boxes of the new map objects
         loadMapObjectBoundingBoxes();
-    }
-
-    /**
-     * Sets the current game map for the player, updates related properties, and sets the player's position.
-     *
-     * @param map The TiledMap object representing the new game map.
-     * @param startPosition The Vector2 object representing the new position of the player on the map.
-     */
-    public void setMap(@NotNull TiledMap map, Vector2 startPosition) {
-        setMap(map);
-        setPosition(startPosition);
     }
 
     /**
@@ -185,49 +145,32 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
      * The sprite cannot move outside the bounds of the game map.
      */
     public void move() {
-        // Get the first layer of the map (the bottom layer)
-        final TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-
-        // Calculate the maximum height and width of the map
-        final int maxHeight = layer.getHeight() * layer.getTileHeight();
-        final int maxWidth = layer.getWidth() * layer.getTileWidth();
-
-        // Calculate the maximum height and width of the map scaled to the screen size
-        final float maxHeightScaled = maxHeight * mapScale;
-        final float maxWidthScaled = maxWidth * mapScale;
-
         // Calculate the amount to move the sprite by
         // If the BOOST movement is active, the sprite moves twice as fast
-        final float amount = (Movement.BOOST.is ? 2 : 1) * mapScale;
+        final float amount = (Movement.BOOST.is ? 4 : 2);
 
+        velocity.set(0, 0);
         // Move the sprite up if the UP movement is active and the sprite is not at the top of the map
-        if (Movement.UP.is && (sprite.getY() + sprite.getHeight() < maxHeightScaled)) {
-            sprite.setRegion(SPRITEAWAYREGION);
-            sprite.translateY(amount);
-            setY(sprite.getY());
+        if (Movement.UP.is) {
+            velocity.set(velocity.x, amount);
         }
 
         // Move the sprite down if the DOWN movement is active and the sprite is not at the bottom of the map
-        if (Movement.DOWN.is && (sprite.getY() > 0)) {
-            sprite.setRegion(SPRITETOWARDSREGION);
-            sprite.translateY(-amount);
-            setY(sprite.getY());
+        if (Movement.DOWN.is) {
+            velocity.set(velocity.x, -amount);
         }
 
         // Move the sprite left if the LEFT movement is active and the sprite is not at the left edge of the map
-        if (Movement.LEFT.is && (sprite.getX() > 0)) {
-            sprite.setRegion(SPRITELEFTREGION);
-            sprite.translateX(-amount);
-            setX(sprite.getX());
+        if (Movement.LEFT.is) {
+            velocity.set(-amount, velocity.y);
         }
 
         // Move the sprite right if the RIGHT movement is active and the sprite is not at the right edge of the map
-        if (Movement.RIGHT.is && (sprite.getX() + sprite.getWidth() < maxWidthScaled)) {
-            sprite.setRegion(SPRITELEFTREGION);
-            sprite.setFlip(true, false);
-            sprite.translateX(amount);
-            setX(sprite.getX());
+        if (Movement.RIGHT.is) {
+            velocity.set(amount, velocity.y);
         }
+
+        fixture.getBody().setLinearVelocity(velocity);
     }
 
     /**
@@ -274,16 +217,10 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
         float width = object.getProperties().get("width", Float.class); // width of the map object
         float height = object.getProperties().get("height", Float.class); // height of the map object
 
-        // Scale the properties of the map object according to the map scale
-        float xScaled = x * mapScale; // scaled x-coordinate of the map object
-        float yScaled = y * mapScale; // scaled y-coordinate of the map object
-        float widthScaled = width * mapScale; // scaled width of the map object
-        float heightScaled = height * mapScale; // scaled height of the map object
-
         // Create two Vector3 objects representing the bottom-left and top-right corners of the bounding box
-        Vector3 pos1 = new Vector3(xScaled, yScaled, 0); // bottom-left corner of the bounding box
+        Vector3 pos1 = new Vector3(x, y, 0); // bottom-left corner of the bounding box
         Vector3 pos2 =
-                new Vector3(xScaled + widthScaled, yScaled + heightScaled, 0); // top-right corner of the bounding box
+                new Vector3(x + width, y + height, 0); // top-right corner of the bounding box
 
         // Return a new BoundingBox object representing the bounding box of the map object
         return new BoundingBox(pos1, pos2);
@@ -351,17 +288,6 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
     }
 
     /**
-     * Sets the position of the player's sprite on the game map.
-     * The sprite's position is updated and the player's bounds are set to the new position.
-     *
-     * @param position The Vector2 object representing the new position of the player on the map.
-     */
-    public void setPosition(@NotNull Vector2 position) {
-        sprite.setPosition(position.x, position.y); // Set the sprite's position
-        setPosition(position.x, position.y); // Set the player's bounds to the new position
-    }
-
-    /**
      * Checks if the player's sprite is currently on a transition tile.
      * A transition tile is a tile that has either the "isNewMap" or "isActivity" property set to true.
      * If the player's sprite is on a tile with the "isNewMap" property set to true, the NEW_MAP transition is returned.
@@ -388,21 +314,6 @@ public class Player extends Actor implements PlayerScore, InputProcessor {
 
         // If the map object does not have either the "isNewMap" or "isActivity" property set to true, return null
         return null;
-    }
-
-    /**
-     * Draws the player's sprite on the screen.
-     * This method is called every frame to update the sprite's position on the screen.
-     * The sprite is drawn using the provided Batch object.
-     * The parent's draw method is also called to ensure that other actors are drawn correctly.
-     *
-     * @param batch The Batch object used to draw the sprite.
-     * @param parentAlpha The parent's alpha value, used to handle transparency.
-     */
-    @Override
-    public void draw(final Batch batch, final float parentAlpha) {
-        sprite.draw(batch); // Draw the player's sprite
-        super.draw(batch, parentAlpha); // Call the parent's draw method
     }
 
     /**
