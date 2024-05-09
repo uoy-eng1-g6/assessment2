@@ -87,7 +87,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * The scale of the map. This is used to adjust the size of the map to fit the screen.
      */
-    private float mapScale;
+    private final float mapScale;
 
     /**
      * The renderer for the map. This is used to draw the map on the screen.
@@ -125,10 +125,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     private final Label timeLabel = new Label("You exist outside of the space-time continuum.", craftacularSkin);
 
     private final World world;
-    private final Box2DDebugRenderer box2dDebugRenderer;
-    private final OrthographicCamera debugCamera;
-    private final DebugRenderer debugRenderer;
+
+    private final OrthographicCamera gameCamera;
     private final Viewport gameViewport;
+
+    private final Box2DDebugRenderer box2dDebugRenderer;
+    private final DebugRenderer debugRenderer;
 
     /**
      * Constructor for the {@link GameScreen} class.
@@ -176,7 +178,51 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
         world = new World(new Vector2(0, 0), true);
         var collisionLayer = map.getLayers().get("collisions");
-        for (var object : collisionLayer.getObjects()) {
+        loadCollisionObjectsFromMapLayer(world, tileWidth, tileHeight, collisionLayer);
+
+        // Initialize the player at the starting point
+        var bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(startingPoint.x / tileWidth, startingPoint.y / tileHeight);
+        var body = world.createBody(bodyDef);
+        var shape = new CircleShape();
+        shape.setRadius(0.25f);
+        var fixture = body.createFixture(shape, 1f);
+        shape.dispose();
+
+        player = new Player(map, fixture);
+
+        // Initialize the stage and set it as the input processor
+        gameCamera = new OrthographicCamera();
+        gameCamera.setToOrtho(false, mapWidth, mapHeight);
+        gameViewport = new FitViewport(mapWidth, mapHeight, gameCamera);
+
+        var stageViewport = new FitViewport(mapWidth * tileWidth, mapHeight * tileWidth);
+        processor = new Stage(stageViewport);
+
+        Gdx.input.setInputProcessor(processor);
+
+        // Add a listener to the stage to handle key events
+        processor.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                return GameScreen.this.keyDown(keycode);
+            }
+
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+                return GameScreen.this.keyUp(keycode);
+            }
+        });
+
+        debugRenderer = new DebugRenderer(player, processor.getBatch());
+        debugRenderer.setMap(map);
+
+        box2dDebugRenderer = new Box2DDebugRenderer();
+    }
+
+    void loadCollisionObjectsFromMapLayer(World world, int tileWidth, int tileHeight, MapLayer mapLayer) {
+        for (var object : mapLayer.getObjects()) {
             float x, y;
             float[] vertices;
             if (object instanceof RectangleMapObject) {
@@ -203,6 +249,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 continue;
             }
 
+            // Normalize the vertices to tile scale instead of pixel scale
+            // - Box2D prefers smaller worlds which allows for smaller velocities
             for (var i = 0; i < vertices.length; i += 2) {
                 vertices[i] /= tileWidth;
                 vertices[i] -= x;
@@ -221,70 +269,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             body.createFixture(shape, 0f);
             shape.dispose();
         }
-
-        // Add wall collisions
-        var walls = new float[][] {
-            // Left wall
-            {0, 0, -0.05f, 0, -0.05f, mapHeight, 0, mapHeight},
-            // Top wall
-            {0, mapHeight, mapWidth, mapHeight, mapWidth, mapHeight + 0.05f, 0, mapHeight + 0.05f},
-            // Right wall
-            {
-                mapWidth, 0, mapWidth + 0.05f, 0f, mapWidth + 0.05f, mapHeight, mapWidth, mapHeight,
-            },
-            // Bottom wall
-            {0, 0, mapWidth, 0, mapWidth, -0.05f, 0, -0.05f}
-        };
-        for (var wall : walls) {
-            var bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(0, 0);
-            var body = world.createBody(bodyDef);
-            var shape = new PolygonShape();
-            shape.set(wall);
-            body.createFixture(shape, 0f);
-            shape.dispose();
-        }
-
-        // Initialize the player at the starting point
-        var bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(startingPoint.x / tileWidth, startingPoint.y / tileHeight);
-        var body = world.createBody(bodyDef);
-        var shape = new CircleShape();
-        shape.setRadius(0.25f);
-        var fixture = body.createFixture(shape, 1f);
-        shape.dispose();
-
-        player = new Player(map, fixture);
-
-        // Initialize the stage and set it as the input processor
-        debugCamera = new OrthographicCamera();
-        debugCamera.setToOrtho(false, mapWidth, mapHeight);
-        gameViewport = new FitViewport(mapWidth, mapHeight, debugCamera);
-
-        var stageViewport = new FitViewport(mapWidth * tileWidth, mapHeight * tileWidth);
-        processor = new Stage(stageViewport);
-
-        Gdx.input.setInputProcessor(processor);
-
-        // Add a listener to the stage to handle key events
-        processor.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                return GameScreen.this.keyDown(keycode);
-            }
-
-            @Override
-            public boolean keyUp(InputEvent event, int keycode) {
-                return GameScreen.this.keyUp(keycode);
-            }
-        });
-
-        debugRenderer = new DebugRenderer(player, processor.getBatch());
-        debugRenderer.setMap(map);
-
-        box2dDebugRenderer = new Box2DDebugRenderer();
     }
 
     /**
@@ -303,15 +287,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             map.dispose();
             // Load the new map
             map = MapManager.getMaps().getResult(mapName);
-            // Get the first layer of the new map
-            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-            // Get the width and height of a tile in the new map
-            int tileWidth = layer.getTileWidth();
-            int tileHeight = layer.getTileHeight();
-            // Calculate the scale of the new map based on the screen size and tile size
-            //            mapScale = Math.max(
-            //                    Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth),
-            //                    Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
             // Initialize the map renderer for the new map
             renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
@@ -336,7 +311,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             }
 
             // Set the view of the map renderer to the camera of the stage
-            renderer.setView(debugCamera);
+            renderer.setView(gameCamera);
 
             // Set the input processor to the stage
             Gdx.input.setInputProcessor(processor);
@@ -486,7 +461,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
 
         // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the screen.
-        renderer.setView(debugCamera);
+        renderer.setView(gameCamera);
 
         // Render the map. This draws the map to the screen.
         renderer.render();
@@ -503,7 +478,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));
         batch.end();
 
-        box2dDebugRenderer.render(world, debugCamera.combined);
+        box2dDebugRenderer.render(world, gameCamera.combined);
 
         // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
         // action.
@@ -707,7 +682,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         processor.getViewport().update(screenWidth, screenHeight, true);
 
         // Set the view of the map renderer to the camera
-        renderer.setView(debugCamera);
+        renderer.setView(gameCamera);
     }
 
     /**
