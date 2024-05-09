@@ -28,6 +28,8 @@ import org.jetbrains.annotations.Range;
  */
 @Getter
 public class Player implements PlayerScore, InputProcessor {
+    public static final float HITBOX_RADIUS = 0.25f;
+
     /**
      * PlayerMetrics object to store and manage player-specific metrics.
      */
@@ -258,7 +260,7 @@ public class Player implements PlayerScore, InputProcessor {
         // Iterate over each entry in the tileObjectBoundingBoxes HashMap
         for (var entry : tileObjectBoundingBoxes.entrySet()) {
             // Get the center position of the player's sprite
-            if (Intersector.overlaps(new Circle(position, 0.25f), entry.getValue())) {
+            if (Intersector.overlaps(new Circle(position, HITBOX_RADIUS), entry.getValue())) {
                 return entry.getKey();
             }
         }

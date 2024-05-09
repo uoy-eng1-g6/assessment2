@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -143,9 +144,11 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Set up the tilemap
         // Get the first layer of the map
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-        // Get the width and height of a tile
-        int tileWidth = layer.getTileWidth();
-        int tileHeight = layer.getTileHeight();
+        // Get the width and height of map tiles and the map background
+        var mapWidth = layer.getWidth();
+        var mapHeight = layer.getHeight();
+        var tileWidth = layer.getTileWidth();
+        var tileHeight = layer.getTileHeight();
 
         mapScale = (float) 1 / tileWidth;
         // Initialize the game time
@@ -153,43 +156,19 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Initialize the map renderer
         renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
-        // Initialize the starting point of the player
-        Vector2 startingPoint = new Vector2(25, 25);
         // Get the layer of the map that contains game objects
-        MapLayer gameObjectsLayer = map.getLayers().get("gameObjects");
-        // Get all objects in the game objects layer
-        MapObjects objects = gameObjectsLayer.getObjects();
-        // Iterate over all objects to find the starting point
-        for (MapObject object : objects) {
-            if (!object.getName().equals("startingPoint")) continue;
-            MapProperties properties = object.getProperties();
-            if (!properties.containsKey("spawnpoint")) continue;
-            Boolean spawnpoint = properties.get("spawnpoint", Boolean.class);
-            if (spawnpoint == null || Boolean.FALSE.equals(spawnpoint)) continue;
-            RectangleMapObject rectangleObject = (RectangleMapObject) object;
-            Rectangle rectangle = rectangleObject.getRectangle();
-            // Update the starting point based on the found object
-            startingPoint = new Vector2(rectangle.getX(), rectangle.getY());
-            break;
+        var gameObjectsLayer = map.getLayers().get("gameObjects");
+        var playerStartPosition = findPlayerStartPosition(tileWidth, tileHeight, gameObjectsLayer);
+        if (playerStartPosition == null) {
+            throw new IllegalStateException("Could not locate player starting position");
         }
-
-        var mapWidth = layer.getWidth();
-        var mapHeight = layer.getHeight();
 
         world = new World(new Vector2(0, 0), true);
         var collisionLayer = map.getLayers().get("collisions");
         loadCollisionObjectsFromMapLayer(world, tileWidth, tileHeight, collisionLayer);
 
         // Initialize the player at the starting point
-        var bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(startingPoint.x / tileWidth, startingPoint.y / tileHeight);
-        var body = world.createBody(bodyDef);
-        var shape = new CircleShape();
-        shape.setRadius(0.25f);
-        var fixture = body.createFixture(shape, 1f);
-        shape.dispose();
-
+        var fixture = createPlayerCollisionFixture(world, playerStartPosition.x, playerStartPosition.y);
         player = new Player(map, fixture);
 
         // Initialize the stage and set it as the input processor
@@ -221,7 +200,20 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         box2dDebugRenderer = new Box2DDebugRenderer();
     }
 
-    void loadCollisionObjectsFromMapLayer(World world, int tileWidth, int tileHeight, MapLayer mapLayer) {
+    static Vector2 findPlayerStartPosition(int tileWidth, int tileHeight, MapLayer mapLayer) {
+        for (var object : mapLayer.getObjects()) {
+            if (object.getProperties().containsKey("isSpawnPoint")
+                    && object.getProperties().get("isSpawnPoint", Boolean.class)) {
+                // Get the center point of the spawn position
+                var rect = ((RectangleMapObject) object).getRectangle();
+                return new Vector2(
+                        (rect.getX() + (rect.width / 2)) / tileWidth, (rect.getY() + (rect.height / 2)) / tileHeight);
+            }
+        }
+        return null;
+    }
+
+    static void loadCollisionObjectsFromMapLayer(World world, int tileWidth, int tileHeight, MapLayer mapLayer) {
         for (var object : mapLayer.getObjects()) {
             float x, y;
             float[] vertices;
@@ -269,6 +261,21 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             body.createFixture(shape, 0f);
             shape.dispose();
         }
+    }
+
+    static Fixture createPlayerCollisionFixture(World world, float x, float y) {
+        var bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(x, y);
+
+        var body = world.createBody(bodyDef);
+        var shape = new CircleShape();
+        shape.setRadius(Player.HITBOX_RADIUS);
+
+        var fixture = body.createFixture(shape, 1f);
+        shape.dispose();
+
+        return fixture;
     }
 
     /**
