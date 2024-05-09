@@ -5,36 +5,44 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import space.earlygrey.shapedrawer.ShapeDrawer;
+import uk.ac.york.student.player.Player;
 
 public class DebugRenderer {
     private final ShapeDrawer shapeDrawer;
 
-    private TiledMap map = null;
-    private MapObjects mapObjects;
+    private final Player player;
 
-    public DebugRenderer(Batch batch) {
+    private Integer tileWidth = null;
+    private Integer tileHeight = null;
+
+    public DebugRenderer(Player player, Batch batch) {
+        this.player = player;
         var texture = new Texture(Gdx.files.internal("white_pixel.png"));
         this.shapeDrawer = new ShapeDrawer(batch, new TextureRegion(texture, 0, 0, 1, 1));
     }
 
     public void setMap(TiledMap map) {
-        this.map = map;
-        this.mapObjects = map.getLayers().get("gameObjects").getObjects();
+        var layer = (TiledMapTileLayer) map.getLayers().get(0);
+        tileWidth = layer.getTileWidth();
+        tileHeight = layer.getTileHeight();
     }
 
     public void render() {
-        if (map == null) {
+        if (tileWidth == null) {
             return;
         }
 
-        for (var object : mapObjects) {
-            var rect = ((RectangleMapObject) object).getRectangle();
-            shapeDrawer.rectangle(new Rectangle(rect.x, rect.y, rect.width, rect.height), Color.RED, 0.5f);
+        for (var object : player.getTileObjectBoundingBoxes().values()) {
+            shapeDrawer.rectangle(
+                    object.x * tileWidth,
+                    object.y * tileHeight,
+                    object.width * tileWidth,
+                    object.height * tileHeight,
+                    Color.RED,
+                    0.5f);
         }
     }
 }

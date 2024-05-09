@@ -17,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -28,13 +27,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-
+import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
-import com.badlogic.gdx.utils.viewport.Viewport;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -132,7 +129,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     private final OrthographicCamera debugCamera;
     private final DebugRenderer debugRenderer;
     private final Viewport gameViewport;
-    private final Viewport stageViewport;
 
     /**
      * Constructor for the {@link GameScreen} class.
@@ -143,24 +139,17 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         super(game);
 
         // Set up the tilemap
-        // Note: cannot extract into a method because class variables are set as final
-
-        // #region Load Tilemap
         // Get the first layer of the map
         TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         // Get the width and height of a tile
         int tileWidth = layer.getTileWidth();
         int tileHeight = layer.getTileHeight();
-        // Calculate the scale of the map based on the screen size and tile size
-//        mapScale = Math.max(
-//                Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth),
-//                Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
-        mapScale = (float) 1 /tileWidth;
+
+        mapScale = (float) 1 / tileWidth;
         // Initialize the game time
         gameTime = new GameTime();
         // Initialize the map renderer
         renderer = new OrthogonalTiledMapRenderer(map, mapScale);
-        // #endregion
 
         // Initialize the starting point of the player
         Vector2 startingPoint = new Vector2(25, 25);
@@ -199,7 +188,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 var width = rectangle.getWidth();
                 var height = rectangle.getHeight();
 
-                vertices = new float[]{x, y, x, y + height, x + width, y + height, x + width, y};
+                vertices = new float[] {x, y, x, y + height, x + width, y + height, x + width, y};
             } else if (object instanceof PolygonMapObject) {
                 var polygonObject = (PolygonMapObject) object;
                 var polygon = polygonObject.getPolygon();
@@ -209,7 +198,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                 vertices = polygon.getTransformedVertices();
             } else {
                 // Can there be another type of map object?
-                System.out.printf("Unrecognised collision object: %s", object.getClass().getSimpleName());
+                System.out.printf(
+                        "Unrecognised collision object: %s", object.getClass().getSimpleName());
                 continue;
             }
 
@@ -233,15 +223,17 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         }
 
         // Add wall collisions
-        var walls = new float[][]{
-                // Left wall
-                {0, 0, -0.05f, 0, -0.05f, mapHeight, 0, mapHeight},
-                // Top wall
-                {0, mapHeight, mapWidth, mapHeight, mapWidth, mapHeight + 0.05f, 0, mapHeight + 0.05f},
-                // Right wall
-                {mapWidth, 0, mapWidth + 0.05f, 0f, mapWidth + 0.05f, mapHeight, mapWidth, mapHeight,},
-                // Bottom wall
-                {0, 0, mapWidth, 0, mapWidth, -0.05f, 0, -0.05f}
+        var walls = new float[][] {
+            // Left wall
+            {0, 0, -0.05f, 0, -0.05f, mapHeight, 0, mapHeight},
+            // Top wall
+            {0, mapHeight, mapWidth, mapHeight, mapWidth, mapHeight + 0.05f, 0, mapHeight + 0.05f},
+            // Right wall
+            {
+                mapWidth, 0, mapWidth + 0.05f, 0f, mapWidth + 0.05f, mapHeight, mapWidth, mapHeight,
+            },
+            // Bottom wall
+            {0, 0, mapWidth, 0, mapWidth, -0.05f, 0, -0.05f}
         };
         for (var wall : walls) {
             var bodyDef = new BodyDef();
@@ -271,7 +263,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         debugCamera.setToOrtho(false, mapWidth, mapHeight);
         gameViewport = new FitViewport(mapWidth, mapHeight, debugCamera);
 
-        stageViewport = new FitViewport(mapWidth * tileWidth, mapHeight * tileWidth);
+        var stageViewport = new FitViewport(mapWidth * tileWidth, mapHeight * tileWidth);
         processor = new Stage(stageViewport);
 
         Gdx.input.setInputProcessor(processor);
@@ -289,7 +281,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             }
         });
 
-        debugRenderer = new DebugRenderer(processor.getBatch());
+        debugRenderer = new DebugRenderer(player, processor.getBatch());
         debugRenderer.setMap(map);
 
         box2dDebugRenderer = new Box2DDebugRenderer();
@@ -317,9 +309,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             int tileWidth = layer.getTileWidth();
             int tileHeight = layer.getTileHeight();
             // Calculate the scale of the new map based on the screen size and tile size
-//            mapScale = Math.max(
-//                    Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth),
-//                    Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
+            //            mapScale = Math.max(
+            //                    Gdx.graphics.getWidth() / (layer.getWidth() * tileWidth),
+            //                    Gdx.graphics.getHeight() / (layer.getHeight() * tileHeight));
             // Initialize the map renderer for the new map
             renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
@@ -369,11 +361,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Set up the action table
         actionTable.setFillParent(true);
         processor.addActor(actionTable);
-        actionLabel.setVisible(false);
+        actionLabel.setFontScale(0.3f);
         actionTable.add(actionLabel);
         actionTable.bottom();
         actionTable.padBottom(10);
 
+        actionTable.setDebug(true);
         metricsTable.setDebug(true);
 
         // Set up the metrics table
@@ -492,9 +485,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         StreamUtils.parallelFromIterator(map.getLayers().iterator())
                 .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
 
-        // Get the first layer of the map. This is typically the background layer.
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-
         // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the screen.
         renderer.setView(debugCamera);
 
@@ -507,7 +497,10 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         debugRenderer.render();
 
         var rawPosition = player.getTilePosition();
-        batch.draw(player.getSprite(), (rawPosition.x * 16) - (player.getSprite().getWidth() / 2), (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));
+        batch.draw(
+                player.getSprite(),
+                (rawPosition.x * 16) - (player.getSprite().getWidth() / 2),
+                (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));
         batch.end();
 
         box2dDebugRenderer.render(world, debugCamera.combined);
@@ -545,7 +538,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     private void setActionLabel(Player.Transition transitionTile) {
         // Get the ActionMapObject associated with the transition tile and the player's current map object
-        ActionMapObject actionMapObject = getActionMapObject(transitionTile, player.getCurrentMapObject());
+        var actionMapObject = getActionMapObject(transitionTile, player.getCurrentMapObject());
         currentActionMapObject.set(actionMapObject);
 
         // Construct the action text based on the type of the ActionMapObject

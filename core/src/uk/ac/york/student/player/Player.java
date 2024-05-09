@@ -2,23 +2,21 @@ package uk.ac.york.student.player;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -174,17 +172,6 @@ public class Player implements PlayerScore, InputProcessor {
     }
 
     /**
-     * Returns the center position of the player's sprite on the game map.
-     * This is calculated as the sprite's position plus half its width and height.
-     *
-     * @return A new Vector2 object representing the center position of the sprite.
-     */
-    @Contract(pure = true)
-    public Vector2 getCenter() {
-        return new Vector2(sprite.getX() + sprite.getWidth() / 2, sprite.getY() + sprite.getHeight() / 2);
-    }
-
-    /**
      * Enum representing the possible transitions for the player.
      * It includes NEW_MAP and ACTIVITY transitions.
      * NEW_MAP is used when the player transitions to a new map.
@@ -197,33 +184,21 @@ public class Player implements PlayerScore, InputProcessor {
 
     /**
      * A HashMap storing the bounding boxes of the map objects.
-     * The key is a MapObject and the value is a BoundingBox.
+     * The key is a MapObject and the value is a Rectangle.
      * This is used to store the bounding boxes of the map objects for collision detection.
      */
-    private final HashMap<MapObject, BoundingBox> tileObjectBoundingBoxes = new HashMap<>();
+    @Getter
+    private final HashMap<MapObject, Rectangle> tileObjectBoundingBoxes = new HashMap<>();
 
     /**
      * Returns the bounding box of a given map object.
-     * The bounding box is calculated based on the object's properties (x, y, width, height) scaled to the map scale.
-     * The bounding box is represented by two Vector3 objects (pos1 and pos2) which are the bottom-left and top-right corners of the bounding box respectively.
      *
      * @param object The MapObject for which the bounding box is to be calculated.
-     * @return A BoundingBox object representing the bounding box of the map object.
+     * @return A Rectangle object representing the bounding box of the map object.
      */
-    public BoundingBox getTileObjectBoundingBox(@NotNull MapObject object) {
-        // Retrieve the properties of the map object
-        float x = object.getProperties().get("x", Float.class); // x-coordinate of the map object
-        float y = object.getProperties().get("y", Float.class); // y-coordinate of the map object
-        float width = object.getProperties().get("width", Float.class); // width of the map object
-        float height = object.getProperties().get("height", Float.class); // height of the map object
-
-        // Create two Vector3 objects representing the bottom-left and top-right corners of the bounding box
-        Vector3 pos1 = new Vector3(x, y, 0); // bottom-left corner of the bounding box
-        Vector3 pos2 =
-                new Vector3(x + width, y + height, 0); // top-right corner of the bounding box
-
-        // Return a new BoundingBox object representing the bounding box of the map object
-        return new BoundingBox(pos1, pos2);
+    public Rectangle getTileObjectBoundingBox(@NotNull MapObject object) {
+        var rectangleObj = (RectangleMapObject) object;
+        return rectangleObj.getRectangle();
     }
 
     /**
@@ -243,6 +218,10 @@ public class Player implements PlayerScore, InputProcessor {
      * This method is typically called when a new map is set for the player.
      */
     public void loadMapObjectBoundingBoxes() {
+        var layer = (TiledMapTileLayer) map.getLayers().get(0);
+        var tileWidth = layer.getTileWidth();
+        var tileHeight = layer.getTileHeight();
+
         // Retrieve the game objects from the map
         MapObjects objects = getMapObjects();
 
@@ -256,7 +235,11 @@ public class Player implements PlayerScore, InputProcessor {
             if (Boolean.FALSE.equals(actionable)) continue;
 
             // Calculate the bounding box of the game object
-            BoundingBox boundingBox = getTileObjectBoundingBox(object);
+            var boundingBox = getTileObjectBoundingBox(object);
+            boundingBox.x /= tileWidth;
+            boundingBox.width /= tileWidth;
+            boundingBox.y /= tileHeight;
+            boundingBox.height /= tileHeight;
 
             // Store the bounding box in the tileObjectBoundingBoxes HashMap
             tileObjectBoundingBoxes.put(object, boundingBox);
@@ -271,14 +254,11 @@ public class Player implements PlayerScore, InputProcessor {
      * @return The MapObject that the player's sprite is currently on, or null if the sprite is not on any map object.
      */
     public @Nullable MapObject getCurrentMapObject() {
+        var position = getTilePosition();
         // Iterate over each entry in the tileObjectBoundingBoxes HashMap
-        for (Map.Entry<MapObject, BoundingBox> entry : tileObjectBoundingBoxes.entrySet()) {
+        for (var entry : tileObjectBoundingBoxes.entrySet()) {
             // Get the center position of the player's sprite
-            Vector2 center = getCenter();
-
-            // Check if the bounding box of the map object contains the center position of the player's sprite
-            if (entry.getValue().contains(new Vector3(center.x, center.y, 0))) {
-                // If it does, return the map object
+            if (Intersector.overlaps(new Circle(position, 0.25f), entry.getValue())) {
                 return entry.getKey();
             }
         }
