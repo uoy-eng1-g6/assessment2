@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="20">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="31">
  <tileset firstgid="1" source="interior.tsx"/>
  <layer id="4" name="room" width="30" height="20">
   <data encoding="csv">
@@ -224,7 +224,7 @@
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="9" name="startingPoint" x="231.693" y="239.187" width="16" height="16">
+  <object id="9" name="startingPoint" x="232.281" y="232.232" width="16" height="16">
    <properties>
     <property name="actionable" type="bool" value="false"/>
     <property name="isSpawnPoint" type="bool" value="true"/>
@@ -249,9 +249,18 @@
  </objectgroup>
  <objectgroup color="#ff2600" id="13" name="collisions" tintcolor="#000000">
   <object id="12" x="160.222" y="156.15" width="68.2697" height="35.4867"/>
-  <object id="13" x="251.474" y="155.812" width="68.9456" height="25.6856"/>
-  <object id="14" x="251.474" y="182.849" width="22.6439" height="9.12515"/>
-  <object id="15" x="275.132" y="182.512" width="27.0375" height="24.6717"/>
+  <object id="13" x="251.092" y="155.048" width="69.3275" height="26.4495"/>
+  <object id="14" x="251.092" y="181.608" width="23.8374" height="10.271"/>
+  <object id="15" x="275.132" y="181.652" width="27.0375" height="25.5311"/>
   <object id="16" x="161.236" y="211.239" width="13.8567" height="27.3755"/>
+  <object id="20" x="160.325" y="103.126" width="14.6295" height="41.2505"/>
+  <object id="21" x="192.102" y="59.2376" width="95.9313" height="36.4539"/>
+  <object id="22" x="155.049" y="58.9978" width="36.8136" height="26.2612"/>
+  <object id="23" x="288.154" y="59.2376" width="36.6937" height="26.0214"/>
+  <object id="24" x="303.997" y="85.3332" width="21.0498" height="10.661"/>
+  <object id="25" x="304.247" y="112.256" width="15.7707" height="15.6728"/>
+  <object id="26" x="320.116" y="96.2895" width="4.70183" height="164.564"/>
+  <object id="29" x="155.16" y="256.152" width="164.76" height="4.79978"/>
+  <object id="30" x="155.062" y="85.5145" width="4.89774" height="170.441"/>
  </objectgroup>
 </map>
