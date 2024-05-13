@@ -24,8 +24,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * This constructor initialises the ProgressBar that represents the player's study level.
      */
     public PlayerStudyLevel() {
-        progressBar.setWidth(200); // Set the width of the ProgressBar to 200
-        progressBar.setHeight(50); // Set the height of the ProgressBar to 50
+        progressBar.setSize(100, 20);
         progressBar.setAnimateDuration(0.25f); // Set the animation duration of the ProgressBar to 0.25 seconds
     }
 

@@ -23,8 +23,7 @@ public class PlayerHappiness implements PlayerMetric {
      * This constructor initializes the ProgressBar representing the player's happiness level.
      */
     public PlayerHappiness() {
-        progressBar.setWidth(200);
-        progressBar.setHeight(50);
+        progressBar.setSize(100, 20);
         progressBar.setAnimateDuration(0.25f);
     }
 

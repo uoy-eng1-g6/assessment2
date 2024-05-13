@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="21" nextobjectid="61">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="21" nextobjectid="70">
  <tileset firstgid="1" source="cosy_town_tiles.tsx"/>
  <tileset firstgid="3016" source="buildings.tsx"/>
  <tileset firstgid="8488" source="interior.tsx"/>
@@ -221,7 +221,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup color="#ff0000" id="13" name="collisions" visible="0">
+ <objectgroup color="#ff0000" id="13" name="collisions">
   <object id="35" x="41.6364" y="98.5455">
    <polygon points="0,0 5.09091,-6.36364 5.27273,-14.3636 8.54545,-19.4545 22.5455,-18.9091 22.5455,12.9091 0.181818,13.2727"/>
   </object>
@@ -253,7 +253,7 @@
    <polygon points="0,0 6.72727,0.0909091 6.72727,4.63636 -0.181818,4.63636"/>
   </object>
   <object id="48" x="424.125" y="159.875">
-   <polygon points="0,0 -26.5714,-0.25 -30.8735,-39.875 -31,-68.125 -24.4204,-76.875 0,-76.875"/>
+   <polygon points="0,0 -22.7276,-0.403754 -30.8735,-39.875 -31,-68.125 -24.4204,-76.875 0,-76.875"/>
   </object>
   <object id="49" x="444.125" y="159.875">
    <polygon points="0,0 26.5714,-0.25 30.8735,-39.875 31,-68.125 24.4204,-76.875 0,-76.875"/>
@@ -281,17 +281,21 @@
    <polygon points="0,0 -29.7273,-0.0909091 -29.3636,-61 0.181818,-60.9091"/>
   </object>
   <object id="58" x="362.182" y="224">
-   <polygon points="0,0 29.7273,-0.0909091 29.3636,-61 -0.181818,-60.9091"/>
+   <polygon points="0,0 29.7273,-0.0909091 30.4689,-47.0558 22.5769,-60.6925 -0.181818,-60.9091"/>
   </object>
   <object id="59" x="342" y="200.273">
    <polygon points="0,0 20,0.0909091 20,-37.4545 -0.0909091,-37.3636"/>
   </object>
   <object id="60" x="226" y="48.9091" width="12.6364" height="30.9091"/>
+  <object id="61" x="0" y="-1" width="480" height="1"/>
+  <object id="67" x="-1" y="0" width="1" height="320"/>
+  <object id="68" x="0" y="320" width="480" height="1"/>
+  <object id="69" x="480" y="0" width="1" height="320"/>
  </objectgroup>
- <objectgroup color="#00ff00" id="11" name="gameObjects" visible="0">
+ <objectgroup color="#00ff00" id="11" name="gameObjects">
   <object id="16" name="startingPoint" x="176" y="256" width="16" height="16">
    <properties>
-    <property name="spawnpoint" type="bool" value="true"/>
+    <property name="isSpawnPoint" type="bool" value="true"/>
    </properties>
   </object>
   <object id="17" name="enterLibrary" x="64.7519" y="72.3722" width="32" height="40.5">

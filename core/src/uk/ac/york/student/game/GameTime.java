@@ -33,14 +33,9 @@ public final class GameTime {
      * Constructor for the {@link GameTime} class.
      * It initializes the progress bar with the given scale.
      *
-     * @param scale The scale factor for the progress bar's width and height.
      */
-    public GameTime(float scale) {
-        System.out.println(scale);
-        final int scaledWidth = (int) (WIDTH * scale);
-        final int scaledHeight = (int) (HEIGHT * scale);
-
-        progressBar = getProgressBar(scaledWidth, scaledHeight);
+    public GameTime() {
+        progressBar = getProgressBar();
     }
 
     /**
@@ -65,11 +60,12 @@ public final class GameTime {
      * This method is used to create a new {@link ProgressBar} instance with the given dimensions.
      * The {@link ProgressBar} is styled and its initial value is set to the current hour.
      *
-     * @param scaledWidth The width of the {@link ProgressBar}, scaled according to the game's scale factor.
-     * @param scaledHeight The height of the {@link ProgressBar}, scaled according to the game's scale factor.
      * @return A new {@link ProgressBar} instance.
      */
-    @NotNull private ProgressBar getProgressBar(int scaledWidth, int scaledHeight) {
+    @NotNull public ProgressBar getProgressBar() {
+        var width = 100;
+        var height = 10;
+
         // Create a new ProgressBarStyle instance
         ProgressBar.ProgressBarStyle style = new ProgressBar.ProgressBarStyle();
 
@@ -80,20 +76,20 @@ public final class GameTime {
         ProgressBar.ProgressBarStyle barStyle = progressBar.getStyle();
 
         // Set the background of the ProgressBar to a gray color
-        barStyle.background = DrawableUtils.getColouredDrawable(scaledWidth, scaledHeight, Color.GRAY);
+        barStyle.background = DrawableUtils.getColouredDrawable(width, height, Color.GRAY);
 
         // Set the color of the ProgressBar before the knob to green
-        barStyle.knobBefore = DrawableUtils.getColouredDrawable(scaledWidth, scaledHeight, Color.GREEN);
+        barStyle.knobBefore = DrawableUtils.getColouredDrawable(width, height, Color.GREEN);
 
         // Set the color of the knob of the ProgressBar to green
-        barStyle.knob = DrawableUtils.getColouredDrawable(0, scaledHeight, Color.GREEN);
+        barStyle.knob = DrawableUtils.getColouredDrawable(0, height, Color.GREEN);
 
         // Apply the style to the ProgressBar
         progressBar.setStyle(barStyle);
 
         // Set the width and height of the ProgressBar
-        progressBar.setWidth(scaledWidth);
-        progressBar.setHeight(scaledHeight);
+        progressBar.setWidth(width);
+        progressBar.setHeight(height);
 
         // Set the duration of the animation of the ProgressBar
         progressBar.setAnimateDuration(0.25f);
@@ -103,27 +99,6 @@ public final class GameTime {
 
         // Return the configured ProgressBar instance
         return progressBar;
-    }
-
-    /**
-     * This method is used to create a new {@link ProgressBar} instance with the given scale.
-     * It calls the {@link GameTime#getProgressBar(int, int)} method with the width and height scaled according to the given scale factor.
-     *
-     * @param scale The scale factor for the {@link ProgressBar}'s width and height.
-     * @return A new {@link ProgressBar} instance with the given scale.
-     */
-    private @NotNull ProgressBar getProgressBar(float scale) {
-        return getProgressBar((int) (WIDTH * scale), (int) (HEIGHT * scale));
-    }
-
-    /**
-     * This method is used to update the {@link ProgressBar} instance with a new scale.
-     * It calls the {@link GameTime#getProgressBar(float)} method with the new scale, effectively resizing the {@link ProgressBar}.
-     *
-     * @param scale The new scale factor for the {@link ProgressBar}'s width and height.
-     */
-    public void updateProgressBar(float scale) {
-        getProgressBar(scale);
     }
 
     /**
