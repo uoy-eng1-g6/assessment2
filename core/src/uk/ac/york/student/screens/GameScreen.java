@@ -31,7 +31,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -429,12 +428,14 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // opaque, and a value of 0 means fully transparent.
             player.setOpacity(processor.getRoot().getColor().a);
 
-            // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1 means
+            // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1
+            // means
             // fully opaque, and a value of 0 means fully transparent.
             StreamUtils.parallelFromIterator(map.getLayers().iterator())
                     .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
 
-            // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the screen.
+            // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the
+            // screen.
             renderer.setView(gameCamera);
 
             // Render the map. This draws the map to the screen.

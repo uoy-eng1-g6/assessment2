@@ -17,9 +17,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import java.util.HashMap;
-
 import com.badlogic.gdx.physics.box2d.World;
+import java.util.HashMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,6 +58,7 @@ public class Player implements PlayerScore, InputProcessor {
      * TiledMap object representing the current game map.
      */
     private TiledMap map;
+
     private String mapName;
 
     /**
