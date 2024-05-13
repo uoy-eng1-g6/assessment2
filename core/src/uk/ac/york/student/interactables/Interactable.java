@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector4;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Range;
@@ -19,12 +18,11 @@ import org.jetbrains.annotations.Range;
 public class Interactable {
     private final SpriteBatch batch;
     private final ShaderProgram shaderProgram;
-    private Vector4 shaderColor;
+    private Color shaderColor;
     private final float x;
     private final float y;
     private final float width;
     private final float height;
-    private final float scale;
     private final Color color;
 
     @Setter
@@ -43,15 +41,13 @@ public class Interactable {
      * @param y The y position of the class.
      * @param width The width of the class.
      * @param height The height of the class.
-     * @param scale The scale that should be applied to the class.
      */
-    public Interactable(float x, float y, float width, float height, float scale) {
+    public Interactable(float x, float y, float width, float height) {
         this.batch = new SpriteBatch();
-        this.x = x * scale;
-        this.y = y * scale;
+        this.x = x;
+        this.y = y;
         this.width = width;
         this.height = height;
-        this.scale = scale;
         this.color = batch.getColor();
         this.map = "map";
 
@@ -65,12 +61,12 @@ public class Interactable {
     /**
      * Sets the color of the object's outline.
      *
-     * @param vec A {@link Vector4} containing red, green, blue, alpha of the outline.
+     * @param outlineColor A {@link Color} containing red, green, blue, alpha of the outline.
      */
-    public void setOutlineColor(Vector4 vec) {
+    public void setOutlineColor(Color outlineColor) {
         batch.begin();
         batch.setColor(color);
-        shaderProgram.setUniformf("u_color", vec);
+        shaderProgram.setUniformf("u_color", outlineColor);
         redraw();
         batch.end();
     }
@@ -78,10 +74,10 @@ public class Interactable {
     /**
      * Sets the default color of the object's outline.
      *
-     * @param vec A {@link Vector4} containing red, green, blue, alpha of the default outline.
+     * @param outlineColor A {@link Color} containing red, green, blue, alpha of the default outline.
      */
-    public void setDefaultOutlineColor(Vector4 vec) {
-        shaderColor = vec;
+    public void setDefaultOutlineColor(Color outlineColor) {
+        shaderColor = outlineColor;
     }
 
     public void draw() {
@@ -99,13 +95,13 @@ public class Interactable {
      */
     public void setAlpha(@Range(from = 0, to = 1) float a) {
         color.a = a;
-        shaderColor.w = a;
+        shaderColor.a = a;
     }
 
     /**
      * Calls batch.draw(), therefore should only be used in between batch.begin() and batch.end().
      */
     private void redraw() {
-        batch.draw(region, x, y, 0f, 0f, width, height, scale, scale, 0);
+        batch.draw(region, x, y, 0f, 0f, width, height, 1, 1, 0);
     }
 }

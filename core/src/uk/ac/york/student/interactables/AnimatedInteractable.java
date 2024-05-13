@@ -29,8 +29,8 @@ public class AnimatedInteractable extends Interactable {
      * @param height The height of the class.
      * @param frameDuration The duration (in seconds) each frame should last in the animation.
      */
-    public AnimatedInteractable(float x, float y, float width, float height, float scale, float frameDuration) {
-        super(x, y, width, height, scale);
+    public AnimatedInteractable(float x, float y, float width, float height, float frameDuration) {
+        super(x, y, width, height);
         this.frameDuration = frameDuration;
         stateTime = 0f;
         animating = false;
@@ -58,12 +58,5 @@ public class AnimatedInteractable extends Interactable {
         TextureRegion currentFrame = animation.getKeyFrame(stateTime, false);
         super.setRegion(currentFrame);
         super.draw();
-    }
-
-    /**
-     * Sets the state time to be past the animation's duration so next time animate is called, it will reset.
-     */
-    public void resetAnimation() {
-        stateTime += animation.getFrameDuration() * animation.getKeyFrames().length;
     }
 }

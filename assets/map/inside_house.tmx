@@ -133,8 +133,8 @@
 0,0,0,0,0,0,0,0,0,0,4467,0,0,0,0,0,0,0,2370,2368,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,4606,0,0,0,0,0,0,0,0,2372,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,3639,3640,6122,0,0,6125,4743,4749,9,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,3778,3779,6261,0,0,6264,4882,4888,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,3623,3624,6122,0,0,6125,4743,4749,9,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,3762,3763,6261,0,0,6264,4882,4888,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8216,8217,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,5296,0,0,0,0,0,0,8355,8356,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,5179,0,0,0,0,0,0,0,0,4534,0,0,0,0,0,0,0,0,0,0,
@@ -215,15 +215,6 @@
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="7" name="nap" x="160.887" y="103.102" width="28.2466" height="41.1265">
-   <properties>
-    <property name="activityStr" value="have a nap"/>
-    <property name="activityTime" type="int" value="4"/>
-    <property name="activityType" value="nap"/>
-    <property name="changeAmount" value="0.3"/>
-    <property name="isActivity" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="9" name="startingPoint" x="232.281" y="232.232" width="16" height="16">
    <properties>
     <property name="actionable" type="bool" value="false"/>
@@ -235,15 +226,6 @@
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="map"/>
     <property name="newMapStr" value="go outside"/>
-   </properties>
-  </object>
-  <object id="11" name="daydream" x="308.448" y="232.482" width="16" height="16">
-   <properties>
-    <property name="activityStr" value="daydream"/>
-    <property name="activityTime" type="int" value="1"/>
-    <property name="activityType" value="nap"/>
-    <property name="changeAmount" value="0.15"/>
-    <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
  </objectgroup>
