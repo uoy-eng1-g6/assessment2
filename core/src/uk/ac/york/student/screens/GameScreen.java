@@ -99,6 +99,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
     private final Interactable busStop;
 
+    private final Interactable pool;
+
+    private final Interactable pubTable;
+
+    private final Interactable barStool;
+
     private Interactable currentInteractable;
 
     /**
@@ -179,17 +185,17 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Initialize the default color of the outline.
         Vector4 defaultOutlineColor = new Vector4(255.0F, 255.0F, 0.0F, 0.8F);
         // Initialize the pubDoor interactable.
-        pubDoor = new AnimatedInteractable(418, 155, 32, 32, 4, 0.33f);
+        pubDoor = new AnimatedInteractable(418, 155, 32, 32, 4, 0.167f);
         pubDoor.setAnimationRegions(interactableAtlas.findRegions("pubdoor"));
         pubDoor.setCamera(gameCamera);
         pubDoor.setDefaultOutlineColor(defaultOutlineColor);
         // Initialize the homeDoor interactable.
-        homeDoor = new AnimatedInteractable(336, 91, 32, 32, 4, 0.33f);
+        homeDoor = new AnimatedInteractable(336, 91, 32, 32, 4, 0.167f);
         homeDoor.setAnimationRegions(interactableAtlas.findRegions("homedoor"));
         homeDoor.setCamera(gameCamera);
         homeDoor.setDefaultOutlineColor(defaultOutlineColor);
         // Initialize the libraryDoor interactable.
-        libraryDoor = new AnimatedInteractable(65, 221, 32, 32, 4, 0.33f);
+        libraryDoor = new AnimatedInteractable(65, 221, 32, 32, 4, 0.167f);
         libraryDoor.setAnimationRegions(interactableAtlas.findRegions("librarydoor"));
         libraryDoor.setCamera(gameCamera);
         libraryDoor.setDefaultOutlineColor(defaultOutlineColor);
@@ -203,6 +209,24 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         busStop.setRegion(interactableAtlas.findRegion("busstop"));
         busStop.setCamera(gameCamera);
         busStop.setDefaultOutlineColor(defaultOutlineColor);
+        // Initialize the pool table interactable.
+        pool = new Interactable(164, 65, 32, 32, 4);
+        pool.setRegion(interactableAtlas.findRegion("pool"));
+        pool.setCamera((OrthographicCamera) processor.getCamera());
+        pool.setDefaultOutlineColor(defaultOutlineColor);
+        pool.setMap("inside_pub");
+        // Initialize the pub table interactable.
+        pubTable = new Interactable(180, 150, 32, 32, 4);
+        pubTable.setRegion(interactableAtlas.findRegion("pubtable"));
+        pubTable.setCamera((OrthographicCamera) processor.getCamera());
+        pubTable.setDefaultOutlineColor(defaultOutlineColor);
+        pubTable.setMap("inside_pub");
+        // Initialize the bar stool interactable.
+        barStool = new Interactable(29, 138, 32, 32, 4);
+        barStool.setRegion(interactableAtlas.findRegion("barstool"));
+        barStool.setCamera((OrthographicCamera) processor.getCamera());
+        barStool.setDefaultOutlineColor(defaultOutlineColor);
+        barStool.setMap("inside_pub");
 
         // Initialize the player
         player = new Player(world);
@@ -521,13 +545,23 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             }
 
         // Draw interactable objects.
-        if (Objects.equals(currentMapName, "map")) {
-            pubDoor.draw();
-            homeDoor.draw();
-            libraryDoor.draw();
-            bench.draw();
-            busStop.draw();
+        switch (currentMapName) {
+            case "map":
+                pubDoor.draw();
+                homeDoor.draw();
+                libraryDoor.draw();
+                bench.draw();
+                busStop.draw();
+                break;
+            case "inside_pub":
+                pool.draw();
+                pubTable.draw();
+                barStool.draw();
+                break;
+            default:
+                break;
         }
+
 
         // Set alpha of the interactable objects, allowing them to be faded in and out properly.
         pubDoor.setAlpha(processor.getRoot().getColor().a);
@@ -535,6 +569,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         libraryDoor.setAlpha(processor.getRoot().getColor().a);
         bench.setAlpha(processor.getRoot().getColor().a);
         busStop.setAlpha(processor.getRoot().getColor().a);
+        pool.setAlpha(processor.getRoot().getColor().a);
+        pubTable.setAlpha(processor.getRoot().getColor().a);
+        barStool.setAlpha(processor.getRoot().getColor().a);
         // Animate the currentInteractable if it is animated and should currently be animating.
         if (currentInteractable instanceof AnimatedInteractable) {
             AnimatedInteractable animatedInteractable = (AnimatedInteractable) currentInteractable;
@@ -750,18 +787,16 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * Sets the current interactable object to match the current action.
      */
     private void setCurrentInteractable() {
-        // Useful for finding out the name of the current object.
-        // System.out.println(Objects.requireNonNull(currentActionMapObject.get()).getStr());
-        Vector4 vec = new Vector4(0F, 255.0F, 0.0F, processor.getRoot().getColor().a);
+        // Gets name of current interactable as defined in Tiled
         switch (Objects.requireNonNull(currentActionMapObject.get()).getStr()) {
-            case "go for drinks":
+            case "go into the pub":
                 currentInteractable = pubDoor;
                 break;
             case "go into your house":
-            case "go outside": // This allows homeDoor to be reset when exiting the house.
+            //case "go outside": // This allows homeDoor to be reset when exiting the house.
                 currentInteractable = homeDoor;
                 break;
-            case "study at the library":
+            case "go into the library":
                 currentInteractable = libraryDoor;
                 break;
             case "head to town":
@@ -770,6 +805,16 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             case "feed the ducks":
                 currentInteractable = bench;
                 break;
+            case "play pool":
+                currentInteractable = pool;
+                break;
+            case "eat at pub":
+                currentInteractable = pubTable;
+                break;
+            case "drink at the bar":
+                currentInteractable = barStool;
+                break;
+
             default:
                 currentInteractable = null;
                 break;

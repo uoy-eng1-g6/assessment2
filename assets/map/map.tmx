@@ -292,7 +292,6 @@
   <object id="68" x="0" y="320" width="480" height="1"/>
   <object id="69" x="480" y="0" width="1" height="320"/>
  </objectgroup>
-<<<<<<< HEAD
  <objectgroup color="#00ff00" id="11" name="gameObjects">
   <object id="16" name="startingPoint" x="176" y="256" width="16" height="16">
    <properties>
@@ -301,11 +300,9 @@
   </object>
   <object id="17" name="enterLibrary" x="64.7519" y="72.3722" width="32" height="40.5">
    <properties>
-    <property name="activityStr" value="study at the library"/>
-    <property name="activityTime" type="int" value="2"/>
-    <property name="activityType" value="study"/>
-    <property name="changeAmount" value="0.3,0.2,0.15"/>
-    <property name="isActivity" type="bool" value="true"/>
+    <property name="isNewMap" type="bool" value="true"/>
+    <property name="newMap" value="inside_library"/>
+    <property name="newMapStr" value="go into the library"/>
    </properties>
   </object>
   <object id="19" name="enterRoom" x="341.987" y="200.325" width="20" height="41">
@@ -317,11 +314,9 @@
   </object>
   <object id="21" name="enterPub" x="424.147" y="130.784" width="20.375" height="41.375">
    <properties>
-    <property name="activityStr" value="go for drinks"/>
-    <property name="activityTime" type="int" value="2"/>
-    <property name="activityType" value="entertain"/>
-    <property name="changeAmount" value="0.4,0.25"/>
-    <property name="isActivity" type="bool" value="true"/>
+    <property name="isNewMap" type="bool" value="true"/>
+    <property name="newMap" value="inside_pub"/>
+    <property name="newMapStr" value="go into the pub"/>
    </properties>
   </object>
   <object id="23" name="enterBusStop" x="16.2257" y="230.904" width="62.5791" height="24.9925">
@@ -339,15 +334,6 @@
     <property name="activityTime" type="int" value="1"/>
     <property name="activityType" value="entertain"/>
     <property name="changeAmount" value="0.1,0.15"/>
-    <property name="isActivity" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="29" name="climbTower" x="389.774" y="0" width="90.5464" height="80.9223">
-   <properties>
-    <property name="activityStr" value="climb clifford's tower"/>
-    <property name="activityTime" type="int" value="1"/>
-    <property name="activityType" value="entertain"/>
-    <property name="changeAmount" value="0.1,0.2"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
