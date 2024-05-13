@@ -48,6 +48,8 @@ import uk.ac.york.student.game.activities.Activity;
 import uk.ac.york.student.player.Player;
 import uk.ac.york.student.player.PlayerMetric;
 import uk.ac.york.student.player.PlayerMetrics;
+import uk.ac.york.student.settings.DebugScreenPreferences;
+import uk.ac.york.student.settings.GamePreferences;
 import uk.ac.york.student.utils.MapOfSuppliers;
 import uk.ac.york.student.utils.Pair;
 import uk.ac.york.student.utils.StreamUtils;
@@ -129,6 +131,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     private final OrthographicCamera gameCamera;
     private final Viewport gameViewport;
 
+    private final Boolean debugEnabled;
     private final Box2DDebugRenderer box2dDebugRenderer;
     private final DebugRenderer debugRenderer;
 
@@ -170,6 +173,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             }
         });
 
+        debugEnabled = ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled();
         debugRenderer = new DebugRenderer(player, processor.getBatch());
         box2dDebugRenderer = new Box2DDebugRenderer();
 
@@ -313,8 +317,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         actionTable.bottom();
         actionTable.padBottom(10);
 
-        actionTable.setDebug(true);
-        metricsTable.setDebug(true);
+        actionTable.setDebug(debugEnabled);
+        metricsTable.setDebug(debugEnabled);
 
         // Set up the metrics table
         metricsTable.setFillParent(true);
@@ -444,7 +448,10 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // Get the batch for the stage. This is used to draw the player and other game objects.
             Batch batch = processor.getBatch();
             batch.begin();
-            debugRenderer.render();
+
+            if (debugEnabled) {
+                debugRenderer.render();
+            }
 
             var rawPosition = player.getTilePosition();
             batch.draw(
@@ -453,7 +460,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                     (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));
             batch.end();
 
-            box2dDebugRenderer.render(world, gameCamera.combined);
+            if (debugEnabled) {
+                box2dDebugRenderer.render(world, gameCamera.combined);
+            }
 
             // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
             // action.
