@@ -10,12 +10,10 @@ import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,11 +25,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -83,12 +83,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * The map for the game. This is loaded from the {@link MapManager} with {@link MapManager#getMaps()} then {@link MapOfSuppliers#getResult(Object)}.
      */
-    private TiledMap map = MapManager.getMaps().getResult("map");
+    private TiledMap map;
 
     /**
      * The scale of the map. This is used to adjust the size of the map to fit the screen.
      */
-    private final float mapScale;
+    private float mapScale;
 
     /**
      * The renderer for the map. This is used to draw the map on the screen.
@@ -141,42 +141,19 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     public GameScreen(GdxGame game) {
         super(game);
 
-        // Set up the tilemap
-        // Get the first layer of the map
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
-        // Get the width and height of map tiles and the map background
-        var mapWidth = layer.getWidth();
-        var mapHeight = layer.getHeight();
-        var tileWidth = layer.getTileWidth();
-        var tileHeight = layer.getTileHeight();
-
-        mapScale = (float) 1 / tileWidth;
         // Initialize the game time
         gameTime = new GameTime();
-        // Initialize the map renderer
-        renderer = new OrthogonalTiledMapRenderer(map, mapScale);
-
-        // Get the layer of the map that contains game objects
-        var gameObjectsLayer = map.getLayers().get("gameObjects");
-        var playerStartPosition = findPlayerStartPosition(tileWidth, tileHeight, gameObjectsLayer);
-        if (playerStartPosition == null) {
-            throw new IllegalStateException("Could not locate player starting position");
-        }
 
         world = new World(new Vector2(0, 0), true);
-        var collisionLayer = map.getLayers().get("collisions");
-        loadCollisionObjectsFromMapLayer(world, tileWidth, tileHeight, collisionLayer);
 
-        // Initialize the player at the starting point
-        var fixture = createPlayerCollisionFixture(world, playerStartPosition.x, playerStartPosition.y);
-        player = new Player(map, fixture);
+        // Initialize the player
+        player = new Player(world);
 
         // Initialize the stage and set it as the input processor
         gameCamera = new OrthographicCamera();
-        gameCamera.setToOrtho(false, mapWidth, mapHeight);
-        gameViewport = new FitViewport(mapWidth, mapHeight, gameCamera);
+        gameViewport = new FitViewport(1, 1, gameCamera);
 
-        var stageViewport = new FitViewport(mapWidth * tileWidth, mapHeight * tileWidth);
+        var stageViewport = new FitViewport(1, 1);
         processor = new Stage(stageViewport);
 
         Gdx.input.setInputProcessor(processor);
@@ -195,22 +172,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         });
 
         debugRenderer = new DebugRenderer(player, processor.getBatch());
-        debugRenderer.setMap(map);
-
         box2dDebugRenderer = new Box2DDebugRenderer();
-    }
 
-    static Vector2 findPlayerStartPosition(int tileWidth, int tileHeight, MapLayer mapLayer) {
-        for (var object : mapLayer.getObjects()) {
-            if (object.getProperties().containsKey("isSpawnPoint")
-                    && object.getProperties().get("isSpawnPoint", Boolean.class)) {
-                // Get the center point of the spawn position
-                var rect = ((RectangleMapObject) object).getRectangle();
-                return new Vector2(
-                        (rect.getX() + (rect.width / 2)) / tileWidth, (rect.getY() + (rect.height / 2)) / tileHeight);
-            }
-        }
-        return null;
+        changeMap("map", true);
     }
 
     static void loadCollisionObjectsFromMapLayer(World world, int tileWidth, int tileHeight, MapLayer mapLayer) {
@@ -263,66 +227,68 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         }
     }
 
-    static Fixture createPlayerCollisionFixture(World world, float x, float y) {
-        var bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(x, y);
-
-        var body = world.createBody(bodyDef);
-        var shape = new CircleShape();
-        shape.setRadius(Player.HITBOX_RADIUS);
-
-        var fixture = body.createFixture(shape, 1f);
-        shape.dispose();
-
-        return fixture;
-    }
-
     /**
      * Changes the current map to a new map specified by the mapName parameter.
      * The screen fades out to black, then the new map is loaded and the screen fades back in.
      *
      * @param mapName The name of the new map to load.
      */
-    public void changeMap(String mapName) {
-        // make the screen black slowly
-        processor.getRoot().getColor().a = 1;
-        SequenceAction sequenceAction = new SequenceAction();
-        sequenceAction.addAction(Actions.fadeOut(0.5f));
-        sequenceAction.addAction(Actions.run(() -> {
+    public void changeMap(String mapName, boolean immediate) {
+        Runnable mapChangeFn = () -> {
             // Dispose of the current map
-            map.dispose();
+            if (map != null) {
+                map.dispose();
+            }
             // Load the new map
             map = MapManager.getMaps().getResult(mapName);
+            debugRenderer.setMap(map);
+
+            // Clear collision objects from world
+            var bodies = new Array<Body>();
+            world.getBodies(bodies);
+            for (int i = 0; i < bodies.size; i++) {
+                world.destroyBody(bodies.get(i));
+            }
+
+            player.setMap(mapName, map);
+
+            // Get the first layer of the map
+            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
+            // Get the width and height of map tiles and the map background
+            var mapWidth = layer.getWidth();
+            var mapHeight = layer.getHeight();
+            var tileWidth = layer.getTileWidth();
+            var tileHeight = layer.getTileHeight();
+
+            mapScale = (float) 1 / tileWidth;
+
             // Initialize the map renderer for the new map
             renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
-            // Initialize the starting point of the player for the new map
-            Vector2 startingPoint = new Vector2(25, 25);
-            // Get the layer of the new map that contains game objects
-            MapLayer gameObjectsLayer = map.getLayers().get("gameObjects");
-            // Get all objects in the game objects layer
-            MapObjects objects = gameObjectsLayer.getObjects();
-            // Iterate over all objects to find the starting point
-            for (MapObject object : objects) {
-                if (!object.getName().equals("startingPoint")) continue;
-                MapProperties properties = object.getProperties();
-                if (!properties.containsKey("spawnpoint")) continue;
-                Boolean spawnpoint = properties.get("spawnpoint", Boolean.class);
-                if (spawnpoint == null || Boolean.FALSE.equals(spawnpoint)) continue;
-                RectangleMapObject rectangleObject = (RectangleMapObject) object;
-                Rectangle rectangle = rectangleObject.getRectangle();
-                // Update the starting point based on the found object
-                startingPoint = new Vector2(rectangle.getX() * mapScale, rectangle.getY() * mapScale);
-                break;
-            }
+            var collisionLayer = map.getLayers().get("collisions");
+            loadCollisionObjectsFromMapLayer(world, tileWidth, tileHeight, collisionLayer);
+
+            gameCamera.setToOrtho(false, mapWidth, mapHeight);
+            gameViewport.setWorldSize(mapWidth, mapHeight);
+            processor.getViewport().setWorldSize(mapWidth * tileWidth, mapHeight * tileWidth);
 
             // Set the view of the map renderer to the camera of the stage
             renderer.setView(gameCamera);
 
             // Set the input processor to the stage
             Gdx.input.setInputProcessor(processor);
-        }));
+        };
+
+        if (immediate) {
+            mapChangeFn.run();
+            return;
+        }
+
+        // make the screen black slowly
+        processor.getRoot().getColor().a = 1;
+        SequenceAction sequenceAction = new SequenceAction();
+        sequenceAction.addAction(Actions.fadeOut(0.5f));
+        sequenceAction.addAction(Actions.run(mapChangeFn));
         // Fade the screen back in
         sequenceAction.addAction(Actions.fadeIn(0.5f));
         // Add the sequence action to the root of the stage
@@ -454,48 +420,50 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Set the clear color to black. This is the color that the screen is cleared to when glClear is called.
         Gdx.gl.glClearColor(0, 0, 0, 1);
 
-        // Move the player. This updates the player's position based on their current velocity and the elapsed time
-        // since the last frame.
-        player.move();
+        if (renderer != null) {
+            // Move the player. This updates the player's position based on their current velocity and the elapsed time
+            // since the last frame.
+            player.move();
 
-        // Set the opacity of the player. This determines how transparent the player is. A value of 1 means fully
-        // opaque, and a value of 0 means fully transparent.
-        player.setOpacity(processor.getRoot().getColor().a);
+            // Set the opacity of the player. This determines how transparent the player is. A value of 1 means fully
+            // opaque, and a value of 0 means fully transparent.
+            player.setOpacity(processor.getRoot().getColor().a);
 
-        // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1 means
-        // fully opaque, and a value of 0 means fully transparent.
-        StreamUtils.parallelFromIterator(map.getLayers().iterator())
-                .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
+            // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1 means
+            // fully opaque, and a value of 0 means fully transparent.
+            StreamUtils.parallelFromIterator(map.getLayers().iterator())
+                    .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
 
-        // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the screen.
-        renderer.setView(gameCamera);
+            // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the screen.
+            renderer.setView(gameCamera);
 
-        // Render the map. This draws the map to the screen.
-        renderer.render();
+            // Render the map. This draws the map to the screen.
+            renderer.render();
 
-        // Get the batch for the stage. This is used to draw the player and other game objects.
-        Batch batch = processor.getBatch();
-        batch.begin();
-        debugRenderer.render();
+            // Get the batch for the stage. This is used to draw the player and other game objects.
+            Batch batch = processor.getBatch();
+            batch.begin();
+            debugRenderer.render();
 
-        var rawPosition = player.getTilePosition();
-        batch.draw(
-                player.getSprite(),
-                (rawPosition.x * 16) - (player.getSprite().getWidth() / 2),
-                (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));
-        batch.end();
+            var rawPosition = player.getTilePosition();
+            batch.draw(
+                    player.getSprite(),
+                    (rawPosition.x * 16) - (player.getSprite().getWidth() / 2),
+                    (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));
+            batch.end();
 
-        box2dDebugRenderer.render(world, gameCamera.combined);
+            box2dDebugRenderer.render(world, gameCamera.combined);
 
-        // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
-        // action.
-        Player.Transition transitionTile = player.isInTransitionTile();
-        if (transitionTile != null) {
-            setActionLabel(transitionTile);
-        } else {
-            // If the player is not in a transition tile, hide the action label.
-            currentActionMapObject.set(null);
-            actionLabel.setVisible(false);
+            // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
+            // action.
+            Player.Transition transitionTile = player.isInTransitionTile();
+            if (transitionTile != null) {
+                setActionLabel(transitionTile);
+            } else {
+                // If the player is not in a transition tile, hide the action label.
+                currentActionMapObject.set(null);
+                actionLabel.setVisible(false);
+            }
         }
 
         // Draw the stage. This renders all actors added to the stage, including the player and UI elements.
@@ -688,8 +656,10 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         gameViewport.update(screenWidth, screenHeight);
         processor.getViewport().update(screenWidth, screenHeight, true);
 
-        // Set the view of the map renderer to the camera
-        renderer.setView(gameCamera);
+        if (renderer != null) {
+            // Set the view of the map renderer to the camera
+            renderer.setView(gameCamera);
+        }
     }
 
     /**
@@ -766,7 +736,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * @return A boolean indicating whether the map change was successful.
      */
     private boolean doMapChange(@NotNull TransitionMapObject actionMapObject) {
-        changeMap(actionMapObject.getType());
+        changeMap(actionMapObject.getType(), false);
         return true;
     }
 

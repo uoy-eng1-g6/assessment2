@@ -14,8 +14,12 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import java.util.HashMap;
+
+import com.badlogic.gdx.physics.box2d.World;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +59,7 @@ public class Player implements PlayerScore, InputProcessor {
      * TiledMap object representing the current game map.
      */
     private TiledMap map;
+    private String mapName;
 
     /**
      * TextureAtlas object containing the textures for the player's sprite.
@@ -62,30 +67,46 @@ public class Player implements PlayerScore, InputProcessor {
     private final TextureAtlas textureAtlas = new TextureAtlas("sprite-atlases/character-sprites.atlas");
 
     private final Vector2 velocity = new Vector2();
-    private final Fixture fixture;
+
+    private final World world;
+    private Fixture fixture;
+
+    private final HashMap<String, Vector2> mapPositions = new HashMap<>();
 
     /**
      * Constructor for the Player class.
-     *
-     * @param map The TiledMap object representing the current game map.
      */
-    public Player(@NotNull TiledMap map, @NotNull Fixture fixture) {
-        this.map = map; // Assign the provided map to the player's map
-        this.fixture = fixture;
-
+    public Player(World world) {
+        this.world = world;
         // Create a sprite for the player and set its position, opacity, and size
         SPRITETOWARDSREGION = textureAtlas.findRegion("char3_towards");
         SPRITEAWAYREGION = textureAtlas.findRegion("char3_away");
         SPRITELEFTREGION = textureAtlas.findRegion("char3_left");
         sprite = textureAtlas.createSprite("char3_towards");
         sprite.setAlpha(1);
-
-        // Load the bounding boxes of the map objects
-        loadMapObjectBoundingBoxes();
     }
 
     public Vector2 getTilePosition() {
         return fixture.getBody().getPosition();
+    }
+
+    Vector2 findStartPosition() {
+        var backgroundLayer = (TiledMapTileLayer) map.getLayers().get(0);
+        var tileWidth = backgroundLayer.getTileWidth();
+        var tileHeight = backgroundLayer.getTileHeight();
+
+        var mapLayer = map.getLayers().get("gameObjects");
+
+        for (var object : mapLayer.getObjects()) {
+            if (object.getProperties().containsKey("isSpawnPoint")
+                    && object.getProperties().get("isSpawnPoint", Boolean.class)) {
+                // Get the center point of the spawn position
+                var rect = ((RectangleMapObject) object).getRectangle();
+                return new Vector2(
+                        (rect.getX() + (rect.width / 2)) / tileWidth, (rect.getY() + (rect.height / 2)) / tileHeight);
+            }
+        }
+        return null;
     }
 
     /**
@@ -93,8 +114,35 @@ public class Player implements PlayerScore, InputProcessor {
      *
      * @param map The TiledMap object representing the new game map.
      */
-    public void setMap(@NotNull TiledMap map) {
+    public void setMap(@NotNull String name, @NotNull TiledMap map) {
+        if (fixture != null) {
+            mapPositions.put(mapName, fixture.getBody().getPosition().cpy());
+        }
+
         this.map = map; // Assign the provided map to the player's map
+        this.mapName = name;
+
+        Vector2 startPosition;
+        if (mapPositions.containsKey(mapName)) {
+            startPosition = mapPositions.get(mapName);
+        } else {
+            startPosition = findStartPosition();
+        }
+
+        if (startPosition == null) {
+            throw new IllegalStateException("No start position found");
+        }
+
+        var bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(startPosition);
+
+        var body = world.createBody(bodyDef);
+        var shape = new CircleShape();
+        shape.setRadius(Player.HITBOX_RADIUS);
+
+        fixture = body.createFixture(shape, 1f);
+        shape.dispose();
 
         // Create a sprite for the player and set its position, opacity, and size
         sprite = textureAtlas.createSprite("char3_towards");
