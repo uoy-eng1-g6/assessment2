@@ -1,8 +1,6 @@
 package uk.ac.york.student.score;
 
 import com.badlogic.gdx.Gdx;
-import org.jetbrains.annotations.NotNull;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -11,19 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScoreManager {
-    private static final String SCHEMA = (
-            "CREATE TABLE IF NOT EXISTS scores ("
+    private static final String SCHEMA = ("CREATE TABLE IF NOT EXISTS scores ("
             + "id INTEGER PRIMARY KEY AUTO_INCREMENT,"
             + "score INTEGER NOT NULL"
-            + ");"
-    );
+            + ");");
     private static final String ADD_SCORE = "INSERT INTO scores (score) VALUES (?);";
     private static final String GET_SCORES = "SELECT score FROM scores ORDER BY score DESC LIMIT 10;";
 
     private static Driver driver = null;
 
     static String getDatabaseUrl() {
-        return "jdbc:h2:file:" + Gdx.files.absolute(Gdx.files.getExternalStoragePath()).child("LetRonCooke/scores.h2").path();
+        return "jdbc:h2:file:"
+                + Gdx.files
+                        .absolute(Gdx.files.getExternalStoragePath())
+                        .child("LetRonCooke/scores.h2")
+                        .path();
     }
 
     static Connection getConnection() {

@@ -77,7 +77,7 @@ public class EndScreen extends BaseScreen {
         centerTable.pad(0, 50, 0, 50);
         centerTable.add(title).padBottom(20).row();
 
-        var headerLabel = new Label(actualScore >= highScores.get(0) ? "NEW HIGHSCORE": "Final Score:", skin);
+        var headerLabel = new Label(actualScore >= highScores.get(0) ? "NEW HIGHSCORE" : "Final Score:", skin);
         headerLabel.setFontScale(0.8f);
         var textScoreLabel = new Label(scoreString, skin);
         textScoreLabel.setFontScale(0.7f);
