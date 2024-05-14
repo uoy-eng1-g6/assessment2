@@ -24,7 +24,7 @@ void main() {
 		texture2D(u_texture, vec2(v_texCoords.x + outline, v_texCoords.y - outline)).a +
 		texture2D(u_texture, vec2(v_texCoords.x - outline, v_texCoords.y + outline)).a;
 
-  if (fragColor.a == 0 && a > 0.0)
+  if (fragColor.a == 0.0 && a > 0.0)
     // give the fragment the color inputted in the game if its an outline
     gl_FragColor = u_color;
   else
