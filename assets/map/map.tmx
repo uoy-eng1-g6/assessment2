@@ -279,21 +279,21 @@
     <property name="isSpawnPoint" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="17" name="enterLibrary" x="64.7519" y="72.3722" width="32" height="40.5">
+  <object id="17" name="enterLibrary" x="64.7519" y="72.3722" width="32" height="32.331">
    <properties>
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="inside_library"/>
     <property name="newMapStr" value="go into the library"/>
    </properties>
   </object>
-  <object id="19" name="enterRoom" x="341.987" y="200.325" width="20" height="41">
+  <object id="19" name="enterRoom" x="341.987" y="200.325" width="20" height="32.4011">
    <properties>
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="inside_house"/>
     <property name="newMapStr" value="go into your house"/>
    </properties>
   </object>
-  <object id="21" name="enterPub" x="424.147" y="130.784" width="20.375" height="41.375">
+  <object id="21" name="enterPub" x="424.147" y="130.784" width="20.375" height="35.6424">
    <properties>
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="inside_pub"/>

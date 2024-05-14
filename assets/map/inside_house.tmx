@@ -170,7 +170,7 @@
 </data>
  </layer>
  <objectgroup color="#ff40ff" id="12" name="gameObjects">
-  <object id="1" name="cookFood" x="215.057" y="96.193" width="33.625" height="26.375">
+  <object id="1" name="cookFood" x="215.208" y="91.6539" width="33.625" height="18.6585">
    <properties>
     <property name="activityStr" value="cook a meal"/>
     <property name="activityTime" type="int" value="2"/>
@@ -179,7 +179,7 @@
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="2" name="getFood" x="263.389" y="93.614" width="31.25" height="27">
+  <object id="2" name="getFood" x="264.448" y="89.8314" width="31.25" height="20.6452">
    <properties>
     <property name="activityStr" value="have a snack"/>
     <property name="activityTime" type="int" value="1"/>
@@ -197,7 +197,7 @@
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="5" name="watchFish" x="175.693" y="191.278" width="32" height="14">
+  <object id="5" name="watchFish" x="176.298" y="185.831" width="32" height="14">
    <properties>
     <property name="activityStr" value="watch the fish"/>
     <property name="activityTime" type="int" value="1"/>
@@ -206,7 +206,7 @@
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="6" name="sleep" x="256.955" y="174.827" width="47.0522" height="44.0333">
+  <object id="6" name="sleep" x="264.974" y="174.827" width="39.0331" height="41.1585">
    <properties>
     <property name="activityStr" value="go to bed"/>
     <property name="activityTime" type="int" value="8"/>
