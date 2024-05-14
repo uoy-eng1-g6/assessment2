@@ -36,7 +36,7 @@ public class Interactable {
     private String map;
 
     /**
-     * Constructor for the AnimatedInteractable class.
+     * Constructor for the Interactable class.
      *
      * @param interactInfo A list of the interactInfo from Tiled. Must be of 4 items: x, y, width, height. This
      *                     information is stored in Tiled as a string as so: interactInfo: x,y,width,height
