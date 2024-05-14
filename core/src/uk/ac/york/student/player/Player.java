@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Range;
  * It also manages the player's score and the player's sprite on the screen.
  */
 @Getter
-public class Player implements PlayerScore, InputProcessor {
+public class Player implements InputProcessor {
     public static final float HITBOX_RADIUS = 0.25f;
 
     /**

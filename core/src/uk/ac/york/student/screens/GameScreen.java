@@ -140,7 +140,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     private final Label timeLabel = new Label("You exist outside of the space-time continuum.", craftacularSkin);
 
-    private final World world;
+    private World world;
 
     private final OrthographicCamera gameCamera;
     private final Viewport gameViewport;
@@ -523,7 +523,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // elements.
         processor.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         // Step the world. This updates the position of all physics objects on the map (just the player).
-        world.step(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f), 8, 3);
+        if (world != null) {
+            world.step(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f), 8, 3);
+        }
     }
 
     /**
@@ -649,13 +651,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
                 } else {
                     // If the activity is sleeping
-                    if (gameTime.isEndOfDays()) {
-                        // If it's the last day of the game, append "End of the game!" to the action text
-                        actionText.append(" (End of the game!)");
-                    } else {
-                        // If it's not the last day of the game, append "End of the day" to the action text
-                        actionText.append(" (End of the day)");
-                    }
+                    actionText.append(gameTime.isEndOfDays() ? " (End of the game!)" : " (End of the day)");
                 }
             }
         }
@@ -751,7 +747,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
     /**
      * This method is called when the game screen is being disposed of.
-     * It disposes of the {@link GameScreen#map}, {@link GameScreen#processor}, {@link GameScreen#craftacularSkin}, and {@link GameScreen#player} to free up resources and prevent memory leaks.
+     * It disposes of the {@link GameScreen#map}, {@link GameScreen#processor},
+     * {@link GameScreen#craftacularSkin}, {@link GameScreen#player}, and {@link GameScreen#world}
+     * to free up resources and prevent memory leaks.
      */
     @Override
     public void dispose() {
@@ -759,6 +757,9 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         processor.dispose();
         craftacularSkin.dispose();
         player.dispose();
+
+        world.dispose();
+        world = null;
     }
 
     /**
@@ -904,7 +905,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // Check if the current day plus one equals the total number of days
             if (gameTime.isEndOfDays()) {
                 // If it does, transition the screen to the end screen and return true
-                game.transitionScreen(Screens.END, player);
+                game.transitionScreen(Screens.END, player.getMetrics());
                 return true;
             } else {
                 // If it doesn't, increment the current day
