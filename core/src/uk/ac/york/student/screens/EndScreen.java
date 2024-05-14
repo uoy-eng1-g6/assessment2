@@ -23,9 +23,9 @@ import uk.ac.york.student.settings.GamePreferences;
 
 @Getter
 public class EndScreen extends BaseScreen {
-    private final Stage processor;
+    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
-    private final Skin skin = SkinManager.getSkins().getResult(Skins.CRAFTACULAR);
+    private final Stage processor;
 
     public EndScreen(GdxGame game) {
         super(game);
@@ -37,17 +37,15 @@ public class EndScreen extends BaseScreen {
         processor = new Stage(new ScreenViewport());
 
         var metrics = (PlayerMetrics) args[0];
-        var energyTotal = metrics.getEnergy().getTotal();
-        var studyLevelTotal = metrics.getStudyLevel().getTotal();
-        var happinessTotal = metrics.getHappiness().getTotal();
-        var energyMax = metrics.getEnergy().getMaxTotal();
-        var studyLevelMax = metrics.getStudyLevel().getMaxTotal();
-        var happinessMax = metrics.getHappiness().getMaxTotal();
-
         var score = ScoreManager.calculateScore(
-                energyTotal, energyMax, studyLevelTotal, studyLevelMax, happinessTotal, happinessMax);
+                metrics.getEnergy().getTotal(),
+                metrics.getEnergy().getMaxTotal(),
+                metrics.getStudyLevel().getTotal(),
+                metrics.getStudyLevel().getMaxTotal(),
+                metrics.getHappiness().getTotal(),
+                metrics.getHappiness().getMaxTotal());
         var actualScore = (int) Math.floor(score * 100);
-        ScoreManager.addScore(actualScore);
+        ScoreManager.saveScore(actualScore);
         var scoreString = ScoreManager.convertScoreToString(score);
 
         var highScores = ScoreManager.getTop10Scores();

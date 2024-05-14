@@ -1,11 +1,8 @@
 package uk.ac.york.student.assets.skins;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import java.util.function.Supplier;
-import lombok.Getter;
+import java.util.HashMap;
 import lombok.experimental.UtilityClass;
-import uk.ac.york.student.utils.EnumMapOfSuppliers;
 
 /**
  * This utility class manages the loading and storage of Skin objects.
@@ -13,22 +10,21 @@ import uk.ac.york.student.utils.EnumMapOfSuppliers;
  */
 @UtilityClass
 public class SkinManager {
-    /**
-     * Supplier for the Craftacular skin
-     */
-    private static final Supplier<Skin> craftacular =
-            () -> new Skin(Gdx.files.internal("skins/craftacular/skin/craftacular-ui.json"));
+    private static final HashMap<Skins, Skin> cachedSkins = new HashMap<>();
 
-    /**
-     * EnumMapOfSuppliers that maps from Skins enum to Skin objects
-     * <p>
-     * Use {@link uk.ac.york.student.utils.EnumMapOfSuppliers#getResult(Enum)} to get the Skin object for a given skin
-     */
-    @Getter
-    private static final EnumMapOfSuppliers<Skins, Skin> skins = new EnumMapOfSuppliers<>(Skins.class);
+    public static Skin getSkin(Skins skin) {
+        if (cachedSkins.containsKey(skin)) {
+            return cachedSkins.get(skin);
+        }
 
-    // Static initializer block that loads the skins
-    static {
-        skins.put(Skins.CRAFTACULAR, craftacular);
+        cachedSkins.put(skin, new Skin(skin.getHandle()));
+        return getSkin(skin);
+    }
+
+    public static void dispose() {
+        for (Skin skin : cachedSkins.values()) {
+            skin.dispose();
+        }
+        cachedSkins.clear();
     }
 }

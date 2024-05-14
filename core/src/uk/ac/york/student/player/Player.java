@@ -534,7 +534,6 @@ public class Player implements InputProcessor {
      */
     public void dispose() {
         textureAtlas.dispose(); // Dispose of the TextureAtlas
-        metrics.dispose(); // Dispose of the PlayerMetrics
     }
 
     /**

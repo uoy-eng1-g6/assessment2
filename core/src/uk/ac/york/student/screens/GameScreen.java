@@ -54,7 +54,6 @@ import uk.ac.york.student.player.PlayerMetric;
 import uk.ac.york.student.player.PlayerMetrics;
 import uk.ac.york.student.settings.DebugScreenPreferences;
 import uk.ac.york.student.settings.GamePreferences;
-import uk.ac.york.student.utils.MapOfSuppliers;
 import uk.ac.york.student.utils.Pair;
 import uk.ac.york.student.utils.StreamUtils;
 
@@ -96,7 +95,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     private final GameTime gameTime;
 
     /**
-     * The map for the game. This is loaded from the {@link MapManager} with {@link MapManager#getMaps()} then {@link MapOfSuppliers#getResult(Object)}.
+     * The map for the game. This is loaded from the {@link MapManager} with {@link MapManager#getMap(String)}.
      */
     private TiledMap map;
 
@@ -113,12 +112,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * The skin for the game. This is used to style the game's UI elements.
      */
-    private final Skin craftacularSkin = SkinManager.getSkins().getResult(Skins.CRAFTACULAR);
+    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
     /**
      * The table for the action UI. This is where the action label is added.
      */
-    private final Table actionTable = new Table(craftacularSkin);
+    private final Table actionTable = new Table(skin);
 
     /**
      * The table for the metrics UI. This is where the metrics labels and progress bars are added.
@@ -133,12 +132,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * The label for the action UI. This displays the current action that the player can perform.
      */
-    private final Label actionLabel = new Label("ENG1 Project. Super cool. (You will never see this)", craftacularSkin);
+    private final Label actionLabel = new Label("ENG1 Project. Super cool. (You will never see this)", skin);
 
     /**
      * The label for the time UI. This displays the current time in the game.
      */
-    private final Label timeLabel = new Label("You exist outside of the space-time continuum.", craftacularSkin);
+    private final Label timeLabel = new Label("You exist outside of the space-time continuum.", skin);
 
     private World world;
 
@@ -257,12 +256,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     public void changeMap(String mapName, boolean immediate) {
         Runnable mapChangeFn = () -> {
-            // Dispose of the current map
-            if (map != null) {
-                map.dispose();
-            }
             // Load the new map
-            map = MapManager.getMaps().getResult(mapName);
+            map = MapManager.getMap(mapName);
             debugRenderer.setMap(map);
 
             // Clear collision objects from world
@@ -346,18 +341,17 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         metricsTable.setFillParent(true);
         processor.addActor(metricsTable);
         PlayerMetrics metrics = player.getMetrics();
-        var playerMetrics =
-                metrics.getMetrics().stream().map(PlayerMetric::getProgressBar).collect(Collectors.toList());
-        var metricLabels =
-                metrics.getMetrics().stream().map(PlayerMetric::getLabel).collect(Collectors.toList());
-        for (int i = 0; i < playerMetrics.size(); i++) {
-            var progressBar = playerMetrics.get(i);
-            var label = new Label(metricLabels.get(i), craftacularSkin);
+        var metricComponents = metrics.getMetrics().stream()
+                .map(metric -> Pair.of(metric.getLabel(), metric.getProgressBar()))
+                .collect(Collectors.toList());
+
+        for (var component : metricComponents) {
+            var label = new Label(component.getLeft(), skin);
             label.setFontScale(0.25f);
             metricsTable.add(label).padRight(2);
-            metricsTable.add(progressBar).width(100).height(30);
-            metricsTable.row();
+            metricsTable.add(component.getRight()).width(100).height(30).row();
         }
+
         metricsTable.bottom().right();
         metricsTable.padBottom(2);
         metricsTable.padRight(2);
@@ -748,14 +742,13 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * This method is called when the game screen is being disposed of.
      * It disposes of the {@link GameScreen#map}, {@link GameScreen#processor},
-     * {@link GameScreen#craftacularSkin}, {@link GameScreen#player}, and {@link GameScreen#world}
+     * {@link GameScreen#skin}, {@link GameScreen#player}, and {@link GameScreen#world}
      * to free up resources and prevent memory leaks.
      */
     @Override
     public void dispose() {
         map.dispose();
         processor.dispose();
-        craftacularSkin.dispose();
         player.dispose();
 
         world.dispose();
@@ -931,112 +924,39 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         return true;
     }
 
-    /**
-     * This method is called when a key is released.
-     * It delegates the key release event to the player object.
-     *
-     * @param keycode The key code of the key that was released.
-     * @return A boolean indicating whether the key release was handled by the player.
-     */
+    // spotless:off
+    /* === UNUSED INPUT METHODS === */
     @Override
     public boolean keyUp(int keycode) {
         return player.keyUp(keycode);
     }
-
-    /**
-     * This method is called when a key is typed.
-     * Currently, it does not perform any actions when a key is typed.
-     *
-     * @param character The character of the key that was typed.
-     * @return A boolean indicating whether the key typing was handled. Always returns false.
-     */
     @Override
     public boolean keyTyped(char character) {
         return false;
     }
-
-    /**
-     * This method is called when a touch down event occurs.
-     * Currently, it does not perform any actions when a touch down event occurs.
-     *
-     * @param screenX The x-coordinate of the touch down event.
-     * @param screenY The y-coordinate of the touch down event.
-     * @param pointer The pointer for the touch down event.
-     * @param button The button for the touch down event.
-     * @return A boolean indicating whether the touch down event was handled. Always returns false.
-     */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         return false;
     }
-
-    /**
-     * This method is called when a touch up event occurs.
-     * Currently, it does not perform any actions when a touch up event occurs.
-     *
-     * @param screenX The x-coordinate of the touch up event.
-     * @param screenY The y-coordinate of the touch up event.
-     * @param pointer The pointer for the touch up event.
-     * @param button The button for the touch up event.
-     * @return A boolean indicating whether the touch up event was handled. Always returns false.
-     */
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         return false;
     }
-
-    /**
-     * This method is called when a touch cancelled event occurs.
-     * Currently, it does not perform any actions when a touch cancelled event occurs.
-     *
-     * @param screenX The x-coordinate of the touch cancelled event.
-     * @param screenY The y-coordinate of the touch cancelled event.
-     * @param pointer The pointer for the touch cancelled event.
-     * @param button The button for the touch cancelled event.
-     * @return A boolean indicating whether the touch cancelled event was handled. Always returns false.
-     */
     @Override
     public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         return false;
     }
-
-    /**
-     * This method is called when a touch dragged event occurs.
-     * Currently, it does not perform any actions when a touch dragged event occurs.
-     *
-     * @param screenX The x-coordinate of the touch dragged event.
-     * @param screenY The y-coordinate of the touch dragged event.
-     * @param pointer The pointer for the touch dragged event.
-     * @return A boolean indicating whether the touch dragged event was handled. Always returns false.
-     */
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         return false;
     }
-
-    /**
-     * This method is called when a mouse moved event occurs.
-     * Currently, it does not perform any actions when a mouse moved event occurs.
-     *
-     * @param screenX The x-coordinate of the mouse moved event.
-     * @param screenY The y-coordinate of the mouse moved event.
-     * @return A boolean indicating whether the mouse moved event was handled. Always returns false.
-     */
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
-
-    /**
-     * This method is called when a scrolled event occurs.
-     * Currently, it does not perform any actions when a scrolled event occurs.
-     *
-     * @param amountX The amount of horizontal scroll.
-     * @param amountY The amount of vertical scroll.
-     * @return A boolean indicating whether the scrolled event was handled. Always returns false.
-     */
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;
     }
+    // spotless:on
 }

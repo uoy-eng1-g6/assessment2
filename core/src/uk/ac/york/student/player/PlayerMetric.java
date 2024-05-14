@@ -1,9 +1,6 @@
 package uk.ac.york.student.player;
 
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import uk.ac.york.student.assets.skins.SkinManager;
-import uk.ac.york.student.assets.skins.Skins;
 
 /**
  * The PlayerMetric interface provides a contract for player metrics in the game.
@@ -14,11 +11,6 @@ public interface PlayerMetric {
      * The minimum value for the progress bar to prevent visual jankyness when the value is 0.
      */
     float PROGRESS_BAR_MINIMUM = 0.1f;
-
-    /**
-     * The skin for the player metric, obtained from the SkinManager.
-     */
-    Skin skin = SkinManager.getSkins().getResult(Skins.CRAFTACULAR);
 
     /**
      * Get the progress bar for the player metric.
@@ -94,12 +86,4 @@ public interface PlayerMetric {
      * @return the maximum total accumulated value that a player can achieve
      */
     float getMaxTotal();
-
-    /**
-     * Dispose resources when they are no longer needed.
-     * By default, it disposes the skin.
-     */
-    default void dispose() {
-        skin.dispose();
-    }
 }

@@ -13,8 +13,8 @@ public class ScoreManager {
             + "id INTEGER PRIMARY KEY AUTO_INCREMENT,"
             + "score INTEGER NOT NULL"
             + ");");
-    private static final String ADD_SCORE = "INSERT INTO scores (score) VALUES (?);";
-    private static final String GET_SCORES = "SELECT score FROM scores ORDER BY score DESC LIMIT 10;";
+    private static final String SAVE_SCORE = "INSERT INTO scores (score) VALUES (?);";
+    private static final String GET_TOP_10_SCORES = "SELECT score FROM scores ORDER BY score DESC LIMIT 10;";
 
     private static Driver driver = null;
 
@@ -49,9 +49,9 @@ public class ScoreManager {
         }
     }
 
-    public static void addScore(int score) {
+    public static void saveScore(int score) {
         try (var conn = getConnection()) {
-            var stmt = conn.prepareStatement(ADD_SCORE);
+            var stmt = conn.prepareStatement(SAVE_SCORE);
             stmt.setInt(1, score);
             stmt.execute();
         } catch (SQLException e) {
@@ -62,7 +62,7 @@ public class ScoreManager {
     public static List<Integer> getTop10Scores() {
         List<Integer> scores = new ArrayList<>();
         try (var conn = getConnection()) {
-            var results = conn.prepareStatement(GET_SCORES).executeQuery();
+            var results = conn.prepareStatement(GET_TOP_10_SCORES).executeQuery();
             while (results.next()) {
                 scores.add(results.getInt("score"));
             }

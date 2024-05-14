@@ -120,13 +120,4 @@ public final class PlayerMetrics {
     public @Unmodifiable List<PlayerMetric> getMetrics() {
         return List.of(energy, happiness, studyLevel);
     }
-
-    /**
-     * Dispose the resources related to the player metrics when they are no longer needed.
-     */
-    public void dispose() {
-        energy.dispose();
-        happiness.dispose();
-        studyLevel.dispose();
-    }
 }

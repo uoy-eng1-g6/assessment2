@@ -97,12 +97,6 @@ public class MainMenuScreen extends BaseScreen {
     private final Image cloudsImage = new Image(new TextureRegionDrawable(new TextureRegion(clouds)));
 
     /**
-     * The Skin instance for the {@link MainMenuScreen}.
-     * This skin is loaded from the {@link SkinManager} using the {@link Skins#CRAFTACULAR} skin.
-     */
-    private final Skin craftacularSkin = SkinManager.getSkins().getResult(Skins.CRAFTACULAR);
-
-    /**
      * The GameSound instance for the button click sound on the {@link MainMenuScreen}.
      * This sound is loaded from the {@link SoundManager} using the {@link Sounds#BUTTON_CLICK} sound.
      */
@@ -123,6 +117,8 @@ public class MainMenuScreen extends BaseScreen {
      */
     private final float cloudsSpeed =
             ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed();
+
+    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
     /**
      * Constructor for the {@link MainMenuScreen} class.
      * This constructor initializes the {@link MainMenuScreen} with the provided game.
@@ -287,9 +283,9 @@ public class MainMenuScreen extends BaseScreen {
         processor.addActor(table);
 
         // Create the buttons and the logo image for the main menu screen.
-        TextButton playButton = new TextButton("Let Ron Cooke", craftacularSkin);
-        TextButton preferencesButton = new TextButton("Settings", craftacularSkin);
-        TextButton exitButton = new TextButton("Exit", craftacularSkin);
+        TextButton playButton = new TextButton("Let Ron Cooke", skin);
+        TextButton preferencesButton = new TextButton("Settings", skin);
+        TextButton exitButton = new TextButton("Exit", skin);
         Image cookeLogoImage = new Image(cookeLogo);
 
         // Add the buttons and the logo image to the table.
@@ -542,8 +538,6 @@ public class MainMenuScreen extends BaseScreen {
         backgroundTexture.dispose();
         // Dispose of the vignette texture
         vignetteTexture.dispose();
-        // Dispose of the craftacular skin
-        craftacularSkin.dispose();
         // Dispose of the cooke logo
         cookeLogo.dispose();
         // Dispose of the clouds texture

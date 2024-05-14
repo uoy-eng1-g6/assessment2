@@ -69,12 +69,6 @@ public class PreferencesScreen extends BaseScreen {
     private final GameSound buttonClick = SoundManager.getSupplierSounds().getResult(Sounds.BUTTON_CLICK);
 
     /**
-     * The skin used for the UI elements.
-     * By default, this is {@link Skins#CRAFTACULAR} from {@link SkinManager}.
-     */
-    private final Skin craftacularSkin = SkinManager.getSkins().getResult(Skins.CRAFTACULAR);
-
-    /**
      * The texture used for the background of the screen.
      */
     private final Texture stoneWallTexture = new Texture(Gdx.files.internal("images/StoneWall.png"));
@@ -83,6 +77,9 @@ public class PreferencesScreen extends BaseScreen {
      * The texture used for the gradient at the bottom of the screen.
      */
     private final Texture bottomUpBlackGradient = new Texture(Gdx.files.internal("images/BottomUpBlackGradient.png"));
+
+    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
+
     /**
      * This is an enumeration of labels used in the {@link PreferencesScreen} class.
      * Each label is associated with a {@link Supplier<String>} that provides the label's text.
@@ -362,12 +359,12 @@ public class PreferencesScreen extends BaseScreen {
      * This method creates a label for the clouds speed control.
      * The label text is obtained from the {@link Labels#MAIN_MENU_CLOUDS_SPEED} label in the {@link Labels} enumeration,
      * and includes the current speed of the clouds as a percentage (rounded to the nearest whole number).
-     * The label is created with the {@link PreferencesScreen#craftacularSkin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
+     * The label is created with the {@link PreferencesScreen#skin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
      */
     private void createCloudsSpeedLabel() {
         screenData.cloudsSpeedLabel = new Label(
                 Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(screenData.cloudsSpeedSlider.getValue() * 100) + "%"),
-                craftacularSkin);
+                skin);
     }
 
     /**
@@ -377,12 +374,12 @@ public class PreferencesScreen extends BaseScreen {
      * - The maximum value is 3 (the clouds move at maximum speed).
      * - The step size is 0.01 (the smallest change in speed that can be made by moving the slider).
      * - The slider is horizontal (not vertical).
-     * - The slider uses the {@link PreferencesScreen#craftacularSkin} skin.
+     * - The slider uses the {@link PreferencesScreen#skin} skin.
      * The slider's visual position and value are set to the current speed of the main menu clouds, which is obtained from the {@link GamePreferences#MAIN_MENU_CLOUDS}.
      * The reference to the slider is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createCloudsSpeedSlider() {
-        screenData.cloudsSpeedSlider = new Slider(0f, 3f, 0.01f, false, craftacularSkin);
+        screenData.cloudsSpeedSlider = new Slider(0f, 3f, 0.01f, false, skin);
         screenData.cloudsSpeedSlider.setVisualPercent(
                 ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());
         screenData.cloudsSpeedSlider.setValue(
@@ -428,7 +425,7 @@ public class PreferencesScreen extends BaseScreen {
      * The button's initial text is obtained from the {@link Labels#MAIN_MENU_CLOUDS_ENABLED} label in the {@link Labels} enumeration,
      * and includes the current state of the main menu clouds (either "ON" or "OFF").
      * The current state of the main menu clouds is obtained from the {@link GamePreferences#MAIN_MENU_CLOUDS}.
-     * The button is created with the {@link PreferencesScreen#craftacularSkin} skin.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createCloudsToggleButton() {
@@ -437,17 +434,17 @@ public class PreferencesScreen extends BaseScreen {
                         ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).isEnabled()
                                 ? "ON"
                                 : "OFF"),
-                craftacularSkin);
+                skin);
     }
 
     /**
      * This method creates a back button for the preferences screen.
      * The button's text is obtained from the {@link Labels#BACK_BUTTON} label in the {@link Labels} enumeration.
-     * The button is created with the {@link PreferencesScreen#craftacularSkin} skin.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createBackButton() {
-        screenData.backButton = new TextButton(Labels.BACK_BUTTON.getLabel(), craftacularSkin);
+        screenData.backButton = new TextButton(Labels.BACK_BUTTON.getLabel(), skin);
     }
 
     /**
@@ -455,7 +452,7 @@ public class PreferencesScreen extends BaseScreen {
      * The button's initial text is obtained from the {@link Labels#DEBUG_SCREEN_ENABLED} label in the {@link Labels} enumeration,
      * and includes the current state of the debug screen (either "ON" or "OFF").
      * The current state of the debug screen is obtained from the {@link GamePreferences#DEBUG_SCREEN}.
-     * The button is created with the {@link PreferencesScreen#craftacularSkin} skin.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createDebugScreenToggleButton() {
@@ -464,7 +461,7 @@ public class PreferencesScreen extends BaseScreen {
                         ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled()
                                 ? "ON"
                                 : "OFF"),
-                craftacularSkin);
+                skin);
     }
 
     /**
@@ -472,12 +469,11 @@ public class PreferencesScreen extends BaseScreen {
      * The label text is obtained from the {@link Labels#SOUND_VOLUME} label in the {@link Labels} enumeration,
      * and includes the current sound volume as a percentage (rounded to the nearest whole number).
      * The current sound volume is obtained from the {@link ScreenData#soundVolumeSlider}.
-     * The label is created with the {@link PreferencesScreen#craftacularSkin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
+     * The label is created with the {@link PreferencesScreen#skin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
      */
     private void createSoundVolumeLabel() {
         screenData.soundVolumeLabel = new Label(
-                Labels.SOUND_VOLUME.getLabel(Math.round(screenData.soundVolumeSlider.getValue() * 100) + "%"),
-                craftacularSkin);
+                Labels.SOUND_VOLUME.getLabel(Math.round(screenData.soundVolumeSlider.getValue() * 100) + "%"), skin);
     }
 
     /**
@@ -487,12 +483,12 @@ public class PreferencesScreen extends BaseScreen {
      * - The maximum value is 1 (maximum volume).
      * - The step size is 0.01 (the smallest change in volume that can be made by moving the slider).
      * - The slider is horizontal (not vertical).
-     * - The slider uses the {@link PreferencesScreen#craftacularSkin} skin.
+     * - The slider uses the {@link PreferencesScreen#skin} skin.
      * The slider's visual position and value are set to the current sound volume, which is obtained from the {@link GamePreferences#SOUND}.
      * The reference to the slider is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createSoundVolumeSlider() {
-        screenData.soundVolumeSlider = new Slider(0f, 1f, 0.01f, false, craftacularSkin);
+        screenData.soundVolumeSlider = new Slider(0f, 1f, 0.01f, false, skin);
         screenData.soundVolumeSlider.setVisualPercent(
                 ((SoundPreferences) GamePreferences.SOUND.getPreference()).getVolume());
     }
@@ -502,14 +498,14 @@ public class PreferencesScreen extends BaseScreen {
      * The button's initial text is obtained from the {@link Labels#SOUND_ENABLED} label in the {@link Labels} enumeration,
      * and includes the current state of the game sound (either "ON" or "OFF").
      * The current state of the game sound is obtained from the {@link GamePreferences#SOUND}.
-     * The button is created with the {@link PreferencesScreen#craftacularSkin} skin.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createSoundToggleButton() {
         screenData.soundToggleButton = new TextButton(
                 Labels.SOUND_ENABLED.getLabel(
                         ((SoundPreferences) GamePreferences.SOUND.getPreference()).isEnabled() ? "ON" : "OFF"),
-                craftacularSkin);
+                skin);
     }
 
     /**
@@ -517,12 +513,11 @@ public class PreferencesScreen extends BaseScreen {
      * The label text is obtained from the {@link Labels#MUSIC_VOLUME} label in the {@link Labels} enumeration,
      * and includes the current music volume as a percentage (rounded to the nearest whole number).
      * The current music volume is obtained from the {@link ScreenData#musicVolumeSlider}.
-     * The label is created with the {@link PreferencesScreen#craftacularSkin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
+     * The label is created with the {@link PreferencesScreen#skin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
      */
     private void createMusicVolumeLabel() {
         screenData.musicVolumeLabel = new Label(
-                Labels.MUSIC_VOLUME.getLabel(Math.round(screenData.musicVolumeSlider.getValue() * 100) + "%"),
-                craftacularSkin);
+                Labels.MUSIC_VOLUME.getLabel(Math.round(screenData.musicVolumeSlider.getValue() * 100) + "%"), skin);
     }
 
     /**
@@ -532,12 +527,12 @@ public class PreferencesScreen extends BaseScreen {
      * - The maximum value is 1 (maximum volume).
      * - The step size is 0.01 (the smallest change in volume that can be made by moving the slider).
      * - The slider is horizontal (not vertical).
-     * - The slider uses the {@link PreferencesScreen#craftacularSkin} skin.
+     * - The slider uses the {@link PreferencesScreen#skin} skin.
      * The slider's visual position and value are set to the current music volume, which is obtained from the {@link GamePreferences#MUSIC}.
      * The reference to the slider is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createMusicVolumeSlider() {
-        screenData.musicVolumeSlider = new Slider(0f, 1f, 0.01f, false, craftacularSkin);
+        screenData.musicVolumeSlider = new Slider(0f, 1f, 0.01f, false, skin);
         screenData.musicVolumeSlider.setVisualPercent(
                 ((MusicPreferences) GamePreferences.MUSIC.getPreference()).getVolume());
     }
@@ -547,14 +542,14 @@ public class PreferencesScreen extends BaseScreen {
      * The button's initial text is obtained from the {@link Labels#MUSIC_ENABLED} label in the {@link Labels} enumeration,
      * and includes the current state of the game music (either "ON" or "OFF").
      * The current state of the game music is obtained from the {@link GamePreferences#MUSIC}.
-     * The button is created with the {@link PreferencesScreen#craftacularSkin} skin.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
      * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
      */
     private void createMusicToggleButton() {
         screenData.musicToggleButton = new TextButton(
                 Labels.MUSIC_ENABLED.getLabel(
                         ((MusicPreferences) GamePreferences.MUSIC.getPreference()).isEnabled() ? "ON" : "OFF"),
-                craftacularSkin);
+                skin);
     }
 
     /**
@@ -587,7 +582,7 @@ public class PreferencesScreen extends BaseScreen {
      * This method sets up the layout of the UI elements in the table.
      * It creates a grid layout and adds the UI elements to the grid.
      * The UI elements are retrieved from the {@link PreferencesScreen#screenData} object.
-     * The table is set to fill the parent actor and its skin is set to {@link PreferencesScreen#craftacularSkin}.
+     * The table is set to fill the parent actor and its skin is set to {@link PreferencesScreen#skin}.
      * If the debug screen is enabled in the {@link GamePreferences#DEBUG_SCREEN}, the table's debug lines are shown.
      * The table is then added to the {@link PreferencesScreen#processor} {@link Stage}.
      * The UI elements are added to the table in a specific order and layout to create the desired appearance for the {@link PreferencesScreen}.
@@ -613,7 +608,7 @@ public class PreferencesScreen extends BaseScreen {
         if (((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled()) {
             table.setDebug(true);
         }
-        table.setSkin(craftacularSkin);
+        table.setSkin(skin);
         // Add the table to the stage
         processor.addActor(table);
 
@@ -925,13 +920,12 @@ public class PreferencesScreen extends BaseScreen {
      * It disposes of the resources that were created in the {@link PreferencesScreen} class to free up memory.
      * The resources that are disposed of include:
      * - The {@link PreferencesScreen#processor} {@link Stage}, which is used to manage and render the UI elements.
-     * - The {@link PreferencesScreen#craftacularSkin} {@link Skin}, which is used for the UI elements.
+     * - The {@link PreferencesScreen#skin} {@link Skin}, which is used for the UI elements.
      * - The {@link PreferencesScreen#buttonClick} {@link GameSound}, which is the sound that is played when a button is clicked.
      */
     @Override
     public void dispose() {
         processor.dispose();
-        craftacularSkin.dispose();
         buttonClick.dispose();
     }
 }
