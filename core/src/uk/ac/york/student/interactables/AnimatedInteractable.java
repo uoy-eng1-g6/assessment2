@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,15 +24,13 @@ public class AnimatedInteractable extends Interactable {
     /**
      * Constructor for the AnimatedInteractable class.
      *
-     * @param x The x position of the class.
-     * @param y The y position of the class.
-     * @param width The width of the class.
-     * @param height The height of the class.
-     * @param frameDuration The duration (in seconds) each frame should last in the animation.
+     * @param interactInfo A list of the interactInfo from Tiled. Must be of 4 items: x, y, width, height. This
+     *                     information is stored in Tiled as a string as so: interactInfo: x,y,width,height
      */
-    public AnimatedInteractable(float x, float y, float width, float height, float frameDuration) {
-        super(x, y, width, height);
-        this.frameDuration = frameDuration;
+    public AnimatedInteractable(List<Float> interactInfo) {
+        super(interactInfo);
+        // the duration for the animations, since there are three frames and the fade time is 0.5, 0.5/3=0.167.
+        this.frameDuration = 0.167f;
         stateTime = 0f;
         animating = false;
     }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Range;
@@ -35,21 +36,18 @@ public class Interactable {
     private String map;
 
     /**
-     * Constructor for the Interactable class.
+     * Constructor for the AnimatedInteractable class.
      *
-     * @param x The x position of the class.
-     * @param y The y position of the class.
-     * @param width The width of the class.
-     * @param height The height of the class.
+     * @param interactInfo A list of the interactInfo from Tiled. Must be of 4 items: x, y, width, height. This
+     *                     information is stored in Tiled as a string as so: interactInfo: x,y,width,height
      */
-    public Interactable(float x, float y, float width, float height) {
+    public Interactable(List<Float> interactInfo) {
         this.batch = new SpriteBatch();
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.x = interactInfo.get(0);
+        this.y = interactInfo.get(1);
+        this.width = interactInfo.get(2);
+        this.height = interactInfo.get(3);
         this.color = batch.getColor();
-        this.map = "map";
 
         // Uses a custom shader to add an outline to the object.
         String vertexShader = Gdx.files.internal("shaders/vertex.glsl").readString();

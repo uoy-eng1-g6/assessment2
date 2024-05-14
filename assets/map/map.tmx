@@ -281,6 +281,7 @@
   </object>
   <object id="17" name="enterLibrary" x="64.7519" y="72.3722" width="32" height="32.331">
    <properties>
+    <property name="interactInfo" value="65,221,32,32"/>
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="inside_library"/>
     <property name="newMapStr" value="go into the library"/>
@@ -288,6 +289,7 @@
   </object>
   <object id="19" name="enterRoom" x="341.987" y="200.325" width="20" height="32.4011">
    <properties>
+    <property name="interactInfo" value="336,91,32,32"/>
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="inside_house"/>
     <property name="newMapStr" value="go into your house"/>
@@ -295,6 +297,7 @@
   </object>
   <object id="21" name="enterPub" x="424.147" y="130.784" width="20.375" height="35.6424">
    <properties>
+    <property name="interactInfo" value="418,155,32,32"/>
     <property name="isNewMap" type="bool" value="true"/>
     <property name="newMap" value="inside_pub"/>
     <property name="newMapStr" value="go into the pub"/>
@@ -306,6 +309,7 @@
     <property name="activityTime" type="int" value="3"/>
     <property name="activityType" value="entertain"/>
     <property name="changeAmount" value="0.2,0.1"/>
+    <property name="interactInfo" value="56,79,32,34"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
@@ -315,6 +319,7 @@
     <property name="activityTime" type="int" value="1"/>
     <property name="activityType" value="entertain"/>
     <property name="changeAmount" value="0.1,0.15"/>
+    <property name="interactInfo" value="217,239,32,33"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>

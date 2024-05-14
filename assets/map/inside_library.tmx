@@ -43,6 +43,7 @@
     <property name="activityTime" type="int" value="3"/>
     <property name="activityType" value="entertain"/>
     <property name="changeAmount" value="0.3,0.3"/>
+    <property name="interactInfo" value="280,58,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
@@ -52,6 +53,7 @@
     <property name="activityTime" type="int" value="2"/>
     <property name="activityType" value="study"/>
     <property name="changeAmount" value="0.3,0.2,0.15"/>
+    <property name="interactInfo" value="286,190,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>

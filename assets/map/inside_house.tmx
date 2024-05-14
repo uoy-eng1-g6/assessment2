@@ -176,6 +176,7 @@
     <property name="activityTime" type="int" value="2"/>
     <property name="activityType" value="eat"/>
     <property name="changeAmount" value="0.3"/>
+    <property name="interactInfo" value="216,216,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
@@ -185,6 +186,7 @@
     <property name="activityTime" type="int" value="1"/>
     <property name="activityType" value="eat"/>
     <property name="changeAmount" value="0.1"/>
+    <property name="interactInfo" value="264,223,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
@@ -194,6 +196,7 @@
     <property name="activityTime" type="int" value="3"/>
     <property name="activityType" value="study"/>
     <property name="changeAmount" value=".2,0.3,0.2"/>
+    <property name="interactInfo" value="169,88,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
@@ -203,6 +206,7 @@
     <property name="activityTime" type="int" value="1"/>
     <property name="activityType" value="entertain"/>
     <property name="changeAmount" value="0.1,0.1"/>
+    <property name="interactInfo" value="176,108,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>
@@ -212,6 +216,7 @@
     <property name="activityTime" type="int" value="8"/>
     <property name="activityType" value="sleep"/>
     <property name="changeAmount" value="0,0"/>
+    <property name="interactInfo" value="273,111,32,34"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
   </object>

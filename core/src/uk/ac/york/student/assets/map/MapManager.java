@@ -25,16 +25,19 @@ public final class MapManager {
     @Getter
     private static final MapOfSuppliers<String, TiledMap> maps = new MapOfSuppliers<>();
 
+    @Getter
+    private static final List<String> mapNames =
+            List.of("map", "inside_house", "inside_pub", "inside_library", "blankMap");
+
     public static void onEnable() {
 
-        List<String> maps = List.of("map", "blankMap", "inside_house", "inside_pub", "inside_library");
         // Create parameters for loading the maps
         TmxMapLoader.Parameters parameter = new TmxMapLoader.Parameters();
         parameter.textureMinFilter = Texture.TextureFilter.Nearest;
         parameter.textureMagFilter = Texture.TextureFilter.Nearest;
 
         // Load each map file in the directory (and hide the potential NullPointerException with Objects.requireNonNull)
-        for (String map : maps) {
+        for (String map : mapNames) {
             map = "map/" + map + ".tmx";
             FileHandle internal = Gdx.files.internal(map);
             File file = internal.file();

@@ -1,54 +1,54 @@
 interactable.png
 size:256,256
 repeat:none
-barstool
-bounds:138,142,32,32
-bed
-bounds:2,174,32,34
-bench
+cook a meal
+bounds:70,176,32,32
+drink at the bar
+bounds:36,107,32,32
+eat at pub
+bounds:70,74,32,32
+feed the ducks
 bounds:36,175,32,33
-busstop
-bounds:2,138,32,34
-deskchair
-bounds:70,108,32,32
-fishstool
-bounds:138,176,32,32
-fridge
-bounds:2,70,32,32
-homedoor
-index:2
+go into the library
+index:1
 bounds:2,104,32,32
-homedoor
+go into the library
+index:0
+bounds:2,36,32,32
+go into the library
+index:2
+bounds:138,176,32,32
+go into the pub
+index:2
+bounds:2,70,32,32
+go into the pub
 index:1
 bounds:104,142,32,32
-homedoor
+go into the pub
 index:0
-bounds:104,108,32,32
-librarydoor
-index:0
-bounds:36,107,32,32
-librarydoor
-index:2
-bounds:36,73,32,32
-librarydoor
-index:1
-bounds:70,74,32,32
-oven
-bounds:2,36,32,32
-pool
 bounds:172,176,32,32
-pubdoor
-index:0
-bounds:36,141,32,32
-pubdoor
-index:2
-bounds:104,176,32,32
-pubdoor
+go into your house
 index:1
-bounds:36,39,32,32
-pubtable
-bounds:70,176,32,32
-read
 bounds:70,142,32,32
-study
+go into your house
+index:0
+bounds:36,39,32,32
+go into your house
+index:2
+bounds:138,142,32,32
+go to bed
+bounds:2,138,32,34
+have a snack
 bounds:2,2,32,32
+head to town
+bounds:2,174,32,34
+play pool
+bounds:70,108,32,32
+read a book
+bounds:104,108,32,32
+study at your desk
+bounds:36,73,32,32
+study in the library
+bounds:104,176,32,32
+watch the fish
+bounds:36,141,32,32
