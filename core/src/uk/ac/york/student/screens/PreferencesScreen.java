@@ -66,7 +66,7 @@ public class PreferencesScreen extends BaseScreen {
      * The sound that is played when a button is clicked.
      * By default, this is {@link Sounds#BUTTON_CLICK} from {@link SoundManager}
      */
-    private final GameSound buttonClick = SoundManager.getSupplierSounds().getResult(Sounds.BUTTON_CLICK);
+    private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
     /**
      * The texture used for the background of the screen.
@@ -555,7 +555,6 @@ public class PreferencesScreen extends BaseScreen {
     /**
      * This method sets up a listener for the {@link ScreenData#backButton}.
      * When the back button is clicked, it plays a button click sound and transitions the game to the main menu screen.
-     * The button click sound is obtained from the {@link SoundManager#getSounds()} method with the {@link Sounds#BUTTON_CLICK} parameter.
      * The transition to the main menu screen is performed by calling the {@link GdxGame#transitionScreen(Class)} method with the {@link Screens#MAIN_MENU} parameter.
      */
     private void listenBackButton() {
@@ -564,7 +563,7 @@ public class PreferencesScreen extends BaseScreen {
             /**
              * This method is triggered when the back button is clicked.
              * It plays a button click sound and transitions the game to the main menu screen.
-             * The button click sound is obtained from the {@link SoundManager#getSounds()} method with the {@link Sounds#BUTTON_CLICK} parameter.
+             * The button click sound is obtained from the {@link SoundManager#getSound(Sounds)} method with the {@link Sounds#BUTTON_CLICK} parameter.
              * The transition to the main menu screen is performed by calling the {@link GdxGame#transitionScreen(Class)} method with the {@link Screens#MAIN_MENU} parameter.
              *
              * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
@@ -572,7 +571,7 @@ public class PreferencesScreen extends BaseScreen {
              */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SoundManager.getSounds().get(Sounds.BUTTON_CLICK).play();
+                buttonClick.play();
                 game.transitionScreen(Screens.MAIN_MENU);
             }
         });
@@ -776,7 +775,7 @@ public class PreferencesScreen extends BaseScreen {
     /**
      * This method sets up a listener for the {@link ScreenData#musicVolumeSlider}.
      * When the slider value changes, it updates the volume of the game music in the {@link GamePreferences#MUSIC},
-     * and updates the {@link MusicManager#BACKGROUND_MUSIC} volume to match the slider value.
+     * and updates the {@link MusicManager} background music volume to match the slider value.
      * It also updates the {@link ScreenData#musicVolumeLabel} to reflect the current volume using {@link Labels#MUSIC_VOLUME}.
      * The volume is displayed as a percentage, rounded to the nearest whole number.
      */
@@ -786,7 +785,7 @@ public class PreferencesScreen extends BaseScreen {
         musicVolumeSlider.addListener(event -> {
             MusicPreferences preference = (MusicPreferences) GamePreferences.MUSIC.getPreference();
             preference.setVolume(musicVolumeSlider.getValue());
-            MusicManager.BACKGROUND_MUSIC.setVolume(musicVolumeSlider.getValue());
+            MusicManager.getInstance().setBackgroundMusicVolume(musicVolumeSlider.getValue());
             musicVolumeLabel.setText(
                     Labels.MUSIC_VOLUME.getLabel(Math.round(musicVolumeSlider.getValue() * 100) + "%"));
             return false;
@@ -926,6 +925,5 @@ public class PreferencesScreen extends BaseScreen {
     @Override
     public void dispose() {
         processor.dispose();
-        buttonClick.dispose();
     }
 }

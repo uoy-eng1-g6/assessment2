@@ -16,6 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import uk.ac.york.student.GdxGame;
 import uk.ac.york.student.assets.skins.SkinManager;
 import uk.ac.york.student.assets.skins.Skins;
+import uk.ac.york.student.audio.sound.GameSound;
+import uk.ac.york.student.audio.sound.SoundManager;
+import uk.ac.york.student.audio.sound.Sounds;
 import uk.ac.york.student.player.PlayerMetrics;
 import uk.ac.york.student.score.ScoreManager;
 import uk.ac.york.student.settings.DebugScreenPreferences;
@@ -26,6 +29,7 @@ public class EndScreen extends BaseScreen {
     private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
     private final Stage processor;
+    private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
     public EndScreen(GdxGame game) {
         super(game);
@@ -75,7 +79,7 @@ public class EndScreen extends BaseScreen {
         centerTable.pad(0, 50, 0, 50);
         centerTable.add(title).padBottom(20).row();
 
-        var headerLabel = new Label(actualScore >= highScores.get(0) ? "NEW HIGHSCORE" : "Final Score:", skin);
+        var headerLabel = new Label(actualScore > highScores.get(0) ? "NEW HIGHSCORE" : "Final Score:", skin);
         headerLabel.setFontScale(0.8f);
         var textScoreLabel = new Label(scoreString, skin);
         textScoreLabel.setFontScale(0.7f);
@@ -90,6 +94,7 @@ public class EndScreen extends BaseScreen {
         mainMenuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                buttonClick.play();
                 game.transitionScreen(Screens.MAIN_MENU);
             }
         });
@@ -97,6 +102,7 @@ public class EndScreen extends BaseScreen {
         quitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                buttonClick.play();
                 Gdx.app.exit();
             }
         });

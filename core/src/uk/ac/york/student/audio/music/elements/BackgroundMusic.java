@@ -18,13 +18,4 @@ public class BackgroundMusic extends GameMusic implements Music {
     public BackgroundMusic() {
         super("audio/music/background.mp3");
     }
-
-    /**
-     * Constructor for the BackgroundMusic class.
-     * It initialises the object with the given path to the music file.
-     * @param path The internal path to the music file (in assets folder)
-     */
-    public BackgroundMusic(final String path) {
-        super(path);
-    }
 }

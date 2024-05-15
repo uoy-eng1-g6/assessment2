@@ -100,7 +100,7 @@ public class MainMenuScreen extends BaseScreen {
      * The GameSound instance for the button click sound on the {@link MainMenuScreen}.
      * This sound is loaded from the {@link SoundManager} using the {@link Sounds#BUTTON_CLICK} sound.
      */
-    private final GameSound buttonClick = SoundManager.getSupplierSounds().getResult(Sounds.BUTTON_CLICK);
+    private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
     /**
      * A boolean value that determines whether the clouds are enabled on the {@link MainMenuScreen}.
@@ -313,7 +313,6 @@ public class MainMenuScreen extends BaseScreen {
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
                 Wait.async(400, TimeUnit.MILLISECONDS).thenRun(() -> {
-                    buttonClick.dispose();
                     Gdx.app.exit();
                 });
             }
@@ -335,7 +334,7 @@ public class MainMenuScreen extends BaseScreen {
              */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SoundManager.getSounds().get(Sounds.BUTTON_CLICK).play();
+                buttonClick.play();
                 zoomAndMove(playButton, Direction.DOWN);
                 zoomAndMove(preferencesButton, Direction.DOWN);
                 zoomAndMove(exitButton, Direction.DOWN);
@@ -358,7 +357,7 @@ public class MainMenuScreen extends BaseScreen {
              */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SoundManager.getSounds().get(Sounds.BUTTON_CLICK).play();
+                buttonClick.play();
                 game.transitionScreen(Screens.PREFERENCES);
             }
         });
@@ -542,8 +541,6 @@ public class MainMenuScreen extends BaseScreen {
         cookeLogo.dispose();
         // Dispose of the clouds texture
         clouds.dispose();
-        // Dispose of the button click sound
-        buttonClick.dispose();
         // Shutdown the executor service
         executorService.shutdown();
     }
