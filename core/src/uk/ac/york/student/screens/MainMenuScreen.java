@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +36,6 @@ import uk.ac.york.student.audio.sound.Sounds;
 import uk.ac.york.student.settings.DebugScreenPreferences;
 import uk.ac.york.student.settings.GamePreferences;
 import uk.ac.york.student.settings.MainMenuCloudsPreferences;
-import uk.ac.york.student.utils.Wait;
 
 /**
  * The MainMenuScreen class extends the BaseScreen class and represents the main menu screen of the game.
@@ -282,7 +282,7 @@ public class MainMenuScreen extends BaseScreen {
         table.add(exitButton).fillX().uniformX();
 
         // Add listeners to the buttons.
-        // The exit button plays the button click sound and exits the application after a delay of 400 milliseconds.
+        // The exit button plays the button click sound and exits the application.
         exitButton.addListener(new ChangeListener() {
             /**
              * This method is triggered when a change event occurs on the actor, in this case, when the exit button is clicked.
@@ -296,12 +296,12 @@ public class MainMenuScreen extends BaseScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
-                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(Gdx.app::exit);
+                Gdx.app.exit();
             }
         });
 
         // The play button plays the button click sound, moves all elements, fades out, and then switches to the game
-        // screen after a delay of 1500 milliseconds.
+        // screen.
         playButton.addListener(new ChangeListener() {
             /**
              * This method is triggered when a change event occurs on the actor, in this case, when the play button is clicked.
@@ -322,7 +322,15 @@ public class MainMenuScreen extends BaseScreen {
                 zoomAndMove(exitButton, Direction.DOWN);
                 zoomAndMove(cookeLogoImage, Direction.UP);
                 fadeOut();
-                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(() -> game.transitionScreen(Screens.GAME));
+                Timer timer = new Timer();
+                timer.scheduleTask(
+                        new Timer.Task() {
+                            @Override
+                            public void run() {
+                                game.transitionScreen(Screens.GAME);
+                            }
+                        },
+                        0.4f);
             }
         });
 

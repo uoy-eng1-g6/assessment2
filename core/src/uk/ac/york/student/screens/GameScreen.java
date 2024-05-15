@@ -57,7 +57,6 @@ import uk.ac.york.student.player.PlayerMetrics;
 import uk.ac.york.student.settings.DebugScreenPreferences;
 import uk.ac.york.student.settings.GamePreferences;
 import uk.ac.york.student.utils.Pair;
-import uk.ac.york.student.utils.StreamUtils;
 
 /**
  * The {@link GameScreen} class extends the {@link BaseScreen} class and implements the {@link InputProcessor} interface.
@@ -464,8 +463,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1
             // means
             // fully opaque, and a value of 0 means fully transparent.
-            StreamUtils.parallelFromIterator(map.getLayers().iterator())
-                    .forEach(l -> l.setOpacity(processor.getRoot().getColor().a));
+            map.getLayers()
+                    .forEach(layer -> layer.setOpacity(processor.getRoot().getColor().a));
 
             // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the
             // screen.
