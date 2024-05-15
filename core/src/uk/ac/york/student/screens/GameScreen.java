@@ -878,11 +878,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             metrics.changeMetric(metricType, metricEffect, changeAmount);
         }
         // Increment the streak
-        if (type == Activity.STUDY) {
-            player.getStreaks().increaseStreak("study");
-        } else {
-            player.getStreaks().increaseStreak(actionMapObject.getStr());
-        }
+        player.getStreaks().increaseStreak(type == Activity.STUDY ? "study" : actionMapObject.getStr());
         // Get the current hour as a string using the getCurrentHourString method
         String currentHour = getCurrentHourString();
 
