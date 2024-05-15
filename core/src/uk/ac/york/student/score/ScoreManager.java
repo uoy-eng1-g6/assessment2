@@ -7,7 +7,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ScoreManager {
     private static final String SCHEMA = ("CREATE TABLE IF NOT EXISTS scores ("
             + "id INTEGER PRIMARY KEY AUTO_INCREMENT,"
