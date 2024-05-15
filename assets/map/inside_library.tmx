@@ -40,7 +40,7 @@
   <object id="16" name="read" x="266.917" y="231.25" width="75.8333" height="33.5">
    <properties>
     <property name="activityStr" value="read a book"/>
-    <property name="activityTime" type="int" value="3"/>
+    <property name="activityTime" type="int" value="2"/>
     <property name="activityType" value="entertain"/>
     <property name="changeAmount" value="0.3,0.3"/>
     <property name="interactInfo" value="280,58,32,32"/>
@@ -50,9 +50,9 @@
   <object id="19" name="study" x="263.75" y="79.75" width="88.25" height="75.5">
    <properties>
     <property name="activityStr" value="study in the library"/>
-    <property name="activityTime" type="int" value="2"/>
+    <property name="activityTime" type="int" value="4"/>
     <property name="activityType" value="study"/>
-    <property name="changeAmount" value="0.3,0.2,0.15"/>
+    <property name="changeAmount" value="0.6,0.3,0.1"/>
     <property name="interactInfo" value="286,190,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>

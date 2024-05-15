@@ -35,7 +35,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * This is a float value between 0 and 1, where 0 represents not studied and 1 represents very studied.
      * By default, the study level is set to 0.1.
      */
-    private @Range(from = 0, to = 1) float studyLevel = 0.1f;
+    private @Range(from = 0, to = 1) float studyLevel = getDefault();
 
     /**
      * The total amount of study accumulated by the player across all days of the game.

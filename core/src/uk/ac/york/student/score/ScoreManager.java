@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import uk.ac.york.student.player.PlayerStreaks;
 
 @UtilityClass
 public class ScoreManager {
@@ -76,19 +77,21 @@ public class ScoreManager {
     }
 
     public static float calculateScore(
-            float energy, float maxEnergy, float studyLevel, float maxStudyLevel, float happiness, float maxHappiness) {
-        float energyWeighting = 1.2f;
-        float studyWeighting = 2f;
-        float happinessWeighting = 1f;
+            float studyLevel, float maxStudyLevel, float happiness, float maxHappiness, PlayerStreaks streaks) {
+        int maxScore = 100;
+        var achievements = streaks.getAchievements();
+        int numOfStreaks = streaks.getStreaks().size();
+        // reserve percentForStreaks% for streaks
+        float percentForStreaks = 24f;
+        float achievementsWeighting = percentForStreaks / numOfStreaks;
 
-        float energyScore = (energy / maxEnergy) * energyWeighting;
-        float studyScore = (studyLevel / maxStudyLevel) * studyWeighting;
-        float happinessScore = (happiness / maxHappiness) * happinessWeighting;
+        float metricWeighting = (maxScore - percentForStreaks) / (maxHappiness + maxStudyLevel);
 
-        float totalScore = energyScore + studyScore + happinessScore;
-        float maxPossibleScore = energyWeighting + studyWeighting + happinessWeighting;
+        float achievementsScore = achievements.size() * achievementsWeighting;
+        float studyScore = studyLevel * metricWeighting;
+        float happinessScore = happiness * metricWeighting;
 
-        return (totalScore / maxPossibleScore) * 100;
+        return studyScore + happinessScore + achievementsScore;
     }
 
     public static String convertScoreToString(float score) {

@@ -37,6 +37,8 @@ public class Player implements InputProcessor {
      */
     private final PlayerMetrics metrics = new PlayerMetrics();
 
+    private final PlayerStreaks streaks = new PlayerStreaks();
+
     /**
      * Sprite object representing the player's character on the screen.
      */

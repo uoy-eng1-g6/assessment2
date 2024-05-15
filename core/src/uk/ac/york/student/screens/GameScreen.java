@@ -843,17 +843,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // If the player does not have enough resources to perform the activity, return false
             if (!hasEnough) return false;
         }
-        // Iterate over the effects of the activity
-        for (Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect> effect : effects) {
-            // Get the type of the metric from the effect
-            PlayerMetrics.MetricType metricType = effect.getLeft();
-            // Get the effect on the metric (increase or decrease)
-            PlayerMetrics.MetricEffect metricEffect = effect.getRight();
-            // Get the amount by which the activity changes the metric
-            float changeAmount = actionMapObject.getChangeAmount(metricType);
-            // Apply the effect to the metric
-            metrics.changeMetric(metricType, metricEffect, changeAmount);
-        }
         // Check if the activity is sleeping
         if (type.equals(Activity.SLEEP)) {
             // Get all player metrics
@@ -866,15 +855,33 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // Check if the current day plus one equals the total number of days
             if (gameTime.isEndOfDays()) {
                 // If it does, transition the screen to the end screen and return true
-                game.transitionScreen(Screens.END, player.getMetrics());
+                game.transitionScreen(Screens.END, player.getMetrics(), player.getStreaks());
                 return true;
             } else {
                 // If it doesn't, increment the current day
                 gameTime.incrementDay();
+                player.getStreaks().nextDay();
             }
         } else {
             // If the activity is not sleeping, increment the current hour by the required time for the activity
             gameTime.incrementHour(requiredTime);
+        }
+        // Iterate over the effects of the activity
+        for (Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect> effect : effects) {
+            // Get the type of the metric from the effect
+            PlayerMetrics.MetricType metricType = effect.getLeft();
+            // Get the effect on the metric (increase or decrease)
+            PlayerMetrics.MetricEffect metricEffect = effect.getRight();
+            // Get the amount by which the activity changes the metric
+            float changeAmount = actionMapObject.getChangeAmount(metricType);
+            // Apply the effect to the metric
+            metrics.changeMetric(metricType, metricEffect, changeAmount);
+        }
+        // Increment the streak
+        if (type == Activity.STUDY) {
+            player.getStreaks().increaseStreak("study");
+        } else {
+            player.getStreaks().increaseStreak(actionMapObject.getStr());
         }
         // Get the current hour as a string using the getCurrentHourString method
         String currentHour = getCurrentHourString();

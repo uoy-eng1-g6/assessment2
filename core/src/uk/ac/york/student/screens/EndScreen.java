@@ -20,6 +20,7 @@ import uk.ac.york.student.audio.sound.GameSound;
 import uk.ac.york.student.audio.sound.SoundManager;
 import uk.ac.york.student.audio.sound.Sounds;
 import uk.ac.york.student.player.PlayerMetrics;
+import uk.ac.york.student.player.PlayerStreaks;
 import uk.ac.york.student.score.ScoreManager;
 import uk.ac.york.student.settings.DebugScreenPreferences;
 import uk.ac.york.student.settings.GamePreferences;
@@ -36,13 +37,14 @@ public class EndScreen extends BaseScreen {
         processor = new Stage(new ScreenViewport());
 
         var metrics = (PlayerMetrics) args[0];
+        var streaks = (PlayerStreaks) args[1];
         var score = ScoreManager.calculateScore(
-                metrics.getEnergy().getTotal(),
-                metrics.getEnergy().getMaxTotal(),
                 metrics.getStudyLevel().getTotal(),
                 metrics.getStudyLevel().getMaxTotal(),
                 metrics.getHappiness().getTotal(),
-                metrics.getHappiness().getMaxTotal());
+                metrics.getHappiness().getMaxTotal(),
+                streaks);
+
         var actualScore = (int) Math.floor(score * 100);
         ScoreManager.saveScore(actualScore);
         var scoreString = ScoreManager.convertScoreToString(score);
@@ -64,6 +66,29 @@ public class EndScreen extends BaseScreen {
         }
 
         processor.addActor(scoresTable);
+
+        var achievementsTable = new Table();
+        achievementsTable.setFillParent(true);
+        achievementsTable.setDebug(((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled());
+
+        var achievementsTitle = new Label("Achievements", skin);
+        achievementsTable.left().padLeft(25);
+        achievementsTable.add(achievementsTitle).center().padBottom(10).row();
+
+        var achievements = streaks.getAchievements();
+        if (achievements.isEmpty()) {
+            var label = new Label("None, try to get a streak next time...", skin);
+            label.setFontScale(0.7f);
+            achievementsTable.add(label).center().row();
+        } else {
+            for (var achievement : achievements) {
+                var label = new Label(achievement, skin);
+                label.setFontScale(0.7f);
+                achievementsTable.add(label).center().row();
+            }
+        }
+
+        processor.addActor(achievementsTable);
 
         var centerTable = new Table();
         centerTable.setFillParent(true);

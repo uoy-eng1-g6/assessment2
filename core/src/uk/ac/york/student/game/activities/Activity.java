@@ -28,7 +28,8 @@ public enum Activity {
      */
     SLEEP(
             Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.RESET),
-            Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.RESET)),
+            Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.RESET),
+            Pair.of(PlayerMetrics.MetricType.HAPPINESS, PlayerMetrics.MetricEffect.RESET)),
     /**
      * The {@link Activity#NAP} activity increases the {@link Player}'s {@link PlayerMetrics#getEnergy()}.
      */
