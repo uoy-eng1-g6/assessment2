@@ -8,8 +8,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.*;
-import com.badlogic.gdx.maps.objects.PolygonMapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.*;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -205,56 +203,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         changeMap("map", true);
     }
 
-    static void loadCollisionObjectsFromMapLayer(World world, int tileWidth, int tileHeight, MapLayer mapLayer) {
-        for (var object : mapLayer.getObjects()) {
-            float x, y;
-            float[] vertices;
-            if (object instanceof RectangleMapObject) {
-                var rectangleObject = (RectangleMapObject) object;
-                var rectangle = rectangleObject.getRectangle();
-
-                x = rectangle.getX();
-                y = rectangle.getY();
-                var width = rectangle.getWidth();
-                var height = rectangle.getHeight();
-
-                vertices = new float[] {x, y, x, y + height, x + width, y + height, x + width, y};
-            } else if (object instanceof PolygonMapObject) {
-                var polygonObject = (PolygonMapObject) object;
-                var polygon = polygonObject.getPolygon();
-
-                x = polygon.getX() / tileWidth;
-                y = polygon.getY() / tileHeight;
-                vertices = polygon.getTransformedVertices();
-            } else {
-                // Can there be another type of map object?
-                System.out.printf(
-                        "Unrecognised collision object: %s", object.getClass().getSimpleName());
-                continue;
-            }
-
-            // Normalize the vertices to tile scale instead of pixel scale
-            // - Box2D prefers smaller worlds which allows for smaller velocities
-            for (var i = 0; i < vertices.length; i += 2) {
-                vertices[i] /= tileWidth;
-                vertices[i] -= x;
-                vertices[i + 1] /= tileHeight;
-                vertices[i + 1] -= y;
-            }
-
-            var bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(x, y);
-
-            var body = world.createBody(bodyDef);
-            var shape = new PolygonShape();
-            shape.set(vertices);
-
-            body.createFixture(shape, 0f);
-            shape.dispose();
-        }
-    }
-
     /**
      * Changes the current map to a new map specified by the mapName parameter.
      * The screen fades out to black, then the new map is loaded and the screen fades back in.
@@ -282,15 +230,24 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             var mapWidth = layer.getWidth();
             var mapHeight = layer.getHeight();
             var tileWidth = layer.getTileWidth();
-            var tileHeight = layer.getTileHeight();
 
             mapScale = (float) 1 / tileWidth;
 
             // Initialize the map renderer for the new map
             renderer = new OrthogonalTiledMapRenderer(map, mapScale);
 
-            var collisionLayer = map.getLayers().get("collisions");
-            loadCollisionObjectsFromMapLayer(world, tileWidth, tileHeight, collisionLayer);
+            for (var collidable : MapManager.getMapObjectData(mapName).getCollisionObjects()) {
+                var bodyDef = new BodyDef();
+                bodyDef.type = BodyDef.BodyType.StaticBody;
+                bodyDef.position.set(collidable.getX(), collidable.getY());
+
+                var body = world.createBody(bodyDef);
+                var shape = new PolygonShape();
+                shape.set(collidable.getVertices());
+
+                body.createFixture(shape, 0f);
+                shape.dispose();
+            }
 
             gameCamera.setToOrtho(false, mapWidth, mapHeight);
             gameViewport.setWorldSize(mapWidth, mapHeight);
@@ -759,7 +716,6 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     @Override
     public void dispose() {
-        map.dispose();
         processor.dispose();
         player.dispose();
 

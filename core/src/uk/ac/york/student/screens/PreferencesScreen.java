@@ -692,7 +692,7 @@ public class PreferencesScreen extends BaseScreen {
                         (DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference();
                 boolean nowEnabled = !preference.isEnabled();
                 preference.setEnabled(nowEnabled);
-                game.setScreen(Screens.PREFERENCES);
+                game.setScreen(Screens.PREFERENCES, false, 0);
             }
         });
     }
