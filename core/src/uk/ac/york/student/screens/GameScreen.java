@@ -1,5 +1,7 @@
 package uk.ac.york.student.screens;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -148,13 +150,19 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     private final Box2DDebugRenderer box2dDebugRenderer;
     private final DebugRenderer debugRenderer;
 
+    private final boolean shouldFadeIn;
+    private final float fadeInTime;
+
     /**
      * Constructor for the {@link GameScreen} class.
      *
      * @param game The {@link GdxGame} instance that this screen is part of.
      */
-    public GameScreen(GdxGame game) {
+    public GameScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime) {
         super(game);
+
+        this.shouldFadeIn = shouldFadeIn;
+        this.fadeInTime = fadeInTime;
 
         // Initialize the game time
         gameTime = new GameTime();
@@ -322,6 +330,11 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     @Override
     public void show() {
+        if (shouldFadeIn) {
+            processor.getRoot().getColor().a = 0;
+            processor.getRoot().addAction(fadeIn(fadeInTime));
+        }
+
         // Get the width and height of the screen
         float width = Gdx.graphics.getWidth();
         float height = Gdx.graphics.getHeight();

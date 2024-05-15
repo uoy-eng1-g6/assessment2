@@ -298,7 +298,7 @@ public class MainMenuScreen extends BaseScreen {
         table.add(exitButton).fillX().uniformX();
 
         // Add listeners to the buttons.
-        // The exit button disposes the button click sound and exits the application after a delay of 400 milliseconds.
+        // The exit button plays the button click sound and exits the application after a delay of 400 milliseconds.
         exitButton.addListener(new ChangeListener() {
             /**
              * This method is triggered when a change event occurs on the actor, in this case, when the exit button is clicked.
@@ -312,9 +312,7 @@ public class MainMenuScreen extends BaseScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
-                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(() -> {
-                    Gdx.app.exit();
-                });
+                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(Gdx.app::exit);
             }
         });
 
@@ -340,8 +338,7 @@ public class MainMenuScreen extends BaseScreen {
                 zoomAndMove(exitButton, Direction.DOWN);
                 zoomAndMove(cookeLogoImage, Direction.UP);
                 fadeOut();
-                Wait.async(1500, TimeUnit.MILLISECONDS)
-                        .thenRun(() -> Gdx.app.postRunnable(() -> game.setScreen(Screens.GAME)));
+                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(() -> game.transitionScreen(Screens.GAME));
             }
         });
 
