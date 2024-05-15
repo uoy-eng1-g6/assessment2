@@ -523,7 +523,7 @@ public class MainMenuScreen extends BaseScreen {
     /**
      * This method is called when the {@link MainMenuScreen} is being disposed of.
      * It is responsible for freeing up resources and stopping any processes that were started in the MainMenuScreen.
-     * It disposes of the {@link MainMenuScreen#processor}, {@link MainMenuScreen#backgroundTexture}, {@link MainMenuScreen#vignetteTexture}, {@link MainMenuScreen#craftacularSkin}, {@link MainMenuScreen#cookeLogo}, {@link MainMenuScreen#clouds}, and {@link MainMenuScreen#buttonClick}.
+     * It disposes of the {@link MainMenuScreen#processor}, {@link MainMenuScreen#backgroundTexture}, {@link MainMenuScreen#vignetteTexture}, {@link MainMenuScreen#cookeLogo}, and {@link MainMenuScreen#clouds}.
      * It also shuts down the {@link MainMenuScreen#executorService}.
      */
     @Override
