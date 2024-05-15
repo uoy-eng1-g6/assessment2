@@ -91,7 +91,8 @@ public class ScoreManager {
         float studyScore = studyLevel * metricWeighting;
         float happinessScore = happiness * metricWeighting;
 
-        return studyScore + happinessScore + achievementsScore;
+        var totalScore = studyScore + happinessScore + achievementsScore;
+        return Math.min(100, Math.max(0, totalScore));
     }
 
     public static String convertScoreToString(float score) {
