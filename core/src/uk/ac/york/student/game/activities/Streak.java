@@ -8,9 +8,9 @@ import lombok.Getter;
 @Getter
 public class Streak {
     /**
-     * A Boolean value used to lock the value of streak for if the player does the activity twice in one day.
+     * A boolean value used to lock the value of streak for if the player does the activity twice in one day.
      */
-    Boolean daily;
+    boolean daily;
     /**
      * An int which tracks the length of the streak.
      */
