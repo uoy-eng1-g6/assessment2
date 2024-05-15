@@ -38,7 +38,7 @@ public class InteractableManager {
         currentInteractable = null;
 
         // Call the functions to set the interactable objects up.
-        for (String mapName : MapManager.getMapNames()) {
+        for (String mapName : MapManager.MAP_NAMES) {
             if (!Objects.equals(mapName, "blankMap")) {
                 setupInteractables(mapName);
             }
@@ -59,7 +59,7 @@ public class InteractableManager {
      * @param mapName A {@link String} of the map name to get the interactable objects from.
      */
     private void setupInteractables(String mapName) {
-        var map = MapManager.getMaps().getResult(mapName);
+        var map = MapManager.getMap(mapName);
         var mapLayer = map.getLayers().get("gameObjects");
         for (var object : mapLayer.getObjects()) {
             var properties = object.getProperties();
@@ -78,7 +78,6 @@ public class InteractableManager {
                     key = properties.get("activityStr", String.class);
                     interact = new Interactable(interactList);
                     interact.setRegion(interactableAtlas.findRegion(key));
-
                 } else { // if not an activity, but has an interactList, must be a door
                     key = properties.get("newMapStr", String.class);
                     interact = new AnimatedInteractable(interactList);

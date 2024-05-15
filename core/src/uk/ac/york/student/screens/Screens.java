@@ -3,7 +3,6 @@ package uk.ac.york.student.screens;
 import com.badlogic.gdx.Gdx;
 import java.lang.reflect.Field;
 import lombok.experimental.UtilityClass;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * This is a utility class that holds references to all the screen classes in the game.
@@ -68,36 +67,5 @@ public final class Screens {
                 Gdx.app.error("Screens", "Could not find class " + path);
             }
         }
-    }
-
-    /**
-     * This method is used to get the class reference of a screen by its name.
-     * It iterates over all the fields in the {@link Screens} class, and if a field's name matches the provided name,
-     * it returns the value of that field, which is a {@link Class} object.
-     * If no field with the provided name is found, it returns null.
-     *
-     * @param name The name of the screen class to get the reference of.
-     * @return The {@link Class} object of the screen class with the provided name, or null if no such class is found.
-     */
-    @SuppressWarnings("unchecked")
-    public static @Nullable Class<? extends BaseScreen> valueOf(String name) {
-        Field[] fields = Screens.class.getFields();
-        // This loop iterates over all the fields in the Screens class.
-        for (Field field : fields) {
-            // Checks if the name of the current field matches the provided name.
-            if (field.getName().equals(name)) {
-                try {
-                    // If a match is found, it attempts to return the value of the field.
-                    // The value of the field is a Class object representing a screen class.
-                    // The field's value is accessed using reflection, and it is cast to Class<? extends BaseScreen>.
-                    return (Class<? extends BaseScreen>) field.get(null);
-                } catch (IllegalAccessException e) {
-                    // If the field cannot be accessed, it logs an error and continues to the next field.
-                    Gdx.app.error("Screens", "Could not access field " + name);
-                }
-            }
-        }
-        // If no field with the provided name is found after iterating over all the fields, it returns null.
-        return null;
     }
 }

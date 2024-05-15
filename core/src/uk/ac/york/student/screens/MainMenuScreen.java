@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +36,6 @@ import uk.ac.york.student.audio.sound.Sounds;
 import uk.ac.york.student.settings.DebugScreenPreferences;
 import uk.ac.york.student.settings.GamePreferences;
 import uk.ac.york.student.settings.MainMenuCloudsPreferences;
-import uk.ac.york.student.utils.Wait;
 
 /**
  * The MainMenuScreen class extends the BaseScreen class and represents the main menu screen of the game.
@@ -97,16 +97,10 @@ public class MainMenuScreen extends BaseScreen {
     private final Image cloudsImage = new Image(new TextureRegionDrawable(new TextureRegion(clouds)));
 
     /**
-     * The Skin instance for the {@link MainMenuScreen}.
-     * This skin is loaded from the {@link SkinManager} using the {@link Skins#CRAFTACULAR} skin.
-     */
-    private final Skin craftacularSkin = SkinManager.getSkins().getResult(Skins.CRAFTACULAR);
-
-    /**
      * The GameSound instance for the button click sound on the {@link MainMenuScreen}.
      * This sound is loaded from the {@link SoundManager} using the {@link Sounds#BUTTON_CLICK} sound.
      */
-    private final GameSound buttonClick = SoundManager.getSupplierSounds().getResult(Sounds.BUTTON_CLICK);
+    private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
     /**
      * A boolean value that determines whether the clouds are enabled on the {@link MainMenuScreen}.
@@ -123,26 +117,8 @@ public class MainMenuScreen extends BaseScreen {
      */
     private final float cloudsSpeed =
             ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed();
-    /**
-     * Constructor for the {@link MainMenuScreen} class.
-     * This constructor initializes the {@link MainMenuScreen} with the provided game.
-     * It sets {@link MainMenuScreen#shouldFadeIn} to false, meaning the screen will not fade in when shown.
-     * @param game the {@link GdxGame} instance representing the game
-     */
-    public MainMenuScreen(GdxGame game) {
-        this(game, false);
-    }
 
-    /**
-     * Constructor for the {@link MainMenuScreen} class.
-     * This constructor initializes the {@link MainMenuScreen} with the provided game and shouldFadeIn value.
-     * It sets fadeInTime to 0.75 seconds, which is the time for the fade-in effect when the screen is shown.
-     * @param game the {@link GdxGame} instance representing the game
-     * @param shouldFadeIn a boolean value that determines whether the screen should fade in when it is shown
-     */
-    public MainMenuScreen(GdxGame game, boolean shouldFadeIn) {
-        this(game, shouldFadeIn, 0.75f);
-    }
+    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
     /**
      * Constructor for the {@link MainMenuScreen} class.
@@ -160,6 +136,10 @@ public class MainMenuScreen extends BaseScreen {
         processor = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(processor);
         executorService = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    public MainMenuScreen(GdxGame game, boolean shouldFadeIn) {
+        this(game, shouldFadeIn, 0.75f);
     }
 
     /**
@@ -287,9 +267,9 @@ public class MainMenuScreen extends BaseScreen {
         processor.addActor(table);
 
         // Create the buttons and the logo image for the main menu screen.
-        TextButton playButton = new TextButton("Let Ron Cooke", craftacularSkin);
-        TextButton preferencesButton = new TextButton("Settings", craftacularSkin);
-        TextButton exitButton = new TextButton("Exit", craftacularSkin);
+        TextButton playButton = new TextButton("Let Ron Cooke", skin);
+        TextButton preferencesButton = new TextButton("Settings", skin);
+        TextButton exitButton = new TextButton("Exit", skin);
         Image cookeLogoImage = new Image(cookeLogo);
 
         // Add the buttons and the logo image to the table.
@@ -302,7 +282,7 @@ public class MainMenuScreen extends BaseScreen {
         table.add(exitButton).fillX().uniformX();
 
         // Add listeners to the buttons.
-        // The exit button disposes the button click sound and exits the application after a delay of 400 milliseconds.
+        // The exit button plays the button click sound and exits the application.
         exitButton.addListener(new ChangeListener() {
             /**
              * This method is triggered when a change event occurs on the actor, in this case, when the exit button is clicked.
@@ -316,15 +296,12 @@ public class MainMenuScreen extends BaseScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
-                Wait.async(400, TimeUnit.MILLISECONDS).thenRun(() -> {
-                    buttonClick.dispose();
-                    Gdx.app.exit();
-                });
+                Gdx.app.exit();
             }
         });
 
         // The play button plays the button click sound, moves all elements, fades out, and then switches to the game
-        // screen after a delay of 1500 milliseconds.
+        // screen.
         playButton.addListener(new ChangeListener() {
             /**
              * This method is triggered when a change event occurs on the actor, in this case, when the play button is clicked.
@@ -339,14 +316,21 @@ public class MainMenuScreen extends BaseScreen {
              */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SoundManager.getSounds().get(Sounds.BUTTON_CLICK).play();
+                buttonClick.play();
                 zoomAndMove(playButton, Direction.DOWN);
                 zoomAndMove(preferencesButton, Direction.DOWN);
                 zoomAndMove(exitButton, Direction.DOWN);
                 zoomAndMove(cookeLogoImage, Direction.UP);
                 fadeOut();
-                Wait.async(1500, TimeUnit.MILLISECONDS)
-                        .thenRun(() -> Gdx.app.postRunnable(() -> game.setScreen(Screens.GAME)));
+                Timer timer = new Timer();
+                timer.scheduleTask(
+                        new Timer.Task() {
+                            @Override
+                            public void run() {
+                                game.transitionScreen(Screens.GAME);
+                            }
+                        },
+                        0.4f);
             }
         });
 
@@ -362,7 +346,7 @@ public class MainMenuScreen extends BaseScreen {
              */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                SoundManager.getSounds().get(Sounds.BUTTON_CLICK).play();
+                buttonClick.play();
                 game.transitionScreen(Screens.PREFERENCES);
             }
         });
@@ -531,7 +515,7 @@ public class MainMenuScreen extends BaseScreen {
     /**
      * This method is called when the {@link MainMenuScreen} is being disposed of.
      * It is responsible for freeing up resources and stopping any processes that were started in the MainMenuScreen.
-     * It disposes of the {@link MainMenuScreen#processor}, {@link MainMenuScreen#backgroundTexture}, {@link MainMenuScreen#vignetteTexture}, {@link MainMenuScreen#craftacularSkin}, {@link MainMenuScreen#cookeLogo}, {@link MainMenuScreen#clouds}, and {@link MainMenuScreen#buttonClick}.
+     * It disposes of the {@link MainMenuScreen#processor}, {@link MainMenuScreen#backgroundTexture}, {@link MainMenuScreen#vignetteTexture}, {@link MainMenuScreen#cookeLogo}, and {@link MainMenuScreen#clouds}.
      * It also shuts down the {@link MainMenuScreen#executorService}.
      */
     @Override
@@ -542,14 +526,10 @@ public class MainMenuScreen extends BaseScreen {
         backgroundTexture.dispose();
         // Dispose of the vignette texture
         vignetteTexture.dispose();
-        // Dispose of the craftacular skin
-        craftacularSkin.dispose();
         // Dispose of the cooke logo
         cookeLogo.dispose();
         // Dispose of the clouds texture
         clouds.dispose();
-        // Dispose of the button click sound
-        buttonClick.dispose();
         // Shutdown the executor service
         executorService.shutdown();
     }

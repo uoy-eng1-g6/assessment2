@@ -1,11 +1,9 @@
 package uk.ac.york.student.audio.sound;
 
-import java.util.EnumMap;
-import java.util.function.Supplier;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import lombok.Getter;
 import uk.ac.york.student.audio.AudioManager;
-import uk.ac.york.student.audio.sound.elements.ButtonClickSound;
-import uk.ac.york.student.utils.EnumMapOfSuppliers;
 
 /**
  * Singleton class that manages the sound for the game.
@@ -19,36 +17,30 @@ public class SoundManager implements AudioManager {
     @Getter
     private static final SoundManager instance = new SoundManager();
 
-    /**
-     * Supplier for the button click sound
-     */
-    private static final Supplier<GameSound> buttonClickSound = ButtonClickSound::new;
-
-    /**
-     * Map of game sounds.
-     * It is a static final instance of EnumMap.
-     */
-    @Getter
-    private static final EnumMap<Sounds, GameSound> sounds = new EnumMap<>(Sounds.class);
-
-    /**
-     * Map of suppliers for game sounds.
-     * It is a static final instance of EnumMapOfSuppliers.
-     */
-    @Getter
-    private static final EnumMapOfSuppliers<Sounds, GameSound> supplierSounds = new EnumMapOfSuppliers<>(Sounds.class);
-
-    // Static block to initialize the sounds map and supplierSounds map
-    static {
-        sounds.put(Sounds.BUTTON_CLICK, buttonClickSound.get());
-        supplierSounds.put(Sounds.BUTTON_CLICK, buttonClickSound);
-    }
+    private final HashMap<Sounds, GameSound> soundCache = new HashMap<>();
 
     /**
      * Private constructor to prevent instantiation.
      * As this is a singleton class, the constructor is private.
      */
     private SoundManager() {}
+
+    public GameSound getSound(Sounds sound) {
+        if (soundCache.containsKey(sound)) {
+            return soundCache.get(sound);
+        }
+
+        try {
+            soundCache.put(sound, sound.getSoundClass().getDeclaredConstructor().newInstance());
+        } catch (InstantiationException
+                | NoSuchMethodException
+                | InvocationTargetException
+                | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        return getSound(sound);
+    }
 
     /**
      * Called when the game is started.
@@ -64,7 +56,7 @@ public class SoundManager implements AudioManager {
      */
     @Override
     public void onDisable() {
-        for (GameSound sound : sounds.values()) {
+        for (var sound : soundCache.values()) {
             sound.dispose();
         }
     }

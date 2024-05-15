@@ -2,6 +2,8 @@ package uk.ac.york.student.player;
 
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import org.jetbrains.annotations.Range;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
 import uk.ac.york.student.game.GameTime;
 
 /**
@@ -15,9 +17,9 @@ public class PlayerHappiness implements PlayerMetric {
      * The ProgressBar instance for the PlayerHappiness class.
      * This ProgressBar represents the happiness level of the player in the game.
      * The minimum value is 0 (not happy), the maximum value is 1 (very happy), and the step size is 0.1.
-     * The ProgressBar does not have a vertical orientation (false), and uses the skin from {@link PlayerMetric#skin}.
+     * The ProgressBar does not have a vertical orientation (false), and uses the craftacular skin.
      */
-    private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, skin);
+    private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));
     /**
      * Constructor for the PlayerHappiness class.
      * This constructor initializes the ProgressBar representing the player's happiness level.

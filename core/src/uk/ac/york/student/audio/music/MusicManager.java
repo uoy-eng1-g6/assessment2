@@ -12,17 +12,13 @@ import uk.ac.york.student.settings.MusicPreferences;
  */
 public class MusicManager implements AudioManager {
     /**
-     * The background music for the game.
-     * It is a static final instance of BackgroundMusic.
-     */
-    public static final BackgroundMusic BACKGROUND_MUSIC = new BackgroundMusic();
-
-    /**
      * The instance of the music manager.
      * It is a static final instance of MusicManager.
      */
     @Getter
     private static final MusicManager instance = new MusicManager();
+
+    private BackgroundMusic backgroundMusic = null;
 
     /**
      * Private constructor to prevent instantiation.
@@ -30,17 +26,25 @@ public class MusicManager implements AudioManager {
      */
     private MusicManager() {}
 
+    public void setBackgroundMusicVolume(float volume) {
+        backgroundMusic.setVolume(volume);
+    }
+
     /**
      * Called when the game is started.
      * It checks the music preferences and if enabled, starts playing the background music.
      */
     @Override
     public void onEnable() {
+        if (backgroundMusic == null) {
+            backgroundMusic = new BackgroundMusic();
+        }
+
         MusicPreferences musicPreferences = (MusicPreferences) GamePreferences.MUSIC.getPreference();
         if (musicPreferences.isEnabled()) {
-            BACKGROUND_MUSIC.setLooping(true);
-            BACKGROUND_MUSIC.play();
-            BACKGROUND_MUSIC.setVolume(musicPreferences.getVolume());
+            backgroundMusic.setLooping(true);
+            backgroundMusic.play();
+            backgroundMusic.setVolume(musicPreferences.getVolume());
         }
     }
 
@@ -50,7 +54,9 @@ public class MusicManager implements AudioManager {
      */
     @Override
     public void onDisable() {
-        BACKGROUND_MUSIC.stop();
-        BACKGROUND_MUSIC.dispose();
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.dispose();
+        }
     }
 }

@@ -4,9 +4,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -23,6 +21,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
+import uk.ac.york.student.assets.map.MapManager;
 
 /**
  * The Player class extends the Actor class and implements the PlayerScore and InputProcessor interfaces.
@@ -30,7 +29,7 @@ import org.jetbrains.annotations.Range;
  * It also manages the player's score and the player's sprite on the screen.
  */
 @Getter
-public class Player implements PlayerScore, InputProcessor {
+public class Player implements InputProcessor {
     public static final float HITBOX_RADIUS = 0.25f;
 
     /**
@@ -144,13 +143,8 @@ public class Player implements PlayerScore, InputProcessor {
         fixture = body.createFixture(shape, 1f);
         shape.dispose();
 
-        // Create a sprite for the player and set its position, opacity, and size
-        sprite = textureAtlas.createSprite("char3_towards");
-        sprite.setAlpha(1);
-
         // Clear the existing bounding boxes of the map objects
         tileObjectBoundingBoxes.clear();
-
         // Load the bounding boxes of the new map objects
         loadMapObjectBoundingBoxes();
     }
@@ -241,58 +235,14 @@ public class Player implements PlayerScore, InputProcessor {
     private final HashMap<MapObject, Rectangle> tileObjectBoundingBoxes = new HashMap<>();
 
     /**
-     * Returns the bounding box of a given map object.
-     *
-     * @param object The MapObject for which the bounding box is to be calculated.
-     * @return A Rectangle object representing the bounding box of the map object.
-     */
-    public Rectangle getTileObjectBoundingBox(@NotNull MapObject object) {
-        var rectangleObj = (RectangleMapObject) object;
-        return rectangleObj.getRectangle();
-    }
-
-    /**
-     * Retrieves the game objects from the map layer named "gameObjects".
-     *
-     * @return MapObjects from the "gameObjects" layer of the map.
-     */
-    public MapObjects getMapObjects() {
-        MapLayer gameObjects = map.getLayers().get("gameObjects"); // Get the "gameObjects" layer from the map
-        return gameObjects.getObjects(); // Return the objects from the "gameObjects" layer
-    }
-
-    /**
      * Loads the bounding boxes of the actionable game objects from the map.
      * The bounding boxes are stored in the tileObjectBoundingBoxes HashMap.
      * The key is a MapObject and the value is a BoundingBox.
      * This method is typically called when a new map is set for the player.
      */
     public void loadMapObjectBoundingBoxes() {
-        var layer = (TiledMapTileLayer) map.getLayers().get(0);
-        var tileWidth = layer.getTileWidth();
-        var tileHeight = layer.getTileHeight();
-
-        // Retrieve the game objects from the map
-        MapObjects objects = getMapObjects();
-
-        // Iterate over each game object
-        for (MapObject object : objects) {
-            // Check if the game object is actionable
-            Boolean actionable = object.getProperties().get("actionable", Boolean.class);
-
-            // If the game object is not actionable, skip it
-            // If the actionable property is not set, or it is set to true, assume the game object is actionable
-            if (Boolean.FALSE.equals(actionable)) continue;
-
-            // Calculate the bounding box of the game object
-            var boundingBox = getTileObjectBoundingBox(object);
-            boundingBox.x /= tileWidth;
-            boundingBox.width /= tileWidth;
-            boundingBox.y /= tileHeight;
-            boundingBox.height /= tileHeight;
-
-            // Store the bounding box in the tileObjectBoundingBoxes HashMap
-            tileObjectBoundingBoxes.put(object, boundingBox);
+        for (var actionableObject : MapManager.getMapObjectData(mapName).getActionableObjects()) {
+            tileObjectBoundingBoxes.put(actionableObject.getObject(), actionableObject.asRectangle());
         }
     }
 
@@ -534,7 +484,6 @@ public class Player implements PlayerScore, InputProcessor {
      */
     public void dispose() {
         textureAtlas.dispose(); // Dispose of the TextureAtlas
-        metrics.dispose(); // Dispose of the PlayerMetrics
     }
 
     /**

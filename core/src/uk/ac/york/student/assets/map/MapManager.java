@@ -1,15 +1,15 @@
 package uk.ac.york.student.assets.map;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import java.io.File;
+import java.util.HashMap;
 import java.util.List;
-import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import uk.ac.york.student.utils.MapOfSuppliers;
 
 /**
  * This utility class manages the loading and storage of TiledMap objects.
@@ -17,36 +17,118 @@ import uk.ac.york.student.utils.MapOfSuppliers;
  */
 @UtilityClass
 public final class MapManager {
-    /**
-     * A MapOfSuppliers that maps from map names (as a string) to TiledMap objects
-     * <p>
-     * Use {@link uk.ac.york.student.utils.MapOfSuppliers#getResult(Object)} to get the TiledMap object for a given map name
-     */
-    @Getter
-    private static final MapOfSuppliers<String, TiledMap> maps = new MapOfSuppliers<>();
-
-    @Getter
-    private static final List<String> mapNames =
+    public static final List<String> MAP_NAMES =
             List.of("map", "inside_house", "inside_pub", "inside_library", "blankMap");
 
-    public static void onEnable() {
+    private static final TmxMapLoader MAP_LOADER;
+    private static final TmxMapLoader.Parameters MAP_LOADER_PARAMETERS;
 
-        // Create parameters for loading the maps
-        TmxMapLoader.Parameters parameter = new TmxMapLoader.Parameters();
-        parameter.textureMinFilter = Texture.TextureFilter.Nearest;
-        parameter.textureMagFilter = Texture.TextureFilter.Nearest;
+    private static final HashMap<String, TiledMap> cachedMaps = new HashMap<>();
+    private static final HashMap<String, MapObjectsPositionData> cachedMapObjectData = new HashMap<>();
 
-        // Load each map file in the directory (and hide the potential NullPointerException with Objects.requireNonNull)
-        for (String map : mapNames) {
-            map = "map/" + map + ".tmx";
-            FileHandle internal = Gdx.files.internal(map);
-            File file = internal.file();
-            // Only load files with the ".tmx" extension
-            if (file.getName().endsWith(".tmx")) {
-                // Add the map to the MapOfSuppliers, using a lambda to allow for lazy loading
-                MapManager.maps.put(file.getName().replace(".tmx", ""), () -> new TmxMapLoader()
-                        .load("map/" + file.getName(), parameter));
-            }
+    static {
+        MAP_LOADER = new TmxMapLoader();
+        MAP_LOADER_PARAMETERS = new TmxMapLoader.Parameters();
+        MAP_LOADER_PARAMETERS.textureMinFilter = Texture.TextureFilter.Nearest;
+        MAP_LOADER_PARAMETERS.textureMagFilter = Texture.TextureFilter.Nearest;
+    }
+
+    public static TiledMap getMap(String mapName) {
+        if (cachedMaps.containsKey(mapName)) {
+            return cachedMaps.get(mapName);
         }
+
+        var map = MAP_LOADER.load("map/" + mapName + ".tmx", MAP_LOADER_PARAMETERS);
+        cachedMaps.put(mapName, map);
+        return map;
+    }
+
+    static void loadCollisionObjectsFromMapLayer(
+            MapObjectsPositionData data, int tileWidth, int tileHeight, MapLayer mapLayer) {
+        for (var object : mapLayer.getObjects()) {
+            float x, y;
+            float[] vertices;
+            if (object instanceof RectangleMapObject) {
+                var rectangleObject = (RectangleMapObject) object;
+                var rectangle = rectangleObject.getRectangle();
+
+                x = rectangle.getX();
+                y = rectangle.getY();
+                var width = rectangle.getWidth();
+                var height = rectangle.getHeight();
+
+                vertices = new float[] {x, y, x, y + height, x + width, y + height, x + width, y};
+            } else if (object instanceof PolygonMapObject) {
+                var polygonObject = (PolygonMapObject) object;
+                var polygon = polygonObject.getPolygon();
+
+                x = polygon.getX() / tileWidth;
+                y = polygon.getY() / tileHeight;
+                vertices = polygon.getTransformedVertices();
+            } else {
+                // Can there be another type of map object?
+                System.out.printf(
+                        "Unrecognised collision object: %s", object.getClass().getSimpleName());
+                continue;
+            }
+
+            // Normalize the vertices to tile scale instead of pixel scale
+            // - Box2D prefers smaller worlds which allows for smaller velocities
+            for (var i = 0; i < vertices.length; i += 2) {
+                vertices[i] /= tileWidth;
+                vertices[i] -= x;
+                vertices[i + 1] /= tileHeight;
+                vertices[i + 1] -= y;
+            }
+
+            data.getCollisionObjects().add(new MapObjectsPositionData.CollisionObjectData(x, y, vertices));
+        }
+    }
+
+    static void loadActionableObjectDataFromMapLayer(
+            MapObjectsPositionData data, int tileWidth, int tileHeight, MapLayer mapLayer) {
+        for (var object : mapLayer.getObjects()) {
+            Boolean actionable = object.getProperties().get("actionable", Boolean.class);
+            if (Boolean.FALSE.equals(actionable)) continue;
+
+            var rectangleObject = (RectangleMapObject) object;
+            var rectangle = rectangleObject.getRectangle();
+
+            data.getActionableObjects()
+                    .add(new MapObjectsPositionData.ActionableObjectData(
+                            rectangle.x / tileWidth,
+                            rectangle.y / tileHeight,
+                            rectangle.width / tileWidth,
+                            rectangle.height / tileHeight,
+                            object));
+        }
+    }
+
+    public static MapObjectsPositionData getMapObjectData(String mapName) {
+        if (cachedMapObjectData.containsKey(mapName)) {
+            return cachedMapObjectData.get(mapName);
+        }
+
+        var map = getMap(mapName);
+        var backgroundLayer = (TiledMapTileLayer) map.getLayers().get(0);
+        var tileWidth = backgroundLayer.getTileWidth();
+        var tileHeight = backgroundLayer.getTileHeight();
+
+        var data = new MapObjectsPositionData();
+
+        var collisionLayer = map.getLayers().get("collisions");
+        loadCollisionObjectsFromMapLayer(data, tileWidth, tileHeight, collisionLayer);
+        var actionableObjectLayer = map.getLayers().get("gameObjects");
+        loadActionableObjectDataFromMapLayer(data, tileWidth, tileHeight, actionableObjectLayer);
+
+        cachedMapObjectData.put(mapName, data);
+        return data;
+    }
+
+    public static void dispose() {
+        for (var map : cachedMaps.values()) {
+            map.dispose();
+        }
+        cachedMaps.clear();
     }
 }

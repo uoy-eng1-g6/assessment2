@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import lombok.Getter;
 import uk.ac.york.student.GdxGame;
+import uk.ac.york.student.score.ScoreManager;
 
 /**
  * The LoadingScreen class extends the BaseScreen class and represents the loading screen of the game.
@@ -26,6 +27,8 @@ public class LoadingScreen extends BaseScreen {
     public LoadingScreen(GdxGame game) {
         super(game);
         processor = new Stage(new ScreenViewport());
+
+        ScoreManager.initScoresDatabase();
     }
 
     /**

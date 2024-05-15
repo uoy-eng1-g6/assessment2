@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import java.lang.reflect.InvocationTargetException;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.york.student.assets.map.MapManager;
+import uk.ac.york.student.assets.skins.SkinManager;
 import uk.ac.york.student.audio.AudioManager;
 import uk.ac.york.student.audio.music.MusicManager;
 import uk.ac.york.student.audio.sound.SoundManager;
@@ -42,8 +43,6 @@ public final class GdxGame extends Game {
         // Get the instance of the sound manager and enable it
         final AudioManager soundManager = SoundManager.getInstance();
         soundManager.onEnable();
-
-        MapManager.onEnable();
 
         // Set the initial screen to the loading screen
         setScreen(Screens.LOADING);
@@ -290,5 +289,8 @@ public final class GdxGame extends Game {
         // Get the instance of the sound manager and disable it
         final AudioManager soundManager = SoundManager.getInstance();
         soundManager.onDisable();
+
+        SkinManager.dispose();
+        MapManager.dispose();
     }
 }
