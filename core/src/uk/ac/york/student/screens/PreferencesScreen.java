@@ -235,29 +235,6 @@ public class PreferencesScreen extends BaseScreen {
 
     /**
      * Constructor for the {@link PreferencesScreen} class.
-     * This constructor initializes a new {@link PreferencesScreen} with the given game instance.
-     * The screen will not fade in when shown.
-     *
-     * @param game The {@link GdxGame} game instance to associate with this screen.
-     */
-    public PreferencesScreen(GdxGame game) {
-        this(game, false);
-    }
-
-    /**
-     * Constructor for the {@link PreferencesScreen} class.
-     * This constructor initializes a new {@link PreferencesScreen} with the given {@link GdxGame} game instance and fade-in flag.
-     * If the fade-in flag is true, the screen will fade in when shown with a default fade-in time of 0.75 seconds.
-     *
-     * @param game The {@link GdxGame} game instance to associate with this screen.
-     * @param shouldFadeIn A flag indicating whether the screen should fade in when shown.
-     */
-    public PreferencesScreen(GdxGame game, boolean shouldFadeIn) {
-        this(game, shouldFadeIn, 0.75f);
-    }
-
-    /**
-     * Constructor for the {@link PreferencesScreen} class.
      * This constructor initializes a new {@link PreferencesScreen} with the given game instance, fade-in flag, and fade-in time.
      * If the fade-in flag is true, the screen will fade in when shown with the given fade-in time.
      * The constructor also initializes the {@link Stage} for the screen and sets it as the {@link Gdx} input processor.

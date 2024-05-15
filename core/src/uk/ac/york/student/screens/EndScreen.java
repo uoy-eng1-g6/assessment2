@@ -31,11 +31,6 @@ public class EndScreen extends BaseScreen {
     private final Stage processor;
     private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
-    public EndScreen(GdxGame game) {
-        super(game);
-        throw new UnsupportedOperationException("This constructor is not supported (must pass in object args!)");
-    }
-
     public EndScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime, Object @NotNull [] args) {
         super(game);
         processor = new Stage(new ScreenViewport());

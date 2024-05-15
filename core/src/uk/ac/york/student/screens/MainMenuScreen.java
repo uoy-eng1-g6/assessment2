@@ -119,26 +119,6 @@ public class MainMenuScreen extends BaseScreen {
             ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed();
 
     private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
-    /**
-     * Constructor for the {@link MainMenuScreen} class.
-     * This constructor initializes the {@link MainMenuScreen} with the provided game.
-     * It sets {@link MainMenuScreen#shouldFadeIn} to false, meaning the screen will not fade in when shown.
-     * @param game the {@link GdxGame} instance representing the game
-     */
-    public MainMenuScreen(GdxGame game) {
-        this(game, false);
-    }
-
-    /**
-     * Constructor for the {@link MainMenuScreen} class.
-     * This constructor initializes the {@link MainMenuScreen} with the provided game and shouldFadeIn value.
-     * It sets fadeInTime to 0.75 seconds, which is the time for the fade-in effect when the screen is shown.
-     * @param game the {@link GdxGame} instance representing the game
-     * @param shouldFadeIn a boolean value that determines whether the screen should fade in when it is shown
-     */
-    public MainMenuScreen(GdxGame game, boolean shouldFadeIn) {
-        this(game, shouldFadeIn, 0.75f);
-    }
 
     /**
      * Constructor for the {@link MainMenuScreen} class.
@@ -156,6 +136,10 @@ public class MainMenuScreen extends BaseScreen {
         processor = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(processor);
         executorService = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    public MainMenuScreen(GdxGame game, boolean shouldFadeIn) {
+        this(game, shouldFadeIn, 0.75f);
     }
 
     /**
