@@ -20,6 +20,7 @@ public class PlayerHappiness implements PlayerMetric {
      * The ProgressBar does not have a vertical orientation (false), and uses the craftacular skin.
      */
     private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));
+
     /**
      * Constructor for the PlayerHappiness class.
      * This constructor initializes the ProgressBar representing the player's happiness level.
@@ -35,6 +36,7 @@ public class PlayerHappiness implements PlayerMetric {
      * It is initially set to 1, indicating that the player starts the game being very happy.
      */
     private @Range(from = 0, to = 1) float happiness = getDefault();
+
     /**
      * The total amount of happiness accumulated by the player across all days of the game.
      * This is a float value that starts at 0 and increases as the player becomes happier.
@@ -87,7 +89,7 @@ public class PlayerHappiness implements PlayerMetric {
      */
     @Override
     public float getDefault() {
-        return 1f;
+        return 0.5f;
     }
     /**
      * Getter method for the happiness level of the player.

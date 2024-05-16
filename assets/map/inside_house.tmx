@@ -193,9 +193,9 @@
   <object id="4" name="studyAtDesk" x="160.558" y="207.728" width="32" height="32">
    <properties>
     <property name="activityStr" value="study at your desk"/>
-    <property name="activityTime" type="int" value="3"/>
+    <property name="activityTime" type="int" value="2"/>
     <property name="activityType" value="study"/>
-    <property name="changeAmount" value=".2,0.3,0.2"/>
+    <property name="changeAmount" value="0.2,0.2,0.1"/>
     <property name="interactInfo" value="169,88,32,32"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
@@ -215,7 +215,7 @@
     <property name="activityStr" value="go to bed"/>
     <property name="activityTime" type="int" value="8"/>
     <property name="activityType" value="sleep"/>
-    <property name="changeAmount" value="0,0"/>
+    <property name="changeAmount" value="0,0,0"/>
     <property name="interactInfo" value="273,111,32,34"/>
     <property name="isActivity" type="bool" value="true"/>
    </properties>
