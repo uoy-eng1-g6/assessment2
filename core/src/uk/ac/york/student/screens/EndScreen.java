@@ -32,52 +32,38 @@ public class EndScreen extends BaseScreen {
     private final Stage processor;
     private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
+    private final PlayerMetrics playerMetrics;
+    private final PlayerStreaks playerStreaks;
+
     public EndScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime, Object @NotNull [] args) {
         super(game);
         processor = new Stage(new ScreenViewport());
 
-        var metrics = (PlayerMetrics) args[0];
-        var streaks = (PlayerStreaks) args[1];
-        var score = ScoreManager.calculateScore(
-                metrics.getStudyLevel().getTotal(),
-                metrics.getStudyLevel().getMaxTotal(),
-                metrics.getHappiness().getTotal(),
-                metrics.getHappiness().getMaxTotal(),
-                streaks);
+        playerMetrics = (PlayerMetrics) args[0];
+        playerStreaks = (PlayerStreaks) args[1];
 
-        var actualScore = (int) Math.floor(score * 100);
-        ScoreManager.saveScore(actualScore);
-        var scoreString = ScoreManager.convertScoreToString(score);
+        Gdx.input.setInputProcessor(processor);
+    }
 
-        var highScores = ScoreManager.getTop10Scores();
+    @Override
+    public void show() {
+        var isDebug = ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled();
 
-        var scoresTable = new Table();
-        scoresTable.setFillParent(true);
-        scoresTable.setDebug(((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled());
+        var rootTable = new Table();
+        rootTable.setFillParent(true);
+        rootTable.setDebug(isDebug);
+        rootTable.pad(20);
 
-        var scoresTitle = new Label("Highscores", skin);
-        scoresTable.right().padRight(25);
-        scoresTable.add(scoresTitle).center().padBottom(10).row();
-
-        for (var highScore : highScores) {
-            var label = new Label(String.valueOf(highScore), skin);
-            label.setFontScale(0.7f);
-            scoresTable.add(label).center().row();
-        }
-
-        processor.addActor(scoresTable);
-
+        // Achievements
         var achievementsTable = new Table();
-        achievementsTable.setFillParent(true);
-        achievementsTable.setDebug(((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled());
+        achievementsTable.setDebug(isDebug);
 
         var achievementsTitle = new Label("Achievements", skin);
-        achievementsTable.left().padLeft(25);
-        achievementsTable.add(achievementsTitle).center().padBottom(10).row();
+        achievementsTable.add(achievementsTitle).center().padBottom(20).row();
 
-        var achievements = streaks.getAchievements();
+        var achievements = playerStreaks.getAchievements();
         if (achievements.isEmpty()) {
-            var label = new Label("None, try to get a streak next time...", skin);
+            var label = new Label("Nothing to see here...", skin);
             label.setFontScale(0.7f);
             achievementsTable.add(label).center().row();
         } else {
@@ -88,28 +74,53 @@ public class EndScreen extends BaseScreen {
             }
         }
 
-        processor.addActor(achievementsTable);
+        // Highscores
+        var highScores = ScoreManager.getTop10Scores();
 
-        var centerTable = new Table();
-        centerTable.setFillParent(true);
-        centerTable.setDebug(((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled());
+        var highScoresTable = new Table();
+        highScoresTable.setDebug(isDebug);
 
-        var title = new Label("Game Over", skin);
-        centerTable.center();
-        centerTable.pad(0, 50, 0, 50);
-        centerTable.add(title).padBottom(20).row();
+        var highscoresTitle = new Label("Highscores", skin);
+        highScoresTable.add(highscoresTitle).center().padBottom(20).row();
 
-        var headerLabel = new Label(actualScore > highScores.get(0) ? "NEW HIGHSCORE" : "Final Score:", skin);
-        headerLabel.setFontScale(0.8f);
-        var textScoreLabel = new Label(scoreString, skin);
-        textScoreLabel.setFontScale(0.7f);
-        var scoreLabel = new Label(String.valueOf(actualScore), skin);
-        scoreLabel.setFontScale(0.7f);
+        for (var highScore : highScores) {
+            var label = new Label(String.valueOf(highScore), skin);
+            label.setFontScale(0.7f);
+            highScoresTable.add(label).center().row();
+        }
 
-        centerTable.add(headerLabel).padBottom(5).row();
-        centerTable.add(textScoreLabel).row();
-        centerTable.add(scoreLabel).padBottom(20).row();
+        // Score
+        var score = ScoreManager.calculateScore(
+                playerMetrics.getStudyLevel().getTotal(),
+                playerMetrics.getStudyLevel().getMaxTotal(),
+                playerMetrics.getHappiness().getTotal(),
+                playerMetrics.getHappiness().getMaxTotal(),
+                playerStreaks);
+        var actualScore = (int) Math.floor(score * 100);
+        ScoreManager.saveScore(actualScore);
+        var scoreString = ScoreManager.convertScoreToString(score);
 
+        var scoreTable = new Table();
+        scoreTable.setDebug(isDebug);
+
+        var scoreTitle = new Label(actualScore > highScores.get(0) ? "NEW HIGHSCORE" : "Final Score:", skin);
+        scoreTable.add(scoreTitle).center().padBottom(20).row();
+
+        var scoreNumberLabel = new Label(String.valueOf(actualScore), skin);
+        scoreNumberLabel.setFontScale(0.7f);
+        var scoreStringLabel = new Label(scoreString, skin);
+        scoreStringLabel.setFontScale(0.7f);
+
+        scoreTable.add(scoreNumberLabel).center().row();
+        scoreTable.add(scoreStringLabel).center().row();
+
+        // Add sub-tables to root
+        rootTable.add(achievementsTable).center().top().uniformX().space(20);
+        rootTable.add(scoreTable).center().top().uniformX().space(20);
+        rootTable.add(highScoresTable).center().top().uniformX().space(20);
+        rootTable.row();
+
+        // Add UI buttons
         var mainMenuButton = new TextButton("Main Menu", skin);
         mainMenuButton.addListener(new ChangeListener() {
             @Override
@@ -127,16 +138,17 @@ public class EndScreen extends BaseScreen {
             }
         });
 
-        centerTable.add(mainMenuButton).fillX().row();
-        centerTable.add(quitButton).fillX().row();
+        var buttonTable = new Table();
+        buttonTable.setDebug(isDebug);
 
-        processor.addActor(centerTable);
+        buttonTable.add(mainMenuButton).padRight(5);
+        buttonTable.add(quitButton).padLeft(5);
 
-        Gdx.input.setInputProcessor(processor);
+        rootTable.add(buttonTable).padTop(20).center().colspan(3);
+
+        // Add UI elements to the stage
+        processor.addActor(rootTable);
     }
-
-    @Override
-    public void show() {}
 
     @Override
     public void render(float v) {
@@ -156,7 +168,9 @@ public class EndScreen extends BaseScreen {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+        processor.clear();
+    }
 
     @Override
     public void dispose() {
