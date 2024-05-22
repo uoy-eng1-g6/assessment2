@@ -196,7 +196,7 @@ public class Player implements InputProcessor {
     public void move() {
         // Calculate the amount to move the sprite by
         // If the BOOST movement is active, the sprite moves twice as fast
-        final float amount = (Movement.BOOST.is ? 4 : 2);
+        final float amount = 4;
 
         velocity.set(0, 0);
         // Move the sprite up if the UP movement is active and the sprite is not at the top of the map
@@ -307,7 +307,7 @@ public class Player implements InputProcessor {
      * Handles the key press events for the player's movement.
      * This method is called when a key is pressed.
      * The player's movement is updated based on the key pressed.
-     * The possible keys are W (up), S (down), A (left), D (right), and CONTROL_LEFT (boost).
+     * The possible keys are W (up), S (down), A (left), D (right)
      * If the key pressed is not one of these, the method returns false.
      * If the key pressed is one of these, the corresponding movement is set to active and the method returns true.
      *
@@ -333,9 +333,6 @@ public class Player implements InputProcessor {
             case Input.Keys.D:
                 Movement.RIGHT.set(true);
                 break;
-            case Input.Keys.CONTROL_LEFT:
-                Movement.BOOST.set(true);
-                break;
             default:
                 return false;
         }
@@ -346,7 +343,7 @@ public class Player implements InputProcessor {
      * Handles the key release events for the player's movement.
      * This method is called when a key is released.
      * The player's movement is updated based on the key released.
-     * The possible keys are W (up), S (down), A (left), D (right), and CONTROL_LEFT (boost).
+     * The possible keys are W (up), S (down), A (left), D (right)
      * If the key released is not one of these, the method returns false.
      * If the key released is one of these, the corresponding movement is set to inactive and the method returns true.
      *
@@ -371,9 +368,6 @@ public class Player implements InputProcessor {
             case Input.Keys.RIGHT:
             case Input.Keys.D:
                 Movement.RIGHT.set(false);
-                break;
-            case Input.Keys.CONTROL_LEFT:
-                Movement.BOOST.set(false);
                 break;
             default:
                 return false;
