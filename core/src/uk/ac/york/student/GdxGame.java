@@ -12,7 +12,6 @@ import uk.ac.york.student.assets.skins.SkinManager;
 import uk.ac.york.student.audio.AudioManager;
 import uk.ac.york.student.audio.music.MusicManager;
 import uk.ac.york.student.audio.sound.SoundManager;
-import uk.ac.york.student.interactables.InteractableManager;
 import uk.ac.york.student.screens.BaseScreen;
 import uk.ac.york.student.screens.Screens;
 

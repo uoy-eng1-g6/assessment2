@@ -60,6 +60,7 @@ public class Player implements InputProcessor {
 
     private final TextureAtlas.AtlasRegion SPRITEAWAYREGION;
     private final TextureAtlas.AtlasRegion SPRITELEFTREGION;
+
     /**
      * TiledMap object representing the current game map.
      */
@@ -70,7 +71,7 @@ public class Player implements InputProcessor {
     /**
      * TextureAtlas object containing the textures for the player's sprite.
      */
-    private final TextureAtlas textureAtlas = new TextureAtlas("sprite-atlases/character-sprites.atlas");
+    private final TextureAtlas textureAtlas;
 
     private final Vector2 velocity = new Vector2();
 
@@ -82,14 +83,20 @@ public class Player implements InputProcessor {
     /**
      * Constructor for the Player class.
      */
-    public Player(World world) {
+    public Player(World world, TextureAtlas textureAtlas) {
         this.world = world;
+        this.textureAtlas = textureAtlas;
+
         // Create a sprite for the player and set its position, opacity, and size
         SPRITETOWARDSREGION = textureAtlas.findRegion("char3_towards");
         SPRITEAWAYREGION = textureAtlas.findRegion("char3_away");
         SPRITELEFTREGION = textureAtlas.findRegion("char3_left");
         sprite = textureAtlas.createSprite("char3_towards");
         sprite.setAlpha(1);
+    }
+
+    public Player(World world) {
+        this(world, new TextureAtlas("sprite-atlases/character-sprites.atlas"));
     }
 
     public Vector2 getTilePosition() {

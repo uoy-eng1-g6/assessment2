@@ -1,5 +1,12 @@
 package uk.ac.york.student.interactables;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
@@ -12,13 +19,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.ac.york.student.GdxTestRunner;
 import uk.ac.york.student.assets.map.MapManager;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 @RunWith(GdxTestRunner.class)
 public class InteractableManagerTest {
@@ -55,11 +55,9 @@ public class InteractableManagerTest {
         var camera = mock(OrthographicCamera.class);
 
         var interactableManager = new InteractableManager(camera, atlas);
-        try (
-                var mapManager = mockStatic(MapManager.class);
+        try (var mapManager = mockStatic(MapManager.class);
                 var ignored = mockConstruction(Interactable.class);
-                var ignored2 = mockConstruction(AnimatedInteractable.class);
-        ) {
+                var ignored2 = mockConstruction(AnimatedInteractable.class)) {
             mapManager.when(() -> MapManager.getMap(anyString())).thenReturn(map);
 
             interactableManager.setupInteractables("foo");
