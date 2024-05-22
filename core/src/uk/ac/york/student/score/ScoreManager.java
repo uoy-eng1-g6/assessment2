@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import uk.ac.york.student.player.PlayerStreaks;
+import uk.ac.york.student.utils.Pair;
 
 /**
  * Utility class to manage the scores and save them using a local database.
@@ -18,10 +19,11 @@ import uk.ac.york.student.player.PlayerStreaks;
 public class ScoreManager {
     private static final String SCHEMA = ("CREATE TABLE IF NOT EXISTS scores ("
             + "id INTEGER PRIMARY KEY AUTO_INCREMENT,"
+            + "name VARCHAR(12) NOT NULL,"
             + "score INTEGER NOT NULL"
             + ");");
-    private static final String SAVE_SCORE = "INSERT INTO scores (score) VALUES (?);";
-    private static final String GET_TOP_10_SCORES = "SELECT score FROM scores ORDER BY score DESC LIMIT 10;";
+    private static final String SAVE_SCORE = "INSERT INTO scores (name, score) VALUES (?, ?);";
+    private static final String GET_TOP_10_SCORES = "SELECT name, score FROM scores ORDER BY score DESC LIMIT 10;";
 
     private static Driver driver = null;
 
@@ -56,22 +58,23 @@ public class ScoreManager {
         }
     }
 
-    public static void saveScore(int score) {
+    public static void saveScore(String name, int score) {
         try (var conn = getConnection()) {
             var stmt = conn.prepareStatement(SAVE_SCORE);
-            stmt.setInt(1, score);
+            stmt.setString(1, name);
+            stmt.setInt(2, score);
             stmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static List<Integer> getTop10Scores() {
-        List<Integer> scores = new ArrayList<>();
+    public static List<Pair<String, Integer>> getTop10Scores() {
+        List<Pair<String, Integer>> scores = new ArrayList<>();
         try (var conn = getConnection()) {
             var results = conn.prepareStatement(GET_TOP_10_SCORES).executeQuery();
             while (results.next()) {
-                scores.add(results.getInt("score"));
+                scores.add(Pair.of(results.getString("name"), results.getInt("score")));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
