@@ -32,6 +32,7 @@ import uk.ac.york.student.assets.map.MapManager;
 @Getter
 public class Player implements InputProcessor {
     public static final float HITBOX_RADIUS = 0.25f;
+    public static final float MOVE_SPEED = 4;
 
     /**
      * PlayerMetrics object to store and manage player-specific metrics.
@@ -76,7 +77,7 @@ public class Player implements InputProcessor {
     private final Vector2 velocity = new Vector2();
 
     private final World world;
-    private Fixture fixture;
+    Fixture fixture;
 
     private final HashMap<String, Vector2> mapPositions = new HashMap<>();
 
@@ -170,7 +171,7 @@ public class Player implements InputProcessor {
      * Each movement has a boolean state indicating whether it is currently active or not.
      */
     @Getter
-    private enum Movement {
+    enum Movement {
         UP,
         DOWN,
         LEFT,
@@ -201,29 +202,25 @@ public class Player implements InputProcessor {
      * The sprite cannot move outside the bounds of the game map.
      */
     public void move() {
-        // Calculate the amount to move the sprite by
-        // If the BOOST movement is active, the sprite moves twice as fast
-        final float amount = 4;
-
         velocity.set(0, 0);
         // Move the sprite up if the UP movement is active and the sprite is not at the top of the map
         if (Movement.UP.is) {
-            velocity.set(velocity.x, amount);
+            velocity.set(velocity.x, MOVE_SPEED);
         }
 
         // Move the sprite down if the DOWN movement is active and the sprite is not at the bottom of the map
         if (Movement.DOWN.is) {
-            velocity.set(velocity.x, -amount);
+            velocity.set(velocity.x, -MOVE_SPEED);
         }
 
         // Move the sprite left if the LEFT movement is active and the sprite is not at the left edge of the map
         if (Movement.LEFT.is) {
-            velocity.set(-amount, velocity.y);
+            velocity.set(-MOVE_SPEED, velocity.y);
         }
 
         // Move the sprite right if the RIGHT movement is active and the sprite is not at the right edge of the map
         if (Movement.RIGHT.is) {
-            velocity.set(amount, velocity.y);
+            velocity.set(MOVE_SPEED, velocity.y);
         }
 
         fixture.getBody().setLinearVelocity(velocity);
