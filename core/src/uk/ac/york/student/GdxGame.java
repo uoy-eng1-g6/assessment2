@@ -20,7 +20,7 @@ import uk.ac.york.student.screens.Screens;
  * The {@link Game} class is the base class for all games, handling the lifecycle of the application and the transition between screens.
  * This class is declared as final, meaning it cannot be subclassed.
  */
-public final class GdxGame extends Game {
+public class GdxGame extends Game {
 
     /**
      * Default constructor for the {@link GdxGame} class.

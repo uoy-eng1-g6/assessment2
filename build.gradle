@@ -68,10 +68,6 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        compileOnly "org.projectlombok:lombok:$lombokVersion"
-        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
-        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
-        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
         implementation 'org.jetbrains:annotations:24.0.0'
         implementation 'com.github.blueboxware:libgdxplugin:1.23.1'
     }
@@ -87,15 +83,36 @@ project(":core") {
         implementation "space.earlygrey:shapedrawer:$shapeDrawerVersion"
         compileOnly "org.projectlombok:lombok:$lombokVersion"
         annotationProcessor "org.projectlombok:lombok:$lombokVersion"
-        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
-        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
         implementation 'org.jetbrains:annotations:24.0.0'
         implementation 'com.github.blueboxware:libgdxplugin:1.23.1'
         implementation 'com.h2database:h2:2.2.224'
+    }
+}
 
-        testImplementation platform("org.junit:junit-bom:5.11.0-M1")
-        testImplementation "org.junit.jupiter:junit-jupiter"
-        testImplementation "org.mockito:mockito-junit-jupiter:5.11.0"
-        testImplementation "org.assertj:assertj-core:3.25.1"
+project(":tests") {
+    apply plugin: "java-library"
+
+    sourceSets.test.java.srcDirs = ["src/"]
+
+    dependencies {
+        implementation project(":core")
+
+        implementation "junit:junit:4.+"
+        implementation "org.mockito:mockito-core:5.12.0"
+
+        implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+        testImplementation "junit:junit:4.+"
+        testImplementation "org.mockito:mockito-core:5.12.0"
+
+        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+
+    test {
+        jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED")
     }
 }
