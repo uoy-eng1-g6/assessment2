@@ -91,6 +91,11 @@ project(":core") {
 
 project(":tests") {
     apply plugin: "java-library"
+    apply plugin: "jacoco"
+
+    jacoco {
+        toolVersion = "0.8.11"
+    }
 
     sourceSets.test.java.srcDirs = ["src/"]
 
@@ -99,6 +104,7 @@ project(":tests") {
 
         implementation "junit:junit:4.+"
         implementation "org.mockito:mockito-core:5.12.0"
+        implementation 'org.assertj:assertj-core:3.25.3'
 
         implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -106,6 +112,7 @@ project(":tests") {
 
         testImplementation "junit:junit:4.+"
         testImplementation "org.mockito:mockito-core:5.12.0"
+        testImplementation 'org.assertj:assertj-core:3.25.3'
 
         testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         testImplementation "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -114,5 +121,14 @@ project(":tests") {
 
     test {
         jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED")
+        finalizedBy jacocoTestReport // report is always generated after tests run
+    }
+    jacocoTestReport {
+        sourceSets project(":core").sourceSets.main
+
+        reports {
+            xml.required = false
+            csv.required = false
+        }
     }
 }

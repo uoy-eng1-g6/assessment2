@@ -210,6 +210,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
         // CHANGE new attribute to initialize
         interactableManager = new InteractableManager((OrthographicCamera) processor.getCamera());
+        interactableManager.onEnable();
 
         // Add a listener to the stage to handle key events
         processor.addListener(new InputListener() {

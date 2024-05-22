@@ -26,19 +26,25 @@ public class InteractableManager {
     @Getter
     private Interactable currentInteractable;
 
+    public InteractableManager(OrthographicCamera camera, TextureAtlas interactableAtlas) {
+        this.camera = camera;
+        this.interactableAtlas = interactableAtlas;
+        this.defaultOutlineColor = new Color(1f, 1f, 1f, 1f);
+        this.interactableMap = new HashMap<>();
+        this.currentInteractable = null;
+    }
+
     /**
      * Constructor for the InteractableManager class.
      *
      * @param camera The OrthographicCamera for the interactable objects to be drawn using
      */
     public InteractableManager(OrthographicCamera camera) {
-        this.camera = camera;
-        interactableAtlas = new TextureAtlas(Gdx.files.internal("sprite-atlases/interactable.atlas"));
-        defaultOutlineColor = new Color(255.0F, 255.0F, 0.0F, 0.8F);
-        interactableMap = new HashMap<>();
-        currentInteractable = null;
+        this(camera, new TextureAtlas(Gdx.files.internal("sprite-atlases/interactable.atlas")));
+    }
 
-        // Call the functions to set the interactable objects up.
+    public void onEnable() {
+        // Set up interactable objects.
         for (String mapName : MapManager.MAP_NAMES) {
             if (!Objects.equals(mapName, "blankMap")) {
                 setupInteractables(mapName);
@@ -59,7 +65,7 @@ public class InteractableManager {
      * Sets up the interactable objects.
      * @param mapName A {@link String} of the map name to get the interactable objects from.
      */
-    private void setupInteractables(String mapName) {
+    void setupInteractables(String mapName) {
         var map = MapManager.getMap(mapName);
         var mapLayer = map.getLayers().get("gameObjects");
         for (var object : mapLayer.getObjects()) {
@@ -67,28 +73,30 @@ public class InteractableManager {
             var isActivity = properties.get("isActivity", Boolean.class);
             var interactInfo = properties.get("interactInfo", String.class);
 
-            if (interactInfo != null) {
-                var interactList = Arrays.stream(interactInfo.split(","))
-                        .map(Float::parseFloat)
-                        .collect(Collectors.toUnmodifiableList());
-
-                Interactable interact;
-                String key;
-
-                if (Boolean.TRUE.equals(isActivity)) {
-                    key = properties.get("activityStr", String.class);
-                    interact = new Interactable(interactList);
-                    interact.setRegion(interactableAtlas.findRegion(key));
-                } else { // if not an activity, but has an interactList, must be a door
-                    key = properties.get("newMapStr", String.class);
-                    interact = new AnimatedInteractable(interactList);
-                    ((AnimatedInteractable) interact).setAnimationRegions(interactableAtlas.findRegions(key));
-                }
-                interact.setCamera(camera);
-                interact.setDefaultOutlineColor(defaultOutlineColor);
-                interact.setMap(mapName);
-                interactableMap.put(key, interact);
+            if (interactInfo == null) {
+                continue;
             }
+
+            var interactList = Arrays.stream(interactInfo.split(","))
+                    .map(Float::parseFloat)
+                    .collect(Collectors.toUnmodifiableList());
+
+            Interactable interact;
+            String key;
+
+            if (Boolean.TRUE.equals(isActivity)) {
+                key = properties.get("activityStr", String.class);
+                interact = new Interactable(interactList);
+                interact.setRegion(interactableAtlas.findRegion(key));
+            } else { // if not an activity, but has an interactList, must be a door
+                key = properties.get("newMapStr", String.class);
+                interact = new AnimatedInteractable(interactList);
+                ((AnimatedInteractable) interact).setAnimationRegions(interactableAtlas.findRegions(key));
+            }
+            interact.setCamera(camera);
+            interact.setDefaultOutlineColor(defaultOutlineColor);
+            interact.setMap(mapName);
+            interactableMap.put(key, interact);
         }
     }
 }
