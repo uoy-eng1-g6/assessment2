@@ -1,20 +1,18 @@
 package uk.ac.york.student.assets.map;
 
-import com.badlogic.gdx.assets.loaders.resolvers.AbsoluteFileHandleResolver;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import uk.ac.york.student.GdxTestRunner;
-
-import java.io.File;
-import java.util.Arrays;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
+
+import com.badlogic.gdx.assets.loaders.resolvers.AbsoluteFileHandleResolver;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import java.io.File;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import uk.ac.york.student.GdxTestRunner;
 
 @RunWith(GdxTestRunner.class)
 public class MapManagerTest {
@@ -23,7 +21,8 @@ public class MapManagerTest {
         var oldLoader = MapManager.MAP_LOADER;
 
         try (var mapManager = mockStatic(MapManager.class)) {
-            mapManager.when(() -> MapManager.getMapPath(anyString()))
+            mapManager
+                    .when(() -> MapManager.getMapPath(anyString()))
                     .then(call -> new File("../assets/map/" + call.getArguments()[0] + ".tmx").getAbsolutePath());
             mapManager.when(() -> MapManager.getMap(anyString())).thenCallRealMethod();
 
@@ -44,7 +43,8 @@ public class MapManagerTest {
         var oldLoader = MapManager.MAP_LOADER;
 
         try (var mapManager = mockStatic(MapManager.class)) {
-            mapManager.when(() -> MapManager.getMapPath(anyString()))
+            mapManager
+                    .when(() -> MapManager.getMapPath(anyString()))
                     .then(call -> new File("../assets/map/" + call.getArguments()[0] + ".tmx").getAbsolutePath());
 
             mapManager.when(() -> MapManager.getMap(anyString())).thenCallRealMethod();
@@ -67,12 +67,16 @@ public class MapManagerTest {
         var oldLoader = MapManager.MAP_LOADER;
 
         try (var mapManager = mockStatic(MapManager.class)) {
-            mapManager.when(() -> MapManager.getMapPath(anyString()))
+            mapManager
+                    .when(() -> MapManager.getMapPath(anyString()))
                     .then(call -> new File("../assets/map/" + call.getArguments()[0] + ".tmx").getAbsolutePath());
 
             mapManager.when(() -> MapManager.getMap(anyString())).thenCallRealMethod();
             mapManager.when(() -> MapManager.getMapObjectData(anyString())).thenCallRealMethod();
-            mapManager.when(() -> MapManager.loadActionableObjectDataFromMapLayer(any(MapObjectsPositionData.class), anyInt(), anyInt(), any(MapLayer.class))).thenCallRealMethod();
+            mapManager
+                    .when(() -> MapManager.loadActionableObjectDataFromMapLayer(
+                            any(MapObjectsPositionData.class), anyInt(), anyInt(), any(MapLayer.class)))
+                    .thenCallRealMethod();
 
             MapManager.MAP_LOADER = new TmxMapLoader(new AbsoluteFileHandleResolver());
 
@@ -95,12 +99,16 @@ public class MapManagerTest {
         var oldLoader = MapManager.MAP_LOADER;
 
         try (var mapManager = mockStatic(MapManager.class)) {
-            mapManager.when(() -> MapManager.getMapPath(anyString()))
+            mapManager
+                    .when(() -> MapManager.getMapPath(anyString()))
                     .then(call -> new File("../assets/map/" + call.getArguments()[0] + ".tmx").getAbsolutePath());
 
             mapManager.when(() -> MapManager.getMap(anyString())).thenCallRealMethod();
             mapManager.when(() -> MapManager.getMapObjectData(anyString())).thenCallRealMethod();
-            mapManager.when(() -> MapManager.loadCollisionObjectsFromMapLayer(any(MapObjectsPositionData.class), anyInt(), anyInt(), any(MapLayer.class))).thenCallRealMethod();
+            mapManager
+                    .when(() -> MapManager.loadCollisionObjectsFromMapLayer(
+                            any(MapObjectsPositionData.class), anyInt(), anyInt(), any(MapLayer.class)))
+                    .thenCallRealMethod();
 
             MapManager.MAP_LOADER = new TmxMapLoader(new AbsoluteFileHandleResolver());
 
@@ -122,12 +130,16 @@ public class MapManagerTest {
         var oldLoader = MapManager.MAP_LOADER;
 
         try (var mapManager = mockStatic(MapManager.class)) {
-            mapManager.when(() -> MapManager.getMapPath(anyString()))
+            mapManager
+                    .when(() -> MapManager.getMapPath(anyString()))
                     .then(call -> new File("../assets/map/" + call.getArguments()[0] + ".tmx").getAbsolutePath());
 
             mapManager.when(() -> MapManager.getMap(anyString())).thenCallRealMethod();
             mapManager.when(() -> MapManager.getMapObjectData(anyString())).thenCallRealMethod();
-            mapManager.when(() -> MapManager.loadCollisionObjectsFromMapLayer(any(MapObjectsPositionData.class), anyInt(), anyInt(), any(MapLayer.class))).thenCallRealMethod();
+            mapManager
+                    .when(() -> MapManager.loadCollisionObjectsFromMapLayer(
+                            any(MapObjectsPositionData.class), anyInt(), anyInt(), any(MapLayer.class)))
+                    .thenCallRealMethod();
 
             MapManager.MAP_LOADER = new TmxMapLoader(new AbsoluteFileHandleResolver());
 

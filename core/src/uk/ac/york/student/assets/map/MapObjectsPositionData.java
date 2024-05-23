@@ -3,7 +3,6 @@ package uk.ac.york.student.assets.map;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
