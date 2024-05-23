@@ -18,7 +18,7 @@ public class SkinManager {
             return cachedSkins.get(skin);
         }
 
-        cachedSkins.put(skin, new Skin(skin.getHandle()));
+        cachedSkins.put(skin, new Skin(skin.getHandleSupplier().get()));
         return getSkin(skin);
     }
 
