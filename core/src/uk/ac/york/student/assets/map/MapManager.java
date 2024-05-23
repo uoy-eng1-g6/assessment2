@@ -21,11 +21,11 @@ public final class MapManager {
     public static final List<String> MAP_NAMES =
             List.of("map", "inside_house", "inside_pub", "inside_library", "blankMap");
 
-    private static final TmxMapLoader MAP_LOADER;
-    private static final TmxMapLoader.Parameters MAP_LOADER_PARAMETERS;
+    static TmxMapLoader MAP_LOADER;
+    static TmxMapLoader.Parameters MAP_LOADER_PARAMETERS;
 
-    private static final HashMap<String, TiledMap> cachedMaps = new HashMap<>();
-    private static final HashMap<String, MapObjectsPositionData> cachedMapObjectData = new HashMap<>();
+    static final HashMap<String, TiledMap> cachedMaps = new HashMap<>();
+    static final HashMap<String, MapObjectsPositionData> cachedMapObjectData = new HashMap<>();
 
     static {
         MAP_LOADER = new TmxMapLoader();
@@ -34,12 +34,16 @@ public final class MapManager {
         MAP_LOADER_PARAMETERS.textureMagFilter = Texture.TextureFilter.Nearest;
     }
 
+    static String getMapPath(String mapName) {
+        return "map/" + mapName + ".tmx";
+    }
+
     public static TiledMap getMap(String mapName) {
         if (cachedMaps.containsKey(mapName)) {
             return cachedMaps.get(mapName);
         }
 
-        var map = MAP_LOADER.load("map/" + mapName + ".tmx", MAP_LOADER_PARAMETERS);
+        var map = MAP_LOADER.load(getMapPath(mapName), MAP_LOADER_PARAMETERS);
         cachedMaps.put(mapName, map);
         return map;
     }
@@ -121,9 +125,13 @@ public final class MapManager {
         var data = new MapObjectsPositionData();
 
         var collisionLayer = map.getLayers().get("collisions");
-        loadCollisionObjectsFromMapLayer(data, tileWidth, tileHeight, collisionLayer);
+        if (collisionLayer != null) {
+            loadCollisionObjectsFromMapLayer(data, tileWidth, tileHeight, collisionLayer);
+        }
         var actionableObjectLayer = map.getLayers().get("gameObjects");
-        loadActionableObjectDataFromMapLayer(data, tileWidth, tileHeight, actionableObjectLayer);
+        if (actionableObjectLayer != null) {
+            loadActionableObjectDataFromMapLayer(data, tileWidth, tileHeight, actionableObjectLayer);
+        }
 
         cachedMapObjectData.put(mapName, data);
         return data;
