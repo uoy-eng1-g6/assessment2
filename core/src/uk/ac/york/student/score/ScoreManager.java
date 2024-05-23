@@ -17,13 +17,13 @@ import uk.ac.york.student.utils.Pair;
 // CHANGE new class
 @UtilityClass
 public class ScoreManager {
-    private static final String SCHEMA = ("CREATE TABLE IF NOT EXISTS scores ("
+    static final String SCHEMA = ("CREATE TABLE IF NOT EXISTS scores ("
             + "id INTEGER PRIMARY KEY AUTO_INCREMENT,"
             + "name VARCHAR(12) NOT NULL,"
             + "score INTEGER NOT NULL"
             + ");");
-    private static final String SAVE_SCORE = "INSERT INTO scores (name, score) VALUES (?, ?);";
-    private static final String GET_TOP_10_SCORES = "SELECT name, score FROM scores ORDER BY score DESC LIMIT 10;";
+    static final String SAVE_SCORE = "INSERT INTO scores (name, score) VALUES (?, ?);";
+    static final String GET_TOP_10_SCORES = "SELECT name, score FROM scores ORDER BY score DESC LIMIT 10;";
 
     private static Driver driver = null;
 
