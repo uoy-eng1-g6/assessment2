@@ -153,12 +153,10 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * Boolean for whether the game's debug mode is enabled or not.
      */
-
     private final Boolean debugEnabled;
     /**
      * box2d debug renderer for rendering collision boxes in debug mode.
      */
-
     private final Box2DDebugRenderer box2dDebugRenderer;
 
     /**
