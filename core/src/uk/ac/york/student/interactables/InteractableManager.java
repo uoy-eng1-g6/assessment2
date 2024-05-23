@@ -13,6 +13,7 @@ import uk.ac.york.student.assets.map.MapManager;
 /**
  * The Interactable Manager class serves as the place where interactable objects are created, stored and accessed from.
  */
+// CHANGE new class
 public class InteractableManager {
     private final TextureAtlas interactableAtlas;
     private final Color defaultOutlineColor;

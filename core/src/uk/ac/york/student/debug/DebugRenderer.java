@@ -13,6 +13,7 @@ import uk.ac.york.student.player.Player;
 /**
  * Class used to render debug bounding boxes in in-game overlay.
  */
+// CHANGE new class
 public class DebugRenderer {
     private final ShapeDrawer shapeDrawer;
 

@@ -10,6 +10,10 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import uk.ac.york.student.player.PlayerStreaks;
 
+/**
+ * Utility class to manage the scores and save them using a local database.
+ */
+// CHANGE new class
 @UtilityClass
 public class ScoreManager {
     private static final String SCHEMA = ("CREATE TABLE IF NOT EXISTS scores ("
@@ -76,6 +80,16 @@ public class ScoreManager {
         return scores;
     }
 
+    /**
+     * Method used to calculate the score of the player.
+     *
+     * @param studyLevel The total study level achieved by the player over their time playing.
+     * @param maxStudyLevel The max study level achievable by the player over their time playing.
+     * @param happiness The total happiness achieved by the player over their time playing.
+     * @param maxHappiness The max happiness achievable by the player over their time playing.
+     * @param streaks PlayerStreaks object with the status of the player's streaks.
+     * @return A score between 0 and 100 deciding how well the player did in their time playing.
+     */
     public static float calculateScore(
             float studyLevel, float maxStudyLevel, float happiness, float maxHappiness, PlayerStreaks streaks) {
         int maxScore = 100;
@@ -95,6 +109,12 @@ public class ScoreManager {
         return Math.min(100, Math.max(0, totalScore));
     }
 
+    /**
+     * Method to convert a score between 0 and 100 to honours.
+     *
+     * @param score A float of the player's score.
+     * @return A String of the player's honours.
+     */
     public static String convertScoreToString(float score) {
         if (score >= 70) {
             return "First-class Honours";

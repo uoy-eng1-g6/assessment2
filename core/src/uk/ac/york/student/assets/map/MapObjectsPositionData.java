@@ -9,6 +9,7 @@ import lombok.Getter;
 /**
  * Class used to store data about the map objects positions.
  */
+// CHANGE new class
 @Getter
 public class MapObjectsPositionData {
     /**

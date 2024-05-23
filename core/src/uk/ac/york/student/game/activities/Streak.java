@@ -5,6 +5,7 @@ import lombok.Getter;
 /**
  * Class which represents a streak of activities.
  */
+// CHANGE new class
 @Getter
 public class Streak {
     /**
