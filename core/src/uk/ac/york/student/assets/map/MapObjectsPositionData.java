@@ -3,8 +3,9 @@ package uk.ac.york.student.assets.map;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
-import lombok.Data;
+
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Class used to store data about the map objects positions.
@@ -15,7 +16,8 @@ public class MapObjectsPositionData {
     /**
      * Class used to store data about the collision objects.
      */
-    @Data
+    @Getter
+    @RequiredArgsConstructor
     public static class CollisionObjectData {
         private final float x;
         private final float y;
@@ -25,7 +27,8 @@ public class MapObjectsPositionData {
     /**
      * Class used to store data about the actionable objects.
      */
-    @Data
+    @Getter
+    @RequiredArgsConstructor
     public static class ActionableObjectData {
         private final float x;
         private final float y;

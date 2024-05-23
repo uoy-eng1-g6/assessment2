@@ -64,6 +64,9 @@ public final class MapManager {
                 var height = rectangle.getHeight();
 
                 vertices = new float[] {x, y, x, y + height, x + width, y + height, x + width, y};
+
+                x = x / tileWidth;
+                y = y / tileHeight;
             } else if (object instanceof PolygonMapObject) {
                 var polygonObject = (PolygonMapObject) object;
                 var polygon = polygonObject.getPolygon();
