@@ -19,6 +19,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * The minimum value is 0 (not studied), the maximum value is 1 (very studied), and the step size is 0.1.
      * The ProgressBar does not have a vertical orientation (false), and uses the Craftacular skin.
      */
+    // CHANGE update progress bar initialization to fit with changes
     private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));
 
     /**
@@ -26,6 +27,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * This constructor initialises the ProgressBar that represents the player's study level.
      */
     public PlayerStudyLevel() {
+        // CHANGE set progress bar size instead of width and height
         progressBar.setSize(100, 20);
         progressBar.setAnimateDuration(0.25f); // Set the animation duration of the ProgressBar to 0.25 seconds
     }
@@ -35,6 +37,7 @@ public class PlayerStudyLevel implements PlayerMetric {
      * This is a float value between 0 and 1, where 0 represents not studied and 1 represents very studied.
      * By default, the study level is set to 0.1.
      */
+    // CHANGE get the default from getDefault() function like other metrics instead of hardcoded
     private @Range(from = 0, to = 1) float studyLevel = getDefault();
 
     /**

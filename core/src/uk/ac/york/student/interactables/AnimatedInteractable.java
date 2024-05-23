@@ -12,6 +12,7 @@ import lombok.Setter;
 /**
  * The AnimatedInteractable class extends the Interactable class, adding functionality for animations.
  */
+// CHANGE new class
 @Getter
 public class AnimatedInteractable extends Interactable {
     private final float frameDuration;

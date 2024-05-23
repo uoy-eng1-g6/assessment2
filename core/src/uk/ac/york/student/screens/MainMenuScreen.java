@@ -100,6 +100,7 @@ public class MainMenuScreen extends BaseScreen {
      * The GameSound instance for the button click sound on the {@link MainMenuScreen}.
      * This sound is loaded from the {@link SoundManager} using the {@link Sounds#BUTTON_CLICK} sound.
      */
+    // CHANGE fix logic slightly for changes to SkinManager
     private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
     /**
@@ -118,6 +119,7 @@ public class MainMenuScreen extends BaseScreen {
     private final float cloudsSpeed =
             ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed();
 
+    // CHANGE update for changes to SkinManager
     private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
     /**
@@ -296,6 +298,7 @@ public class MainMenuScreen extends BaseScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonClick.play();
+                // CHANGE remove delay to exit button.
                 Gdx.app.exit();
             }
         });
@@ -518,6 +521,7 @@ public class MainMenuScreen extends BaseScreen {
      * It disposes of the {@link MainMenuScreen#processor}, {@link MainMenuScreen#backgroundTexture}, {@link MainMenuScreen#vignetteTexture}, {@link MainMenuScreen#cookeLogo}, and {@link MainMenuScreen#clouds}.
      * It also shuts down the {@link MainMenuScreen#executorService}.
      */
+    // CHANGE removed some disposes that are still needed
     @Override
     public void dispose() {
         // Dispose of the processor

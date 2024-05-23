@@ -120,4 +120,6 @@ public final class PlayerMetrics {
     public @Unmodifiable List<PlayerMetric> getMetrics() {
         return List.of(energy, happiness, studyLevel);
     }
+
+    // CHANGE remove dispose from PlayerMetrics
 }

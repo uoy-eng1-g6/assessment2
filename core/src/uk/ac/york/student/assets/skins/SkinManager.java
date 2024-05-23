@@ -6,10 +6,11 @@ import lombok.experimental.UtilityClass;
 
 /**
  * This utility class manages the loading and storage of Skin objects.
- * It uses an EnumMapOfSuppliers to store the skins, allowing for lazy loading.
+ * It uses a HashMap to store the cached skins, allowing for lazy loading.
  */
 @UtilityClass
 public class SkinManager {
+    // CHANGE refactor class to fix issues
     private static final HashMap<Skins, Skin> cachedSkins = new HashMap<>();
 
     public static Skin getSkin(Skins skin) {

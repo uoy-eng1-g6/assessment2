@@ -6,8 +6,15 @@ import java.util.ArrayList;
 import lombok.Data;
 import lombok.Getter;
 
+/**
+ * Class used to store data about the map objects positions.
+ */
+// CHANGE new class
 @Getter
 public class MapObjectsPositionData {
+    /**
+     * Class used to store data about the collision objects.
+     */
     @Data
     public static class CollisionObjectData {
         private final float x;
@@ -15,6 +22,9 @@ public class MapObjectsPositionData {
         private final float[] vertices;
     }
 
+    /**
+     * Class used to store data about the actionable objects.
+     */
     @Data
     public static class ActionableObjectData {
         private final float x;

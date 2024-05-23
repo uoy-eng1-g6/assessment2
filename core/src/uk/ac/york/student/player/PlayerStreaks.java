@@ -9,6 +9,7 @@ import uk.ac.york.student.game.activities.Streak;
 /**
  * Class to monitor streaks achieved by the player. These streaks factor into the final score.
  */
+// CHANGE new class
 @Getter
 public class PlayerStreaks {
     private final Map<String, Streak> streaks;

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Range;
  * The Interactable class represents an object the player can interact with. It helps make it clearer what is
  * interactable by giving it an outline, and allowing that outline to be changed depending on events.
  */
+// CHANGE new class
 @Getter
 public class Interactable {
     private final SpriteBatch batch;

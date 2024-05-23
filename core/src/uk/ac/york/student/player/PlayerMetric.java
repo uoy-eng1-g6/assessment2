@@ -12,6 +12,8 @@ public interface PlayerMetric {
      */
     float PROGRESS_BAR_MINIMUM = 0.1f;
 
+    // CHANGE remove skin definition here to fit with other changes.
+
     /**
      * Get the progress bar for the player metric.
      * @return ProgressBar object representing the player's progress.

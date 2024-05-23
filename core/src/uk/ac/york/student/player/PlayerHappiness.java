@@ -19,6 +19,7 @@ public class PlayerHappiness implements PlayerMetric {
      * The minimum value is 0 (not happy), the maximum value is 1 (very happy), and the step size is 0.1.
      * The ProgressBar does not have a vertical orientation (false), and uses the craftacular skin.
      */
+    // CHANGE update progress bar initialization to fit with changes
     private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));
 
     /**
@@ -26,6 +27,7 @@ public class PlayerHappiness implements PlayerMetric {
      * This constructor initializes the ProgressBar representing the player's happiness level.
      */
     public PlayerHappiness() {
+        // CHANGE set progress bar size instead of width and height
         progressBar.setSize(100, 20);
         progressBar.setAnimateDuration(0.25f);
     }
@@ -89,6 +91,7 @@ public class PlayerHappiness implements PlayerMetric {
      */
     @Override
     public float getDefault() {
+        // CHANGE set default to 0.5 per day to improve balance and consistency between stats
         return 0.5f;
     }
     /**

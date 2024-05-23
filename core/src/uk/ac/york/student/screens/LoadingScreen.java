@@ -28,6 +28,7 @@ public class LoadingScreen extends BaseScreen {
         super(game);
         processor = new Stage(new ScreenViewport());
 
+        // CHANGE new functionality for scores
         ScoreManager.initScoresDatabase();
     }
 

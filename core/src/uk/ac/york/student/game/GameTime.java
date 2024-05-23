@@ -35,6 +35,7 @@ public final class GameTime {
      *
      */
     public GameTime() {
+        // CHANGE calculate the width and height of progress bar in getProgressBar() instead, relevant lines removed
         progressBar = getProgressBar();
     }
 
@@ -63,6 +64,7 @@ public final class GameTime {
      * @return A new {@link ProgressBar} instance.
      */
     @NotNull public ProgressBar getProgressBar() {
+        // CHANGE calculate the width and height of progress bar in getProgressBar() instead, rename variables
         var width = 100;
         var height = 10;
 
@@ -100,6 +102,8 @@ public final class GameTime {
         // Return the configured ProgressBar instance
         return progressBar;
     }
+
+    // CHANGE remove unused methods relating to progress bar scale
 
     /**
      * The current hour in the game. It ranges from 0 to {@link GameTime#DAY_LENGTH}

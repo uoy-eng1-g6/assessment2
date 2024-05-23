@@ -44,6 +44,8 @@ public final class GdxGame extends Game {
         final AudioManager soundManager = SoundManager.getInstance();
         soundManager.onEnable();
 
+        // CHANGE line removed - MapManager.onEnable();
+
         // Set the initial screen to the loading screen
         setScreen(Screens.LOADING);
     }
@@ -290,6 +292,7 @@ public final class GdxGame extends Game {
         final AudioManager soundManager = SoundManager.getInstance();
         soundManager.onDisable();
 
+        // CHANGE - lines added
         SkinManager.dispose();
         MapManager.dispose();
     }

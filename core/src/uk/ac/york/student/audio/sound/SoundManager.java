@@ -9,6 +9,7 @@ import uk.ac.york.student.audio.AudioManager;
  * Singleton class that manages the sound for the game.
  * It implements the AudioManager interface and controls the game sounds.
  */
+// CHANGE refactor class with cached hash map to fix issues
 public class SoundManager implements AudioManager {
     /**
      * The instance of the sound manager.
