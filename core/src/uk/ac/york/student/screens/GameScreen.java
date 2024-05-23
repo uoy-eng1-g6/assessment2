@@ -81,11 +81,13 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * The name of the map which is currently active.
      */
+    // CHANGE this attribute is new
     private String currentMapName;
 
     /**
      * The interactable manager. This is what creates and stores the information for the interactable objects.
      */
+    // CHANGE this attribute is new
     private final InteractableManager interactableManager;
 
     /**
@@ -111,6 +113,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     /**
      * The skin for the game. This is used to style the game's UI elements.
      */
+    // CHANGE use better name for skin attribute and use improved method in SkinManager
     private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
     /**
@@ -138,16 +141,38 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     private final Label timeLabel = new Label("You exist outside of the space-time continuum.", skin);
 
+    // CHANGE below attributes are new
+    /**
+     * The box2d world for managing physics.
+     */
     private World world;
 
     private final OrthographicCamera gameCamera;
     private final Viewport gameViewport;
 
+    /**
+     * Boolean for whether the game's debug mode is enabled or not.
+     */
+
     private final Boolean debugEnabled;
+    /**
+     * box2d debug renderer for rendering collision boxes in debug mode.
+     */
+
     private final Box2DDebugRenderer box2dDebugRenderer;
+
+    /**
+     * debug renderer for all other bounding boxes in debug mode.
+     */
     private final DebugRenderer debugRenderer;
 
+    /**
+     * boolean for whether the GameScreen should fade in or not.
+     */
     private final boolean shouldFadeIn;
+    /**
+     * float for how long the fade in should last if shouldFadeIn is true.
+     */
     private final float fadeInTime;
 
     /**
@@ -155,8 +180,11 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      *
      * @param game The {@link GdxGame} instance that this screen is part of.
      */
+    // CHANGE added parameters shouldFadeIn and fadeInTime
     public GameScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime) {
         super(game);
+
+        // CHANGE remove code for setting up tilemap from the constructor of GameScreen
 
         this.shouldFadeIn = shouldFadeIn;
         this.fadeInTime = fadeInTime;
@@ -164,15 +192,16 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Initialize the game time
         gameTime = new GameTime();
 
-        // Initialize the current map name.
+        // Initialize the current map name. CHANGE new attribute to initialize
         currentMapName = "map";
 
+        // CHANGE new attribute to initialize
         world = new World(new Vector2(0, 0), true);
 
-        // Initialize the player
+        // Initialize the player CHANGE to work with the box2d world
         player = new Player(world);
 
-        // Initialize the stage and set it as the input processor
+        // Initialize the stage and set it as the input processor CHANGE new attributes to initialize
         gameCamera = new OrthographicCamera();
         gameViewport = new FitViewport(1, 1, gameCamera);
 
@@ -181,6 +210,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
 
         Gdx.input.setInputProcessor(processor);
 
+        // CHANGE new attribute to initialize
         interactableManager = new InteractableManager((OrthographicCamera) processor.getCamera());
 
         // Add a listener to the stage to handle key events
@@ -196,10 +226,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             }
         });
 
+        // CHANGE new attributes to initialize
         debugEnabled = ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled();
         debugRenderer = new DebugRenderer(player, processor.getBatch());
         box2dDebugRenderer = new Box2DDebugRenderer();
 
+        // CHANGE set up tile map in changeMap function
         changeMap("map", true);
     }
 
@@ -209,6 +241,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      *
      * @param mapName The name of the new map to load.
      */
+    // CHANGE refactor method to implement collisions with box2d
     public void changeMap(String mapName, boolean immediate) {
         Runnable mapChangeFn = () -> {
             // Load the new map
@@ -286,6 +319,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      */
     @Override
     public void show() {
+        // CHANGE check if shouldFadeIn before fading in
         if (shouldFadeIn) {
             processor.getRoot().getColor().a = 0;
             processor.getRoot().addAction(fadeIn(fadeInTime));
@@ -298,11 +332,12 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Set up the action table
         actionTable.setFillParent(true);
         processor.addActor(actionTable);
-        actionLabel.setFontScale(0.3f);
+        actionLabel.setFontScale(0.3f); // CHANGE set the font scale
         actionTable.add(actionLabel);
         actionTable.bottom();
         actionTable.padBottom(10);
 
+        // CHANGE set debug mode to the debugEnabled Boolean
         actionTable.setDebug(debugEnabled);
         metricsTable.setDebug(debugEnabled);
 
@@ -310,10 +345,13 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         metricsTable.setFillParent(true);
         processor.addActor(metricsTable);
         PlayerMetrics metrics = player.getMetrics();
+
+        // CHANGE use a map instead of two separate lists for related variables
         var metricComponents = metrics.getMetrics().stream()
                 .map(metric -> Pair.of(metric.getLabel(), metric.getProgressBar()))
                 .collect(Collectors.toList());
 
+        // CHANGE iterate through components instead of iterator
         for (var component : metricComponents) {
             var label = new Label(component.getLeft(), skin);
             label.setFontScale(0.25f);
@@ -322,8 +360,8 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         }
 
         metricsTable.bottom().right();
-        metricsTable.padBottom(2);
-        metricsTable.padRight(2);
+        metricsTable.padBottom(2); // CHANGE padding value
+        metricsTable.padRight(2); // CHANGE padding value
 
         // Set up the timetable
         ProgressBar timeBar = gameTime.getProgressBar();
@@ -337,7 +375,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         timeLabel.setFontScale(0.5f);
         timeTable.add(timeLabel);
         timeTable.row();
-        timeTable.add(timeBar);
+        timeTable.add(timeBar); // CHANGE remove .width(500)
         timeTable.top();
         timeTable.padTop(10);
 
@@ -393,6 +431,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      *
      * @param v The time in seconds since the last frame.
      */
+    // CHANGE refactor this function to improve rendering logic and add functionality
     @Override
     public void render(float v) {
         // Set the blend function for the OpenGL context. This determines how new pixels are combined with existing
@@ -420,6 +459,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1
             // means
             // fully opaque, and a value of 0 means fully transparent.
+            // CHANGE use better logic for this part
             map.getLayers()
                     .forEach(layer -> layer.setOpacity(processor.getRoot().getColor().a));
 
@@ -509,12 +549,13 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         // Construct the action text based on the type of the ActionMapObject
         StringBuilder actionText = new StringBuilder(getActionText(actionMapObject));
 
-        // Initialize the vector for the outline color.
+        // Initialize the vector for the outline color. CHANGE new variable
         Color outlineColor = new Color(0.0F, 255.0F, 0F, processor.getRoot().getColor().a);
 
         // Check if the ActionMapObject is an instance of ActivityMapObject
         if (actionMapObject instanceof ActivityMapObject) {
             // Set the outline color to red by default, and we will make it green if it passes checks.
+            // CHANGE new functionality
             outlineColor.r = 255.0F;
             outlineColor.g = 0.0F;
             // Cast the ActionMapObject to an ActivityMapObject
@@ -604,7 +645,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                     actionText.append(" to do this activity.");
                 }
             } else {
-                // Checks passed, set the outline color to green.
+                // Checks passed, set the outline color to green. CHANGE new functionality
                 outlineColor.r = 0.0F;
                 outlineColor.g = 255.0F;
                 // If the player has enough resources and time to perform the activity
@@ -613,7 +654,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
                     actionText.append(" (").append(requiredTime).append(" hours)");
 
                 } else {
-                    // If the activity is sleeping
+                    // If the activity is sleeping CHANGE refactor with ? operator
                     actionText.append(gameTime.isEndOfDays() ? " (End of the game!)" : " (End of the day)");
                 }
             }
@@ -622,6 +663,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
         actionLabel.setText(actionText.toString());
         actionLabel.setVisible(true);
 
+        // CHANGE new functionality
         interactableManager.setCurrentInteractable(
                 Objects.requireNonNull(currentActionMapObject.get()).getStr());
         var currentInteractable = interactableManager.getCurrentInteractable();
@@ -676,6 +718,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
      * @param screenWidth The new width of the screen.
      * @param screenHeight The new height of the screen.
      */
+    // CHANGE refactor a lot of this functionality out to simplify logic and fix issues
     @Override
     public void resize(int screenWidth, int screenHeight) {
         gameViewport.update(screenWidth, screenHeight);
@@ -766,7 +809,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
     private boolean doMapChange(@NotNull TransitionMapObject actionMapObject) {
         changeMap(actionMapObject.getType(), false);
 
-        // Trigger the current interactable object's animation if it is animated.
+        // Trigger the current interactable object's animation if it is animated. CHANGE new functionality
         if (interactableManager.getCurrentInteractable() instanceof AnimatedInteractable) {
             ((AnimatedInteractable) interactableManager.getCurrentInteractable()).setAnimating(true);
         }
@@ -854,7 +897,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             }
             // Check if the current day plus one equals the total number of days
             if (gameTime.isEndOfDays()) {
-                // If it does, transition the screen to the end screen and return true
+                // If it does, transition the screen to the end screen and return true CHANGE pass arguments
                 game.transitionScreen(Screens.END, player.getMetrics(), player.getStreaks());
                 return true;
             } else {
@@ -866,7 +909,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // If the activity is not sleeping, increment the current hour by the required time for the activity
             gameTime.incrementHour(requiredTime);
         }
-        // Iterate over the effects of the activity
+        // Iterate over the effects of the activity CHANGE move this to fix a bug with score calculation
         for (Pair<PlayerMetrics.MetricType, PlayerMetrics.MetricEffect> effect : effects) {
             // Get the type of the metric from the effect
             PlayerMetrics.MetricType metricType = effect.getLeft();
@@ -877,7 +920,7 @@ public class GameScreen extends BaseScreen implements InputProcessor {
             // Apply the effect to the metric
             metrics.changeMetric(metricType, metricEffect, changeAmount);
         }
-        // Increment the streak
+        // Increment the streak CHANGE new functionality
         player.getStreaks().increaseStreak(type == Activity.STUDY ? "study" : actionMapObject.getStr());
         // Get the current hour as a string using the getCurrentHourString method
         String currentHour = getCurrentHourString();

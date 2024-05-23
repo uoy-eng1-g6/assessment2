@@ -18,4 +18,6 @@ public class BackgroundMusic extends GameMusic implements Music {
     public BackgroundMusic() {
         super("audio/music/background.mp3");
     }
+
+    // CHANGE remove unused overloaded constructor
 }

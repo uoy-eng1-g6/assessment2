@@ -28,6 +28,7 @@ import uk.ac.york.student.assets.map.MapManager;
  * This class represents a player in the game, handling player movement, interaction with the game map, and input processing.
  * It also manages the player's score and the player's sprite on the screen.
  */
+// CHANGE new functionality throughout to allow for player's collisions, and other changes to work with box2d
 @Getter
 public class Player implements InputProcessor {
     public static final float HITBOX_RADIUS = 0.25f;
@@ -37,6 +38,10 @@ public class Player implements InputProcessor {
      */
     private final PlayerMetrics metrics = new PlayerMetrics();
 
+    /**
+     * PlayerStreaks object to store and manage player streaks.
+     */
+    // CHANGE add PlayerStreaks to player
     private final PlayerStreaks streaks = new PlayerStreaks();
 
     /**
@@ -486,6 +491,7 @@ public class Player implements InputProcessor {
      */
     public void dispose() {
         textureAtlas.dispose(); // Dispose of the TextureAtlas
+        // CHANGE do not dispose of the PlayerMetrics
     }
 
     /**

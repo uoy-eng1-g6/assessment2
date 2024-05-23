@@ -19,6 +19,7 @@ public class PlayerEnergy implements PlayerMetric {
      * The minimum value is 0 (no energy), the maximum value is 1 (full energy), and the step size is 0.1.
      * The ProgressBar does not have a vertical orientation (false), and uses the Craftacular skin.
      */
+    // CHANGE update progress bar initialization to fit with changes
     private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));
 
     /**
@@ -26,6 +27,7 @@ public class PlayerEnergy implements PlayerMetric {
      * This constructor initializes the ProgressBar that represents the player's energy level.
      */
     public PlayerEnergy() {
+        // CHANGE set progress bar size instead of width and height
         progressBar.setSize(100, 20);
         progressBar.setAnimateDuration(0.25f); // Set the animation duration of the ProgressBar to 0.25 seconds
     }

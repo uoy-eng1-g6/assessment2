@@ -10,6 +10,7 @@ import uk.ac.york.student.settings.MusicPreferences;
  * Singleton class that manages the music for the game.
  * It implements the AudioManager interface and controls the background music.
  */
+// CHANGE refactor class to fix issues
 public class MusicManager implements AudioManager {
     /**
      * The instance of the music manager.

@@ -39,12 +39,16 @@ public class EndScreen extends BaseScreen {
         super(game);
         processor = new Stage(new ScreenViewport());
 
+        // CHANGE get metrics and streaks from args
         playerMetrics = (PlayerMetrics) args[0];
         playerStreaks = (PlayerStreaks) args[1];
+
+        // CHANGE do not calculate the score here, separate functionality into different class
 
         Gdx.input.setInputProcessor(processor);
     }
 
+    // CHANGE show method implemented to populate end screen to fulfil requirements
     @Override
     public void show() {
         var isDebug = ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled();
@@ -150,6 +154,7 @@ public class EndScreen extends BaseScreen {
         processor.addActor(rootTable);
     }
 
+    // CHANGE render method implemented to render end screen
     @Override
     public void render(float v) {
         ScreenUtils.clear(Color.BLACK);
@@ -167,11 +172,13 @@ public class EndScreen extends BaseScreen {
     @Override
     public void resume() {}
 
+    // CHANGE hide method implemented
     @Override
     public void hide() {
         processor.clear();
     }
 
+    // CHANGE dispose method implemented
     @Override
     public void dispose() {
         processor.dispose();

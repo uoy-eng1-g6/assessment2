@@ -15,6 +15,7 @@ import lombok.experimental.UtilityClass;
  * This utility class manages the loading and storage of TiledMap objects.
  * It uses a MapOfSuppliers to store the maps, allowing for lazy loading.
  */
+// CHANGE refactor class to use simple hashmap cache with better object disposal to fix many issues
 @UtilityClass
 public final class MapManager {
     public static final List<String> MAP_NAMES =
@@ -43,6 +44,7 @@ public final class MapManager {
         return map;
     }
 
+    // CHANGE new method
     static void loadCollisionObjectsFromMapLayer(
             MapObjectsPositionData data, int tileWidth, int tileHeight, MapLayer mapLayer) {
         for (var object : mapLayer.getObjects()) {
@@ -85,6 +87,7 @@ public final class MapManager {
         }
     }
 
+    // CHANGE new method
     static void loadActionableObjectDataFromMapLayer(
             MapObjectsPositionData data, int tileWidth, int tileHeight, MapLayer mapLayer) {
         for (var object : mapLayer.getObjects()) {
@@ -104,6 +107,7 @@ public final class MapManager {
         }
     }
 
+    // CHANGE new method
     public static MapObjectsPositionData getMapObjectData(String mapName) {
         if (cachedMapObjectData.containsKey(mapName)) {
             return cachedMapObjectData.get(mapName);

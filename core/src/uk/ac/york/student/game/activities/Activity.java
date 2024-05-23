@@ -24,8 +24,9 @@ public enum Activity {
             Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.DECREASE),
             Pair.of(PlayerMetrics.MetricType.HAPPINESS, PlayerMetrics.MetricEffect.DECREASE)),
     /**
-     * The {@link Activity#SLEEP} activity resets the {@link Player}'s {@link PlayerMetrics#getEnergy()} and {@link PlayerMetrics#getStudyLevel()}.
+     * The {@link Activity#SLEEP} activity resets the {@link Player}'s {@link PlayerMetrics#getEnergy()}, {@link PlayerMetrics#getStudyLevel()} and {@link PlayerMetrics#getHappiness()}.
      */
+    // CHANGE sleeping to reset happiness
     SLEEP(
             Pair.of(PlayerMetrics.MetricType.ENERGY, PlayerMetrics.MetricEffect.RESET),
             Pair.of(PlayerMetrics.MetricType.STUDY_LEVEL, PlayerMetrics.MetricEffect.RESET),

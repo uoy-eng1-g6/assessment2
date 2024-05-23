@@ -66,6 +66,7 @@ public class PreferencesScreen extends BaseScreen {
      * The sound that is played when a button is clicked.
      * By default, this is {@link Sounds#BUTTON_CLICK} from {@link SoundManager}
      */
+    // CHANGE fix logic for changes to SoundManager
     private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);
 
     /**
@@ -78,6 +79,10 @@ public class PreferencesScreen extends BaseScreen {
      */
     private final Texture bottomUpBlackGradient = new Texture(Gdx.files.internal("images/BottomUpBlackGradient.png"));
 
+    /**
+     * The skin used for the UI.
+     */
+    // CHANGE fix logic for changes to SkinManager
     private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);
 
     /**
@@ -232,6 +237,8 @@ public class PreferencesScreen extends BaseScreen {
          */
         private TextButton backButton;
     }
+
+    // CHANGE remove unused overloaded constructors
 
     /**
      * Constructor for the {@link PreferencesScreen} class.
@@ -692,6 +699,7 @@ public class PreferencesScreen extends BaseScreen {
                         (DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference();
                 boolean nowEnabled = !preference.isEnabled();
                 preference.setEnabled(nowEnabled);
+                // CHANGE set the screen with new parameters added
                 game.setScreen(Screens.PREFERENCES, false, 0);
             }
         });
