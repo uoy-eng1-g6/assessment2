@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SkinManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.assets.skins</a> &gt; <span class="el_source">SkinManager.java</span></div><h1>SkinManager.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.assets.skins;
+
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import java.util.HashMap;
+import lombok.experimental.UtilityClass;
+
+/**
+ * This utility class manages the loading and storage of Skin objects.
+ * It uses a HashMap to store the cached skins, allowing for lazy loading.
+ */
+@UtilityClass
+<span class="nc" id="L12">public class SkinManager {</span>
+    // CHANGE refactor class to fix issues
+<span class="fc" id="L14">    private static final HashMap&lt;Skins, Skin&gt; cachedSkins = new HashMap&lt;&gt;();</span>
+
+    public static Skin getSkin(Skins skin) {
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        if (cachedSkins.containsKey(skin)) {</span>
+<span class="fc" id="L18">            return cachedSkins.get(skin);</span>
+        }
+
+<span class="fc" id="L21">        cachedSkins.put(skin, new Skin(skin.getHandleSupplier().get()));</span>
+<span class="fc" id="L22">        return getSkin(skin);</span>
+    }
+
+    public static void dispose() {
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        for (Skin skin : cachedSkins.values()) {</span>
+<span class="fc" id="L27">            skin.dispose();</span>
+<span class="fc" id="L28">        }</span>
+<span class="fc" id="L29">        cachedSkins.clear();</span>
+<span class="fc" id="L30">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

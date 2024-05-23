@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GamePreferences.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.settings</a> &gt; <span class="el_source">GamePreferences.java</span></div><h1>GamePreferences.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.settings;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * The {@link GamePreferences} enum is used to manage the different types of game preferences.
+ * It includes preferences for music ({@link GamePreferences#MUSIC}), sound ({@link GamePreferences#SOUND}), debug screen ({@link GamePreferences#DEBUG_SCREEN}), and main menu clouds ({@link GamePreferences#MAIN_MENU_CLOUDS}).
+ * Each preference type is associated with a specific {@link Preference} object.
+ * The enum also provides a method {@link GamePreferences#getName()} to get the name of the preference type in lowercase.
+ * Additionally, it provides a static method {@link GamePreferences#getPreferences()} to retrieve the {@link Preferences} object from the application.
+ */
+<span class="nc" id="L15">@Getter</span>
+public enum GamePreferences {
+<span class="nc" id="L17">    MUSIC(new MusicPreferences()),</span>
+<span class="nc" id="L18">    SOUND(new SoundPreferences()),</span>
+<span class="nc" id="L19">    DEBUG_SCREEN(new DebugScreenPreferences()),</span>
+<span class="nc" id="L20">    MAIN_MENU_CLOUDS(new MainMenuCloudsPreferences());</span>
+
+    /**
+     * This is a private final field of type {@link Preference}.
+     * Each enum constant in the {@link GamePreferences} enum is associated with a specific {@link Preference} object.
+     * This field is initialized through the constructor {@link GamePreferences#GamePreferences(Preference)} of the {@link GamePreferences} enum.
+     */
+<span class="nc" id="L27">    private final Preference preference;</span>
+
+    /**
+     * This is the constructor for the {@link GamePreferences} enum.
+     * It takes a {@link Preference} object as a parameter and assigns it to the {@link GamePreferences#preference} field.
+     * Each enum constant in the {@link GamePreferences} enum is associated with a specific {@link Preference} object.
+     * This association is established through this constructor.
+     *
+     * @param preference A {@link Preference} object which is associated with the enum constant.
+     */
+<span class="nc" id="L37">    GamePreferences(Preference preference) {</span>
+<span class="nc" id="L38">        this.preference = preference;</span>
+<span class="nc" id="L39">    }</span>
+
+    /**
+     * This method is used to get the name of the enum constant in lowercase.
+     * It does not take any parameters.
+     * The method returns a string which is the name of the enum constant in lowercase.
+     * This can be useful when the enum constant's name is needed in a format that is not case-sensitive.
+     *
+     * @return A string value which is the name of the enum constant in lowercase.
+     */
+    public @NotNull String getName() {
+<span class="nc" id="L50">        return this.name().toLowerCase();</span>
+    }
+
+    /**
+     * It represents the name of the preferences file where the game settings are stored.
+     * The value of this field is used in the {@link GamePreferences#getPreferences()} method to retrieve the {@link Preferences} object from the application.
+     */
+    private static final String NAME = &quot;settings&quot;;
+
+    /**
+     * This is a static method that retrieves the {@link Preferences} object from the application.
+     * The method uses the {@link com.badlogic.gdx.Application#getPreferences(String)} method to retrieve the {@link Preferences} object.
+     * The name of the preferences file, stored in the static field {@link GamePreferences#NAME}, is passed as a parameter to the {@link GamePreferences#getPreferences()} method.
+     * The {@link Preferences} object contains the game settings which are stored in the preferences file.
+     *
+     * @return A {@link Preferences} object which contains the game settings.
+     */
+    static Preferences getPreferences() {
+<span class="nc" id="L68">        return Gdx.app.getPreferences(NAME);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

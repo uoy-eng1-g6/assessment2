@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GdxGame.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student</a> &gt; <span class="el_source">GdxGame.java</span></div><h1>GdxGame.java</h1><pre class="source lang-java linenums">package uk.ac.york.student;
+
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import java.lang.reflect.InvocationTargetException;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.york.student.assets.map.MapManager;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.audio.AudioManager;
+import uk.ac.york.student.audio.music.MusicManager;
+import uk.ac.york.student.audio.sound.SoundManager;
+import uk.ac.york.student.screens.BaseScreen;
+import uk.ac.york.student.screens.Screens;
+
+/**
+ * This is the main game class for the application. It extends the {@link Game} class from the libGDX library.
+ * The {@link Game} class is the base class for all games, handling the lifecycle of the application and the transition between screens.
+ * This class is declared as final, meaning it cannot be subclassed.
+ */
+public class GdxGame extends Game {
+
+    /**
+     * Default constructor for the {@link GdxGame} class.
+     * Calls the superclass constructor.
+     */
+    public GdxGame() {
+<span class="nc" id="L30">        super();</span>
+<span class="nc" id="L31">    }</span>
+
+    /**
+     * This method is called when the application is created.
+     * It initializes the {@link MusicManager} and {@link SoundManager} and sets the initial screen to {@link Screens#LOADING}
+     */
+    @Override
+    public void create() {
+        // Get the instance of the music manager and enable it
+<span class="nc" id="L40">        final AudioManager musicManager = MusicManager.getInstance();</span>
+<span class="nc" id="L41">        musicManager.onEnable();</span>
+
+        // Get the instance of the sound manager and enable it
+<span class="nc" id="L44">        final AudioManager soundManager = SoundManager.getInstance();</span>
+<span class="nc" id="L45">        soundManager.onEnable();</span>
+
+        // CHANGE line removed - MapManager.onEnable();
+
+        // Set the initial screen to the loading screen
+<span class="nc" id="L50">        setScreen(Screens.LOADING);</span>
+<span class="nc" id="L51">    }</span>
+
+    /**
+     * Sets the current screen to the specified screen class.
+     * The current screen, retrieved from {@link GdxGame#getScreen()}, is disposed using {@link BaseScreen#dispose()} before the new screen is set.
+     * The new screen is instantiated using reflection, with the constructor that takes a single argument of type {@link GdxGame}.
+     * If an error occurs during the instantiation of the new screen, an error is logged and the application is exited.
+     *
+     * @param screen The class of the screen to set. This class must extend {@link BaseScreen} and have a constructor that takes a single argument of type {@link GdxGame}.
+     */
+    public void setScreen(@NotNull Class&lt;? extends BaseScreen&gt; screen) {
+        // Dispose the current screen if it exists
+<span class="nc" id="L63">        final Screen currentScreen = getScreen();</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (currentScreen != null) {</span>
+<span class="nc" id="L65">            currentScreen.dispose();</span>
+        }
+
+        // Create a new screen instance
+        BaseScreen newScreen;
+        try {
+            // Instantiate the new screen using reflection
+<span class="nc" id="L72">            newScreen = screen.getConstructor(GdxGame.class).newInstance(this);</span>
+<span class="nc" id="L73">        } catch (InstantiationException</span>
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchMethodException e) {
+            // Log the error and exit the application if the new screen cannot be instantiated
+<span class="nc" id="L78">            Gdx.app.error(&quot;LetRonCooke&quot;, &quot;Error loading screen&quot;, e);</span>
+<span class="nc" id="L79">            Gdx.app.exit();</span>
+<span class="nc" id="L80">            return;</span>
+<span class="nc" id="L81">        }</span>
+
+        // Set the new screen
+<span class="nc" id="L84">        super.setScreen(newScreen);</span>
+<span class="nc" id="L85">    }</span>
+
+    /**
+     * Sets the current screen to the specified screen class with an option to fade in.
+     * The current screen, retrieved from {@link GdxGame#getScreen()}, is disposed using {@link BaseScreen#dispose()} before the new screen is set.
+     * The new screen is instantiated using reflection, with the constructor that takes a single argument of type {@link GdxGame} and a boolean indicating whether the screen should fade in.
+     * If an error occurs during the instantiation of the new screen, an error is logged and the application is exited.
+     *
+     * @param screen The class of the screen to set. This class must extend {@link BaseScreen} and have a constructor that takes a single argument of type {@link GdxGame} and a boolean.
+     * @param shouldFadeIn A boolean indicating whether the new screen should fade in.
+     */
+    public void setScreen(@NotNull Class&lt;? extends BaseScreen&gt; screen, boolean shouldFadeIn) {
+        // Dispose the current screen if it exists
+<span class="nc" id="L98">        final Screen currentScreen = getScreen();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (currentScreen != null) {</span>
+<span class="nc" id="L100">            currentScreen.dispose();</span>
+        }
+
+        // Create a new screen instance
+        BaseScreen newScreen;
+        try {
+            // Instantiate the new screen using reflection
+<span class="nc" id="L107">            newScreen = screen.getConstructor(GdxGame.class, boolean.class).newInstance(this, shouldFadeIn);</span>
+<span class="nc" id="L108">        } catch (InstantiationException</span>
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchMethodException e) {
+            // Log the error and exit the application if the new screen cannot be instantiated
+<span class="nc" id="L113">            Gdx.app.error(&quot;LetRonCooke&quot;, &quot;Error loading screen&quot;, e);</span>
+<span class="nc" id="L114">            Gdx.app.exit();</span>
+<span class="nc" id="L115">            return;</span>
+<span class="nc" id="L116">        }</span>
+
+        // Set the new screen
+<span class="nc" id="L119">        super.setScreen(newScreen);</span>
+<span class="nc" id="L120">    }</span>
+
+    /**
+     * Sets the current screen to the specified screen class with an option to fade in and a specified fade-in time.
+     * The current screen, retrieved from {@link GdxGame#getScreen()}, is disposed using {@link BaseScreen#dispose()} before the new screen is set.
+     * The new screen is instantiated using reflection, with the constructor that takes a single argument of type {@link GdxGame}, a boolean indicating whether the screen should fade in, and a float specifying the fade-in time.
+     * If an error occurs during the instantiation of the new screen, an error is logged and the application is exited.
+     *
+     * @param screen The class of the screen to set. This class must extend {@link BaseScreen} and have a constructor that takes a single argument of type {@link GdxGame}, a boolean, and a float.
+     * @param shouldFadeIn A boolean indicating whether the new screen should fade in.
+     * @param fadeInTime A float specifying the time for the fade-in effect in seconds
+     */
+    public void setScreen(@NotNull Class&lt;? extends BaseScreen&gt; screen, boolean shouldFadeIn, float fadeInTime) {
+        // Dispose the current screen if it exists
+<span class="nc" id="L134">        final Screen currentScreen = getScreen();</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (currentScreen != null) {</span>
+<span class="nc" id="L136">            currentScreen.dispose();</span>
+        }
+
+        // Create a new screen instance
+        BaseScreen newScreen;
+        try {
+            // Instantiate the new screen using reflection
+<span class="nc" id="L143">            newScreen = screen.getConstructor(GdxGame.class, boolean.class, float.class)</span>
+<span class="nc" id="L144">                    .newInstance(this, shouldFadeIn, fadeInTime);</span>
+<span class="nc" id="L145">        } catch (InstantiationException</span>
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchMethodException e) {
+            // Log the error and exit the application if the new screen cannot be instantiated
+<span class="nc" id="L150">            Gdx.app.error(&quot;LetRonCooke&quot;, &quot;Error loading screen&quot;, e);</span>
+<span class="nc" id="L151">            Gdx.app.exit();</span>
+<span class="nc" id="L152">            return;</span>
+<span class="nc" id="L153">        }</span>
+
+        // Set the new screen
+<span class="nc" id="L156">        super.setScreen(newScreen);</span>
+<span class="nc" id="L157">    }</span>
+
+    /**
+     * Sets the current screen to the specified screen class with an option to fade in, a specified fade-in time, and additional initialization arguments.
+     * The current screen, retrieved from {@link GdxGame#getScreen()}, is disposed using {@link BaseScreen#dispose()} before the new screen is set.
+     * The new screen is instantiated using reflection, with the constructor that takes a single argument of type {@link GdxGame}, a boolean indicating whether the screen should fade in, a float specifying the fade-in time, and an array of Objects as additional initialization arguments.
+     * If an error occurs during the instantiation of the new screen, an error is logged and the application is exited.
+     *
+     * @param screen The class of the screen to set. This class must extend {@link BaseScreen} and have a constructor that takes a single argument of type {@link GdxGame}, a boolean, a float, and an array of {@link Object}s.
+     * @param shouldFadeIn A boolean indicating whether the new screen should fade in.
+     * @param fadeInTime A float specifying the time for the fade-in effect in seconds.
+     * @param initArgs An array of {@link Object}s that are passed as additional initialization arguments to the new screen's constructor.
+     */
+    public void setScreen(
+            @NotNull Class&lt;? extends BaseScreen&gt; screen, boolean shouldFadeIn, float fadeInTime, Object... initArgs) {
+        // Dispose the current screen if it exists
+<span class="nc" id="L173">        final Screen currentScreen = getScreen();</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        if (currentScreen != null) {</span>
+<span class="nc" id="L175">            currentScreen.dispose();</span>
+        }
+
+        // Create a new screen instance
+        BaseScreen newScreen;
+        try {
+            // Instantiate the new screen using reflection
+<span class="nc" id="L182">            newScreen = screen.getConstructor(GdxGame.class, boolean.class, float.class, Object[].class)</span>
+<span class="nc" id="L183">                    .newInstance(this, shouldFadeIn, fadeInTime, initArgs);</span>
+<span class="nc" id="L184">        } catch (InstantiationException</span>
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchMethodException e) {
+            // Log the error and exit the application if the new screen cannot be instantiated
+<span class="nc" id="L189">            Gdx.app.error(&quot;LetRonCooke&quot;, &quot;Error loading screen&quot;, e);</span>
+<span class="nc" id="L190">            Gdx.app.exit();</span>
+<span class="nc" id="L191">            return;</span>
+<span class="nc" id="L192">        }</span>
+
+        // Set the new screen
+<span class="nc" id="L195">        super.setScreen(newScreen);</span>
+<span class="nc" id="L196">    }</span>
+
+    /**
+     * Transitions to a new screen with a fade-out effect.
+     * The current screen, retrieved from {@link GdxGame#getScreen()}, is checked if it's an instance of {@link BaseScreen}.
+     * If the current screen is null or not an instance of {@link BaseScreen}, the new screen is set immediately without transition.
+     * If the current screen is an instance of {@link BaseScreen}, a fade-out effect is applied to the current screen before transitioning to the new screen.
+     * The new screen is set with a fade-in effect.
+     *
+     * @param screen The class of the screen to transition to. This class must extend {@link BaseScreen} and have a constructor that takes a single argument of type {@link GdxGame}.
+     */
+    public void transitionScreen(@NotNull Class&lt;? extends BaseScreen&gt; screen) {
+        // Dispose current screen
+<span class="nc" id="L209">        final Screen currentScreen = getScreen();</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (currentScreen == null) {</span>
+<span class="nc" id="L211">            setScreen(screen);</span>
+<span class="nc" id="L212">            return;</span>
+        }
+
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (!(currentScreen instanceof BaseScreen)) {</span>
+<span class="nc" id="L216">            setScreen(screen);</span>
+<span class="nc" id="L217">            return;</span>
+        }
+
+<span class="nc" id="L220">        final BaseScreen baseScreen = (BaseScreen) currentScreen;</span>
+
+        // Set the alpha value of the root's color to 1
+<span class="nc" id="L223">        baseScreen.getProcessor().getRoot().getColor().a = 1;</span>
+<span class="nc" id="L224">        SequenceAction sequenceAction = new SequenceAction();</span>
+        // Add a fade-out action to the sequence
+<span class="nc" id="L226">        sequenceAction.addAction(Actions.fadeOut(0.5f));</span>
+        // Add a run action to the sequence that sets the new screen with a fade-in effect
+<span class="nc" id="L228">        sequenceAction.addAction(Actions.run(() -&gt; setScreen(screen, true, 0.5f)));</span>
+        // Add the sequence action to the root
+<span class="nc" id="L230">        baseScreen.getProcessor().getRoot().addAction(sequenceAction);</span>
+<span class="nc" id="L231">    }</span>
+
+    /**
+     * Transitions to a new screen with a fade-out effect and additional initialization arguments.
+     * The current screen, retrieved from {@link GdxGame#getScreen()}, is checked if it's an instance of {@link BaseScreen}.
+     * If the current screen is null or not an instance of {@link BaseScreen}, the new screen is set immediately with a fade-in effect and the provided initialization arguments.
+     * If the current screen is an instance of {@link BaseScreen}, a fade-out effect is applied to the current screen before transitioning to the new screen.
+     * The new screen is set with a fade-in effect and the provided initialization arguments.
+     *
+     * @param screen The class of the screen to transition to. This class must extend {@link BaseScreen} and have a constructor that takes a single argument of type {@link GdxGame}, a boolean, a float, and an array of {@link Object}s.
+     * @param initArgs An array of {@link Object}s that are passed as additional initialization arguments to the new screen's constructor.
+     */
+    public void transitionScreen(@NotNull Class&lt;? extends BaseScreen&gt; screen, Object... initArgs) {
+        // Dispose current screen
+<span class="nc" id="L245">        final Screen currentScreen = getScreen();</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">        if (currentScreen == null) {</span>
+<span class="nc" id="L247">            setScreen(screen, true, 0.5f, initArgs);</span>
+<span class="nc" id="L248">            return;</span>
+        }
+
+<span class="nc bnc" id="L251" title="All 2 branches missed.">        if (!(currentScreen instanceof BaseScreen)) {</span>
+<span class="nc" id="L252">            setScreen(screen, true, 0.5f, initArgs);</span>
+<span class="nc" id="L253">            return;</span>
+        }
+
+<span class="nc" id="L256">        final BaseScreen baseScreen = (BaseScreen) currentScreen;</span>
+
+        // Set the alpha value of the root's color to 1
+<span class="nc" id="L259">        baseScreen.getProcessor().getRoot().getColor().a = 1;</span>
+<span class="nc" id="L260">        SequenceAction sequenceAction = new SequenceAction();</span>
+        // Add a fade-out action to the sequence
+<span class="nc" id="L262">        sequenceAction.addAction(Actions.fadeOut(0.5f));</span>
+        // Add a run action to the sequence that sets the new screen with a fade-in effect and the provided
+        // initialization arguments
+<span class="nc" id="L265">        sequenceAction.addAction(Actions.run(() -&gt; setScreen(screen, true, 0.5f, initArgs)));</span>
+        // Add the sequence action to the root
+<span class="nc" id="L267">        baseScreen.getProcessor().getRoot().addAction(sequenceAction);</span>
+<span class="nc" id="L268">    }</span>
+
+    /**
+     * Renders the game, updating the screen display.
+     * This method is called by the game loop from the application every time rendering should be performed.
+     * This method calls the render method of the superclass {@link Game}, which in turn calls the render method of the current screen.
+     */
+    @Override
+    public void render() {
+<span class="nc" id="L277">        super.render();</span>
+<span class="nc" id="L278">    }</span>
+
+    /**
+     * Disposes the game, cleaning up resources.
+     * This method is called when the application is about to be closed.
+     * It retrieves the instances of {@link MusicManager} and {@link SoundManager} and disables them, stopping all audio playback and releasing audio resources.
+     */
+    @Override
+    public void dispose() {
+        // Get the instance of the music manager and disable it
+<span class="nc" id="L288">        final AudioManager musicManager = MusicManager.getInstance();</span>
+<span class="nc" id="L289">        musicManager.onDisable();</span>
+
+        // Get the instance of the sound manager and disable it
+<span class="nc" id="L292">        final AudioManager soundManager = SoundManager.getInstance();</span>
+<span class="nc" id="L293">        soundManager.onDisable();</span>
+
+        // CHANGE - lines added
+<span class="nc" id="L296">        SkinManager.dispose();</span>
+<span class="nc" id="L297">        MapManager.dispose();</span>
+<span class="nc" id="L298">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

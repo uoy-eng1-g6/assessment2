@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActivityMapObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.assets.map</a> &gt; <span class="el_source">ActivityMapObject.java</span></div><h1>ActivityMapObject.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.assets.map;
+
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapProperties;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+import uk.ac.york.student.game.activities.Activity;
+import uk.ac.york.student.player.Player;
+import uk.ac.york.student.player.PlayerMetrics;
+
+/**
+ * This class extends MapObject and implements ActionMapObject.
+ * It represents an activity on the map with specific properties.
+ */
+public final class ActivityMapObject extends MapObject implements ActionMapObject {
+    /**
+     * MapProperties object to store the properties of the activity
+     */
+    private final MapProperties properties;
+
+    /**
+     * String representing the activity to display on the screen
+     */
+<span class="nc" id="L28">    @Getter</span>
+    private final String str;
+
+    /**
+     * The type of the activity
+     */
+<span class="nc" id="L34">    @Getter</span>
+    private final Activity type;
+
+    /**
+     * Integer representing how long the activity takes (in hours)
+     */
+<span class="nc" id="L40">    @Getter</span>
+    private final int time;
+
+    /**
+     * An {@link Unmodifiable} {@link List} of {@link Float}s representing the amounts by which the player's metrics change when performing the activity.
+     * Each {@link Float} corresponds to a specific metric, in the order they are defined in the {@link PlayerMetrics.MetricType} enum.
+     * The amounts are retrieved from the &quot;changeAmount&quot; property of the {@link MapObject}, which is a comma-separated string of floats.
+     */
+<span class="nc" id="L48">    @Getter</span>
+    private final @Unmodifiable List&lt;Float&gt; changeAmounts;
+
+    /**
+     * Returns the change amount for the specified {@link PlayerMetrics.MetricType}.
+     * This method retrieves the index of the specified {@link PlayerMetrics.MetricType} in the {@link Activity#getEffects()} of the {@link Activity}.
+     * It then returns the change amount at that index in {@link Activity#getEffects()}.
+     * The change amount represents the amount by which the {@link Player}'s {@link PlayerMetrics} changes when performing the {@link Activity}.
+     *
+     * @param metricType the {@link PlayerMetrics.MetricType} to get the change amount for
+     * @return the change amount for the specified {@link PlayerMetrics.MetricType}
+     */
+    public float getChangeAmount(PlayerMetrics.MetricType metricType) {
+<span class="nc" id="L61">        return changeAmounts.get(type.indexOf(metricType));</span>
+    }
+
+    /**
+     * Constructor for the ActivityMapObject class.
+     * It initialises the object with the properties of the given MapObject.
+     * @param object The MapObject to initialize the ActivityMapObject with.
+     */
+    public ActivityMapObject(@NotNull MapObject object) {
+        // Calls the superclass constructor
+<span class="nc" id="L71">        super();</span>
+
+        // Sets the name of the ActivityMapObject to the name of the given MapObject
+<span class="nc" id="L74">        setName(object.getName());</span>
+
+        // Sets the color of the ActivityMapObject to the color of the given MapObject
+<span class="nc" id="L77">        setColor(object.getColor());</span>
+
+        // Sets the opacity of the ActivityMapObject to the opacity of the given MapObject
+<span class="nc" id="L80">        setOpacity(object.getOpacity());</span>
+
+        // Sets the visibility of the ActivityMapObject to the visibility of the given MapObject
+<span class="nc" id="L83">        setVisible(object.isVisible());</span>
+
+        // Retrieves the properties of the given MapObject and assigns them to the properties of the ActivityMapObject
+<span class="nc" id="L86">        properties = object.getProperties();</span>
+
+        // Retrieves the &quot;activityStr&quot; property from the properties of the ActivityMapObject and assigns it to the str
+        // field
+<span class="nc" id="L90">        str = properties.get(&quot;activityStr&quot;, String.class);</span>
+
+        // Retrieves the &quot;activityType&quot; property from the properties of the ActivityMapObject, converts it to uppercase,
+        // and assigns it to the type field
+<span class="nc" id="L94">        type = Activity.valueOf(properties.get(&quot;activityType&quot;, String.class).toUpperCase());</span>
+
+        // Retrieves the &quot;activityTime&quot; property from the properties of the ActivityMapObject and assigns it to the time
+        // field
+<span class="nc" id="L98">        time = properties.get(&quot;activityTime&quot;, Integer.class);</span>
+
+        // Retrieves the &quot;changeAmount&quot; property from the properties of the ActivityMapObject, splits it into an array
+        // of strings, converts each string to a float, and collects them into an unmodifiable list
+<span class="nc" id="L102">        changeAmounts = Arrays.stream(</span>
+<span class="nc" id="L103">                        properties.get(&quot;changeAmount&quot;, String.class).split(&quot;,&quot;))</span>
+<span class="nc" id="L104">                .map(Float::parseFloat)</span>
+<span class="nc" id="L105">                .collect(Collectors.toUnmodifiableList());</span>
+<span class="nc" id="L106">    }</span>
+
+    /**
+     * Getter for the properties of the ActivityMapObject.
+     * @return The properties of the ActivityMapObject.
+     */
+    @Override
+    public MapProperties getProperties() {
+<span class="nc" id="L114">        return properties;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

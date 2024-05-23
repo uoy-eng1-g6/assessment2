@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.player</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.player;
+
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.World;
+import java.util.HashMap;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
+import uk.ac.york.student.assets.map.MapManager;
+
+/**
+ * The Player class extends the Actor class and implements the PlayerScore and InputProcessor interfaces.
+ * This class represents a player in the game, handling player movement, interaction with the game map, and input processing.
+ * It also manages the player's score and the player's sprite on the screen.
+ */
+// CHANGE new functionality throughout to allow for player's collisions, and other changes to work with box2d
+@Getter
+public class Player implements InputProcessor {
+    public static final float HITBOX_RADIUS = 0.25f;
+    public static final float MOVE_SPEED = 4;
+
+    /**
+     * PlayerMetrics object to store and manage player-specific metrics.
+     */
+<span class="pc" id="L40">    private final PlayerMetrics metrics = new PlayerMetrics();</span>
+
+    /**
+     * PlayerStreaks object to store and manage player streaks.
+     */
+    // CHANGE add PlayerStreaks to player
+<span class="pc" id="L46">    private final PlayerStreaks streaks = new PlayerStreaks();</span>
+
+    /**
+     * Sprite object representing the player's character on the screen.
+     */
+<span class="nc" id="L51">    private Sprite sprite;</span>
+
+    /**
+     * Sprite objects for each direction to face in.
+     *&lt;p&gt;
+     *     There's no right facing region in the Atlas so the left one is flipped
+     *     when facing right.
+     *&lt;/p&gt;
+     */
+<span class="nc" id="L60">    private final TextureAtlas.AtlasRegion SPRITETOWARDSREGION;</span>
+
+<span class="nc" id="L62">    private final TextureAtlas.AtlasRegion SPRITEAWAYREGION;</span>
+<span class="nc" id="L63">    private final TextureAtlas.AtlasRegion SPRITELEFTREGION;</span>
+
+    /**
+     * TiledMap object representing the current game map.
+     */
+<span class="nc" id="L68">    private TiledMap map;</span>
+
+<span class="nc" id="L70">    private String mapName;</span>
+
+    /**
+     * TextureAtlas object containing the textures for the player's sprite.
+     */
+<span class="nc" id="L75">    private final TextureAtlas textureAtlas;</span>
+
+<span class="pc" id="L77">    private final Vector2 velocity = new Vector2();</span>
+
+<span class="nc" id="L79">    private final World world;</span>
+<span class="nc" id="L80">    Fixture fixture;</span>
+
+<span class="pc" id="L82">    private final HashMap&lt;String, Vector2&gt; mapPositions = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Constructor for the Player class.
+     */
+<span class="fc" id="L87">    public Player(World world, TextureAtlas textureAtlas) {</span>
+<span class="fc" id="L88">        this.world = world;</span>
+<span class="fc" id="L89">        this.textureAtlas = textureAtlas;</span>
+
+        // Create a sprite for the player and set its position, opacity, and size
+<span class="fc" id="L92">        SPRITETOWARDSREGION = textureAtlas.findRegion(&quot;char3_towards&quot;);</span>
+<span class="fc" id="L93">        SPRITEAWAYREGION = textureAtlas.findRegion(&quot;char3_away&quot;);</span>
+<span class="fc" id="L94">        SPRITELEFTREGION = textureAtlas.findRegion(&quot;char3_left&quot;);</span>
+<span class="fc" id="L95">        sprite = textureAtlas.createSprite(&quot;char3_towards&quot;);</span>
+<span class="fc" id="L96">        sprite.setAlpha(1);</span>
+<span class="fc" id="L97">    }</span>
+
+    public Player(World world) {
+<span class="nc" id="L100">        this(world, new TextureAtlas(&quot;sprite-atlases/character-sprites.atlas&quot;));</span>
+<span class="nc" id="L101">    }</span>
+
+    public Vector2 getTilePosition() {
+<span class="nc" id="L104">        return fixture.getBody().getPosition();</span>
+    }
+
+    Vector2 findStartPosition() {
+<span class="fc" id="L108">        var backgroundLayer = (TiledMapTileLayer) map.getLayers().get(0);</span>
+<span class="fc" id="L109">        var tileWidth = backgroundLayer.getTileWidth();</span>
+<span class="fc" id="L110">        var tileHeight = backgroundLayer.getTileHeight();</span>
+
+<span class="fc" id="L112">        var mapLayer = map.getLayers().get(&quot;gameObjects&quot;);</span>
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        for (var object : mapLayer.getObjects()) {</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">            if (object.getProperties().containsKey(&quot;isSpawnPoint&quot;)</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                    &amp;&amp; object.getProperties().get(&quot;isSpawnPoint&quot;, Boolean.class)) {</span>
+                // Get the center point of the spawn position
+<span class="fc" id="L118">                var rect = ((RectangleMapObject) object).getRectangle();</span>
+<span class="fc" id="L119">                return new Vector2(</span>
+<span class="fc" id="L120">                        (rect.getX() + (rect.width / 2)) / tileWidth, (rect.getY() + (rect.height / 2)) / tileHeight);</span>
+            }
+<span class="nc" id="L122">        }</span>
+<span class="fc" id="L123">        return null;</span>
+    }
+
+    /**
+     * Sets the current game map for the player and updates related properties.
+     *
+     * @param map The TiledMap object representing the new game map.
+     */
+    public void setMap(@NotNull String name, @NotNull TiledMap map) {
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        if (fixture != null) {</span>
+<span class="nc" id="L133">            mapPositions.put(mapName, fixture.getBody().getPosition().cpy());</span>
+        }
+
+<span class="fc" id="L136">        this.map = map; // Assign the provided map to the player's map</span>
+<span class="fc" id="L137">        this.mapName = name;</span>
+
+        Vector2 startPosition;
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (mapPositions.containsKey(mapName)) {</span>
+<span class="nc" id="L141">            startPosition = mapPositions.get(mapName);</span>
+        } else {
+<span class="fc" id="L143">            startPosition = findStartPosition();</span>
+        }
+
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        if (startPosition == null) {</span>
+<span class="fc" id="L147">            throw new IllegalStateException(&quot;No start position found&quot;);</span>
+        }
+
+<span class="fc" id="L150">        var bodyDef = new BodyDef();</span>
+<span class="fc" id="L151">        bodyDef.type = BodyDef.BodyType.DynamicBody;</span>
+<span class="fc" id="L152">        bodyDef.position.set(startPosition);</span>
+
+<span class="fc" id="L154">        var body = world.createBody(bodyDef);</span>
+<span class="fc" id="L155">        var shape = new CircleShape();</span>
+<span class="fc" id="L156">        shape.setRadius(Player.HITBOX_RADIUS);</span>
+
+<span class="fc" id="L158">        fixture = body.createFixture(shape, 1f);</span>
+<span class="fc" id="L159">        shape.dispose();</span>
+
+        // Clear the existing bounding boxes of the map objects
+<span class="fc" id="L162">        tileObjectBoundingBoxes.clear();</span>
+        // Load the bounding boxes of the new map objects
+<span class="fc" id="L164">        loadMapObjectBoundingBoxes();</span>
+<span class="fc" id="L165">    }</span>
+
+    /**
+     * Enum representing the possible movements of the player.
+     * It includes UP, DOWN, LEFT, RIGHT.
+     * BOOST is also included to represent the boost movement (faster movement).
+     * Each movement has a boolean state indicating whether it is currently active or not.
+     */
+<span class="fc" id="L173">    @Getter</span>
+    enum Movement {
+<span class="fc" id="L175">        UP,</span>
+<span class="fc" id="L176">        DOWN,</span>
+<span class="fc" id="L177">        LEFT,</span>
+<span class="fc" id="L178">        RIGHT,</span>
+<span class="fc" id="L179">        BOOST;</span>
+
+        /**
+         * Boolean state of the movement.
+         * If true, the movement is currently active.
+         * If false, the movement is not active.
+         */
+<span class="nc" id="L186">        private boolean is;</span>
+
+        /**
+         * Sets the state of the movement.
+         *
+         * @param is The new state of the movement. True if the movement is active, false otherwise.
+         */
+        void set(boolean is) {
+<span class="fc" id="L194">            this.is = is;</span>
+<span class="fc" id="L195">        }</span>
+    }
+
+    /**
+     * Moves the player's sprite on the game map.
+     * The movement is based on the current active movements (UP, DOWN, LEFT, RIGHT) and BOOST.
+     * The sprite's position is updated and the player's bounds are set to the new position.
+     * The sprite cannot move outside the bounds of the game map.
+     */
+    public void move() {
+<span class="fc" id="L205">        velocity.set(0, 0);</span>
+        // Move the sprite up if the UP movement is active and the sprite is not at the top of the map
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (Movement.UP.is) {</span>
+<span class="fc" id="L208">            velocity.set(velocity.x, MOVE_SPEED);</span>
+        }
+
+        // Move the sprite down if the DOWN movement is active and the sprite is not at the bottom of the map
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (Movement.DOWN.is) {</span>
+<span class="fc" id="L213">            velocity.set(velocity.x, -MOVE_SPEED);</span>
+        }
+
+        // Move the sprite left if the LEFT movement is active and the sprite is not at the left edge of the map
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        if (Movement.LEFT.is) {</span>
+<span class="fc" id="L218">            velocity.set(-MOVE_SPEED, velocity.y);</span>
+        }
+
+        // Move the sprite right if the RIGHT movement is active and the sprite is not at the right edge of the map
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        if (Movement.RIGHT.is) {</span>
+<span class="fc" id="L223">            velocity.set(MOVE_SPEED, velocity.y);</span>
+        }
+
+<span class="fc" id="L226">        fixture.getBody().setLinearVelocity(velocity);</span>
+<span class="fc" id="L227">    }</span>
+
+    /**
+     * Enum representing the possible transitions for the player.
+     * It includes NEW_MAP and ACTIVITY transitions.
+     * NEW_MAP is used when the player transitions to a new map.
+     * ACTIVITY is used when the player does an activity on the map.
+     */
+<span class="nc" id="L235">    public enum Transition {</span>
+<span class="nc" id="L236">        NEW_MAP,</span>
+<span class="nc" id="L237">        ACTIVITY</span>
+    }
+
+    /**
+     * A HashMap storing the bounding boxes of the map objects.
+     * The key is a MapObject and the value is a Rectangle.
+     * This is used to store the bounding boxes of the map objects for collision detection.
+     */
+<span class="pc" id="L245">    @Getter</span>
+    private final HashMap&lt;MapObject, Rectangle&gt; tileObjectBoundingBoxes = new HashMap&lt;&gt;();
+
+    /**
+     * Loads the bounding boxes of the actionable game objects from the map.
+     * The bounding boxes are stored in the tileObjectBoundingBoxes HashMap.
+     * The key is a MapObject and the value is a BoundingBox.
+     * This method is typically called when a new map is set for the player.
+     */
+    public void loadMapObjectBoundingBoxes() {
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">        for (var actionableObject : MapManager.getMapObjectData(mapName).getActionableObjects()) {</span>
+<span class="nc" id="L256">            tileObjectBoundingBoxes.put(actionableObject.getObject(), actionableObject.asRectangle());</span>
+<span class="nc" id="L257">        }</span>
+<span class="fc" id="L258">    }</span>
+
+    /**
+     * Returns the current map object that the player's sprite is on.
+     * This is determined by checking if the player's center position is within the bounding box of each map object.
+     * If the player's sprite is not on any map object, null is returned.
+     *
+     * @return The MapObject that the player's sprite is currently on, or null if the sprite is not on any map object.
+     */
+    public @Nullable MapObject getCurrentMapObject() {
+<span class="nc" id="L268">        var position = getTilePosition();</span>
+        // Iterate over each entry in the tileObjectBoundingBoxes HashMap
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        for (var entry : tileObjectBoundingBoxes.entrySet()) {</span>
+            // Get the center position of the player's sprite
+<span class="nc bnc" id="L272" title="All 2 branches missed.">            if (Intersector.overlaps(new Circle(position, HITBOX_RADIUS), entry.getValue())) {</span>
+<span class="nc" id="L273">                return entry.getKey();</span>
+            }
+<span class="nc" id="L275">        }</span>
+
+        // If the player's sprite is not on any map object, return null
+<span class="nc" id="L278">        return null;</span>
+    }
+
+    /**
+     * Checks if the player's sprite is currently on a transition tile.
+     * A transition tile is a tile that has either the &quot;isNewMap&quot; or &quot;isActivity&quot; property set to true.
+     * If the player's sprite is on a tile with the &quot;isNewMap&quot; property set to true, the NEW_MAP transition is returned.
+     * If the player's sprite is on a tile with the &quot;isActivity&quot; property set to true, the ACTIVITY transition is returned.
+     * If the player's sprite is not on any transition tile, null is returned.
+     *
+     * @return The Transition that the player's sprite is currently on, or null if the sprite is not on any transition tile.
+     */
+    public @Nullable Transition isInTransitionTile() {
+        // Retrieve the current map object that the player's sprite is on
+<span class="nc" id="L292">        MapObject tileObject = getCurrentMapObject();</span>
+
+        // If the player's sprite is not on any map object, return null
+<span class="nc bnc" id="L295" title="All 2 branches missed.">        if (tileObject == null) return null;</span>
+
+        // If the map object has the &quot;isNewMap&quot; property set to true, return the NEW_MAP transition
+<span class="nc bnc" id="L298" title="All 2 branches missed.">        if (Boolean.TRUE.equals(tileObject.getProperties().get(&quot;isNewMap&quot;, Boolean.class))) {</span>
+<span class="nc" id="L299">            return Transition.NEW_MAP;</span>
+        }
+        // If the map object has the &quot;isActivity&quot; property set to true, return the ACTIVITY transition
+<span class="nc bnc" id="L302" title="All 2 branches missed.">        else if (Boolean.TRUE.equals(tileObject.getProperties().get(&quot;isActivity&quot;, Boolean.class))) {</span>
+<span class="nc" id="L303">            return Transition.ACTIVITY;</span>
+        }
+
+        // If the map object does not have either the &quot;isNewMap&quot; or &quot;isActivity&quot; property set to true, return null
+<span class="nc" id="L307">        return null;</span>
+    }
+
+    /**
+     * Handles the key press events for the player's movement.
+     * This method is called when a key is pressed.
+     * The player's movement is updated based on the key pressed.
+     * The possible keys are W (up), S (down), A (left), D (right)
+     * If the key pressed is not one of these, the method returns false.
+     * If the key pressed is one of these, the corresponding movement is set to active and the method returns true.
+     *
+     * @param keycode The integer value representing the key pressed. Use {@link Input.Keys} to get the key codes.
+     * @return True if the key pressed corresponds to a movement, false otherwise.
+     */
+    @Override
+    public boolean keyDown(int keycode) {
+<span class="nc bnc" id="L323" title="All 5 branches missed.">        switch (keycode) {</span>
+            case Input.Keys.UP:
+            case Input.Keys.W:
+<span class="nc" id="L326">                Movement.UP.set(true);</span>
+<span class="nc" id="L327">                break;</span>
+            case Input.Keys.DOWN:
+            case Input.Keys.S:
+<span class="nc" id="L330">                Movement.DOWN.set(true);</span>
+<span class="nc" id="L331">                break;</span>
+            case Input.Keys.LEFT:
+            case Input.Keys.A:
+<span class="nc" id="L334">                Movement.LEFT.set(true);</span>
+<span class="nc" id="L335">                break;</span>
+            case Input.Keys.RIGHT:
+            case Input.Keys.D:
+<span class="nc" id="L338">                Movement.RIGHT.set(true);</span>
+<span class="nc" id="L339">                break;</span>
+            default:
+<span class="nc" id="L341">                return false;</span>
+        }
+<span class="nc" id="L343">        return true;</span>
+    }
+
+    /**
+     * Handles the key release events for the player's movement.
+     * This method is called when a key is released.
+     * The player's movement is updated based on the key released.
+     * The possible keys are W (up), S (down), A (left), D (right)
+     * If the key released is not one of these, the method returns false.
+     * If the key released is one of these, the corresponding movement is set to inactive and the method returns true.
+     *
+     * @param keycode The integer value representing the key released. Use {@link Input.Keys} to get the key codes.
+     * @return True if the key released corresponds to a movement, false otherwise.
+     */
+    @Override
+    public boolean keyUp(int keycode) {
+<span class="nc bnc" id="L359" title="All 5 branches missed.">        switch (keycode) {</span>
+            case Input.Keys.UP:
+            case Input.Keys.W:
+<span class="nc" id="L362">                Movement.UP.set(false);</span>
+<span class="nc" id="L363">                break;</span>
+            case Input.Keys.DOWN:
+            case Input.Keys.S:
+<span class="nc" id="L366">                Movement.DOWN.set(false);</span>
+<span class="nc" id="L367">                break;</span>
+            case Input.Keys.LEFT:
+            case Input.Keys.A:
+<span class="nc" id="L370">                Movement.LEFT.set(false);</span>
+<span class="nc" id="L371">                break;</span>
+            case Input.Keys.RIGHT:
+            case Input.Keys.D:
+<span class="nc" id="L374">                Movement.RIGHT.set(false);</span>
+<span class="nc" id="L375">                break;</span>
+            default:
+<span class="nc" id="L377">                return false;</span>
+        }
+<span class="nc" id="L379">        return true;</span>
+    }
+
+    /**
+     * Handles the key typed event.
+     * This method is called when a key is typed.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param character The character of the key typed.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean keyTyped(char character) {
+<span class="nc" id="L392">        return false;</span>
+    }
+
+    /**
+     * Handles the touch down event.
+     * This method is called when the screen is touched.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param screenX The x-coordinate of the touch event.
+     * @param screenY The y-coordinate of the touch event.
+     * @param pointer The pointer for the touch event.
+     * @param button The button of the touch event.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+<span class="nc" id="L408">        return false;</span>
+    }
+
+    /**
+     * Handles the touch up event.
+     * This method is called when a touch on the screen is released.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param screenX The x-coordinate of the touch event.
+     * @param screenY The y-coordinate of the touch event.
+     * @param pointer The pointer for the touch event.
+     * @param button The button of the touch event.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+<span class="nc" id="L424">        return false;</span>
+    }
+
+    /**
+     * Handles the touch cancelled event.
+     * This method is called when a touch event is cancelled.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param screenX The x-coordinate of the touch event.
+     * @param screenY The y-coordinate of the touch event.
+     * @param pointer The pointer for the touch event.
+     * @param button The button of the touch event.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+<span class="nc" id="L440">        return false;</span>
+    }
+
+    /**
+     * Handles the touch dragged event.
+     * This method is called when a touch on the screen is dragged.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param screenX The x-coordinate of the touch event.
+     * @param screenY The y-coordinate of the touch event.
+     * @param pointer The pointer for the touch event.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+<span class="nc" id="L455">        return false;</span>
+    }
+
+    /**
+     * Handles the mouse moved event.
+     * This method is called when the mouse is moved.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param screenX The x-coordinate of the mouse event.
+     * @param screenY The y-coordinate of the mouse event.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+<span class="nc" id="L469">        return false;</span>
+    }
+
+    /**
+     * Handles the scrolled event.
+     * This method is called when the mouse wheel is scrolled.
+     * Currently, this method does not perform any action and always returns false.
+     *
+     * @param amountX The amount of horizontal scroll.
+     * @param amountY The amount of vertical scroll.
+     * @return False, as this method does not perform any action.
+     */
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+<span class="nc" id="L483">        return false;</span>
+    }
+
+    /**
+     * Disposes of the resources used by the player.
+     * This method is called when the player is no longer needed, to free up memory.
+     */
+    public void dispose() {
+<span class="nc" id="L491">        textureAtlas.dispose(); // Dispose of the TextureAtlas</span>
+        // CHANGE do not dispose of the PlayerMetrics
+<span class="nc" id="L493">    }</span>
+
+    /**
+     * Sets the opacity of the player's sprite.
+     * The opacity is a value between 0 (completely transparent) and 1 (completely opaque).
+     *
+     * @param opacity The opacity value to set. This should be a float between 0 and 1.
+     */
+    public void setOpacity(@Range(from = 0, to = 1) float opacity) {
+<span class="nc" id="L502">        sprite.setAlpha(opacity);</span>
+<span class="nc" id="L503">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.screens</a> &gt; <span class="el_source">BaseScreen.java</span></div><h1>BaseScreen.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.screens;
+
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import uk.ac.york.student.GdxGame;
+
+/**
+ * The BaseScreen class is an abstract class that implements the Screen interface from the libGDX library.
+ * This class serves as a base for all other screen classes in the game.
+ * It contains a protected final instance of the GdxGame class, which represents the game itself.
+ * The class also includes an abstract method getProcessor() that returns a {@link Stage} object.
+ * Each subclass of BaseScreen must implement this method.
+ */
+public abstract class BaseScreen implements Screen {
+    /**
+     * The GdxGame instance for the BaseScreen class.
+     * This instance represents the game itself.
+     */
+    protected final GdxGame game;
+
+    /**
+     * Constructor for the BaseScreen class.
+     * This constructor initializes the GdxGame instance with the provided game.
+     * @param game the GdxGame instance representing the game
+     */
+<span class="nc" id="L26">    protected BaseScreen(GdxGame game) {</span>
+<span class="nc" id="L27">        this.game = game;</span>
+<span class="nc" id="L28">    }</span>
+
+    /**
+     * Get the processor for the screen.
+     * This is an abstract method that returns a {@link Stage} object.
+     * Each subclass of BaseScreen must implement this method.
+     * @return the processor for the screen
+     */
+    public abstract Stage getProcessor();
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

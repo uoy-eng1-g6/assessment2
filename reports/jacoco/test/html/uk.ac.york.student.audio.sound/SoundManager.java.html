@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SoundManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.audio.sound</a> &gt; <span class="el_source">SoundManager.java</span></div><h1>SoundManager.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.audio.sound;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import lombok.Getter;
+import uk.ac.york.student.audio.AudioManager;
+
+/**
+ * Singleton class that manages the sound for the game.
+ * It implements the AudioManager interface and controls the game sounds.
+ */
+// CHANGE refactor class with cached hash map to fix issues
+public class SoundManager implements AudioManager {
+    /**
+     * The instance of the sound manager.
+     * It is a static final instance of SoundManager.
+     */
+<span class="nc" id="L18">    @Getter</span>
+<span class="nc" id="L19">    private static final SoundManager instance = new SoundManager();</span>
+
+<span class="nc" id="L21">    private final HashMap&lt;Sounds, GameSound&gt; soundCache = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Private constructor to prevent instantiation.
+     * As this is a singleton class, the constructor is private.
+     */
+<span class="nc" id="L27">    private SoundManager() {}</span>
+
+    public GameSound getSound(Sounds sound) {
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if (soundCache.containsKey(sound)) {</span>
+<span class="nc" id="L31">            return soundCache.get(sound);</span>
+        }
+
+        try {
+<span class="nc" id="L35">            soundCache.put(sound, sound.getSoundClass().getDeclaredConstructor().newInstance());</span>
+<span class="nc" id="L36">        } catch (InstantiationException</span>
+                | NoSuchMethodException
+                | InvocationTargetException
+                | IllegalAccessException e) {
+<span class="nc" id="L40">            throw new RuntimeException(e);</span>
+<span class="nc" id="L41">        }</span>
+
+<span class="nc" id="L43">        return getSound(sound);</span>
+    }
+
+    /**
+     * Called when the game is started.
+     * This method is part of the AudioManager interface.
+     */
+    @Override
+<span class="nc" id="L51">    public void onEnable() {}</span>
+
+    /**
+     * Called when the game is stopped.
+     * This method is part of the AudioManager interface.
+     * It disposes all the game sounds.
+     */
+    @Override
+    public void onDisable() {
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        for (var sound : soundCache.values()) {</span>
+<span class="nc" id="L61">            sound.dispose();</span>
+<span class="nc" id="L62">        }</span>
+<span class="nc" id="L63">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

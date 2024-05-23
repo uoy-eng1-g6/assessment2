@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DebugRenderer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.debug</a> &gt; <span class="el_source">DebugRenderer.java</span></div><h1>DebugRenderer.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.debug;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import space.earlygrey.shapedrawer.ShapeDrawer;
+import uk.ac.york.student.player.Player;
+
+/**
+ * Class used to render debug bounding boxes in in-game overlay.
+ */
+// CHANGE new class
+public class DebugRenderer {
+    private final ShapeDrawer shapeDrawer;
+
+    private final Player player;
+
+<span class="nc" id="L22">    private Integer tileWidth = null;</span>
+<span class="nc" id="L23">    private Integer tileHeight = null;</span>
+
+    /**
+     * Class used to render debug bounding boxes in in-game overlay.
+     *
+     * @param player Player object which contains the bounding boxes to draw.
+     * @param batch Batch object to use when drawing the bounding boxes.
+     */
+<span class="nc" id="L31">    public DebugRenderer(Player player, Batch batch) {</span>
+<span class="nc" id="L32">        this.player = player;</span>
+<span class="nc" id="L33">        var texture = new Texture(Gdx.files.internal(&quot;white_pixel.png&quot;));</span>
+<span class="nc" id="L34">        this.shapeDrawer = new ShapeDrawer(batch, new TextureRegion(texture, 0, 0, 1, 1));</span>
+<span class="nc" id="L35">    }</span>
+
+    /**
+     * Method to set the map when changed, to let the DebugRenderer update.
+     * @param map TiledMap object of the map being changed to.
+     */
+    public void setMap(TiledMap map) {
+<span class="nc" id="L42">        var layer = (TiledMapTileLayer) map.getLayers().get(0);</span>
+<span class="nc" id="L43">        tileWidth = layer.getTileWidth();</span>
+<span class="nc" id="L44">        tileHeight = layer.getTileHeight();</span>
+<span class="nc" id="L45">    }</span>
+
+    public void render() {
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (tileWidth == null) {</span>
+<span class="nc" id="L49">            return;</span>
+        }
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (var object : player.getTileObjectBoundingBoxes().values()) {</span>
+<span class="nc" id="L53">            shapeDrawer.rectangle(</span>
+<span class="nc" id="L54">                    object.x * tileWidth,</span>
+<span class="nc" id="L55">                    object.y * tileHeight,</span>
+<span class="nc" id="L56">                    object.width * tileWidth,</span>
+<span class="nc" id="L57">                    object.height * tileHeight,</span>
+                    Color.RED,
+                    0.5f);
+<span class="nc" id="L60">        }</span>
+<span class="nc" id="L61">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

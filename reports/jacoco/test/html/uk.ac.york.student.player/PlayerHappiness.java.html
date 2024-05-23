@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayerHappiness.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.player</a> &gt; <span class="el_source">PlayerHappiness.java</span></div><h1>PlayerHappiness.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.player;
+
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import org.jetbrains.annotations.Range;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
+import uk.ac.york.student.game.GameTime;
+
+/**
+ * The PlayerHappiness class implements the PlayerMetric interface.
+ * This class is responsible for managing the happiness level of a player in the game.
+ * It includes methods to get, set, increase, and decrease the happiness level.
+ * It also includes methods to get a ProgressBar representing the happiness level and a label for the happiness level.
+ */
+public class PlayerHappiness implements PlayerMetric {
+    /**
+     * The ProgressBar instance for the PlayerHappiness class.
+     * This ProgressBar represents the happiness level of the player in the game.
+     * The minimum value is 0 (not happy), the maximum value is 1 (very happy), and the step size is 0.1.
+     * The ProgressBar does not have a vertical orientation (false), and uses the craftacular skin.
+     */
+    // CHANGE update progress bar initialization to fit with changes
+<span class="fc" id="L23">    private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));</span>
+
+    /**
+     * Constructor for the PlayerHappiness class.
+     * This constructor initializes the ProgressBar representing the player's happiness level.
+     */
+<span class="fc" id="L29">    public PlayerHappiness() {</span>
+        // CHANGE set progress bar size instead of width and height
+<span class="fc" id="L31">        progressBar.setSize(100, 20);</span>
+<span class="fc" id="L32">        progressBar.setAnimateDuration(0.25f);</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * The happiness level of the player.
+     * This is a float value ranging from 0 to 1, where 0 represents not happy and 1 represents very happy.
+     * It is initially set to 1, indicating that the player starts the game being very happy.
+     */
+<span class="fc" id="L40">    private @Range(from = 0, to = 1) float happiness = getDefault();</span>
+
+    /**
+     * The total amount of happiness accumulated by the player across all days of the game.
+     * This is a float value that starts at 0 and increases as the player becomes happier.
+     * This value is incremented when the player sleeps based on what their happiness level is at that given time.
+     */
+<span class="fc" id="L47">    private float totalHappiness = 0f;</span>
+
+    /**
+     * Returns the maximum total happiness that a player can accumulate.
+     * This is equivalent to the number of days in the game, as represented by {@link GameTime#getDays()}.
+     *
+     * @return the maximum total happiness that a player can accumulate
+     */
+    public float getMaxTotal() {
+<span class="nc" id="L56">        return GameTime.getDays();</span>
+    }
+
+    /**
+     * Returns the total amount of happiness accumulated by the player.
+     *
+     * @return the total amount of happiness accumulated by the player
+     */
+    public float getTotal() {
+<span class="nc" id="L65">        return totalHappiness;</span>
+    }
+
+    /**
+     * Sets the total amount of happiness accumulated by the player.
+     *
+     * @param total the new total amount of happiness accumulated by the player
+     */
+    public void setTotal(float total) {
+<span class="nc" id="L74">        this.totalHappiness = total;</span>
+<span class="nc" id="L75">    }</span>
+
+    /**
+     * Increases the total amount of happiness accumulated by the player by a specified amount.
+     *
+     * @param amount the amount of happiness to add to the total
+     */
+    public void increaseTotal(float amount) {
+<span class="nc" id="L83">        this.totalHappiness += amount;</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     * This method is used to get the default happiness level for a player.
+     * The default happiness level is set to 1.0, indicating that a player starts the game at full happiness.
+     *
+     * @return float This returns the default happiness level of 1.0.
+     */
+    @Override
+    public float getDefault() {
+        // CHANGE set default to 0.5 per day to improve balance and consistency between stats
+<span class="fc" id="L95">        return 0.5f;</span>
+    }
+    /**
+     * Getter method for the happiness level of the player.
+     * This method returns the current happiness level of the player.
+     * The happiness level is a float value ranging from 0 to 1, where 0 represents not happy and 1 represents very happy.
+     * @return the current happiness level of the player.
+     */
+    @Override
+    public @Range(from = 0, to = 1) float get() {
+<span class="fc" id="L105">        return happiness;</span>
+    }
+
+    /**
+     * Set the happiness level of the player.
+     * This method takes a float value between 0 and 1 as an argument, where 0 represents not happy and 1 represents very happy.
+     * The happiness level is then set to the maximum of the minimum happiness level ({@link PlayerMetric#PROGRESS_BAR_MINIMUM}) and the minimum of 1 and the provided happiness level.
+     * This ensures that the happiness level is always within the valid range.
+     * @param happiness the new happiness level of the player
+     */
+    @Override
+    public void set(@Range(from = 0, to = 1) float happiness) {
+<span class="fc" id="L117">        this.happiness = Math.max(PROGRESS_BAR_MINIMUM, Math.min(1, happiness));</span>
+<span class="fc" id="L118">        this.progressBar.setValue(this.happiness);</span>
+<span class="fc" id="L119">    }</span>
+
+    /**
+     * Increase the happiness level of the player.
+     * This method takes a float value as an argument, which represents the amount to increase the happiness level by.
+     * The happiness level after the increase is the minimum of 1 and the sum of the current happiness level and the provided amount.
+     * This ensures that the happiness level does not exceed 1.
+     * @param amount the amount to increase the happiness level by
+     */
+    @Override
+    public void increase(float amount) {
+<span class="fc" id="L130">        set(Math.min(1, happiness + amount));</span>
+<span class="fc" id="L131">    }</span>
+
+    /**
+     * Decrease the happiness level of the player.
+     * This method takes a float value as an argument, which represents the amount to decrease the happiness level by.
+     * The happiness level after the decrease is the maximum of the minimum happiness level ({@link PlayerMetric#PROGRESS_BAR_MINIMUM}) and the difference between the current happiness level and the provided amount.
+     * This ensures that the happiness level does not go below the minimum happiness level.
+     * @param amount the amount to decrease the happiness level by
+     */
+    @Override
+    public void decrease(float amount) {
+<span class="fc" id="L142">        set(Math.max(PROGRESS_BAR_MINIMUM, happiness - amount));</span>
+<span class="fc" id="L143">    }</span>
+
+    /**
+     * Get the ProgressBar representing the happiness level of the player.
+     * This method sets the value of the ProgressBar to the current happiness level of the player and then returns the ProgressBar.
+     * The ProgressBar represents the happiness level of the player in the game, with a minimum value of 0 (not happy) and a maximum value of 1 (very happy).
+     * @return the ProgressBar representing the happiness level of the player.
+     */
+    @Override
+    public ProgressBar getProgressBar() {
+<span class="nc" id="L153">        progressBar.setValue(get());</span>
+<span class="nc" id="L154">        return progressBar;</span>
+    }
+
+    /**
+     * Get the label used to display on the screen for the player's happiness level.
+     * @return the label for the player's happiness level
+     */
+    @Override
+    public String getLabel() {
+<span class="nc" id="L163">        return &quot;Happiness&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

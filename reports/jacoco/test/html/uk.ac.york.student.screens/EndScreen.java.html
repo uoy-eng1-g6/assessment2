@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EndScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.screens</a> &gt; <span class="el_source">EndScreen.java</span></div><h1>EndScreen.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.york.student.GdxGame;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
+import uk.ac.york.student.audio.sound.GameSound;
+import uk.ac.york.student.audio.sound.SoundManager;
+import uk.ac.york.student.audio.sound.Sounds;
+import uk.ac.york.student.player.PlayerMetrics;
+import uk.ac.york.student.player.PlayerStreaks;
+import uk.ac.york.student.score.ScoreManager;
+import uk.ac.york.student.settings.DebugScreenPreferences;
+import uk.ac.york.student.settings.GamePreferences;
+
+@Getter
+public class EndScreen extends BaseScreen {
+<span class="nc" id="L31">    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);</span>
+
+<span class="nc" id="L33">    private final Stage processor;</span>
+<span class="nc" id="L34">    private final Table table;</span>
+
+<span class="nc" id="L36">    private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);</span>
+
+<span class="nc" id="L38">    private final PlayerMetrics playerMetrics;</span>
+<span class="nc" id="L39">    private final PlayerStreaks playerStreaks;</span>
+
+<span class="nc" id="L41">    private final TextField nameInput;</span>
+<span class="nc" id="L42">    private String playerName = &quot;&quot;;</span>
+
+    public EndScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime, Object @NotNull [] args) {
+<span class="nc" id="L45">        super(game);</span>
+<span class="nc" id="L46">        processor = new Stage(new ScreenViewport());</span>
+
+        // CHANGE get metrics and streaks from args
+<span class="nc" id="L49">        nameInput = new TextField(&quot;&quot;, skin);</span>
+<span class="nc" id="L50">        nameInput.setMaxLength(12);</span>
+
+<span class="nc" id="L52">        table = new Table();</span>
+<span class="nc" id="L53">        table.setDebug(((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled());</span>
+<span class="nc" id="L54">        table.setFillParent(true);</span>
+<span class="nc" id="L55">        table.pad(20);</span>
+<span class="nc" id="L56">        processor.addActor(table);</span>
+
+<span class="nc" id="L58">        playerMetrics = (PlayerMetrics) args[0];</span>
+<span class="nc" id="L59">        playerStreaks = (PlayerStreaks) args[1];</span>
+
+        // CHANGE do not calculate the score here, separate functionality into different class
+
+<span class="nc" id="L63">        Gdx.input.setInputProcessor(processor);</span>
+
+<span class="nc" id="L65">        makeNameInputLayout();</span>
+<span class="nc" id="L66">    }</span>
+
+    void makeNameInputLayout() {
+<span class="nc" id="L69">        table.clear();</span>
+
+<span class="nc" id="L71">        var label = new Label(&quot;Enter Name:&quot;, skin);</span>
+<span class="nc" id="L72">        table.add(label).center();</span>
+<span class="nc" id="L73">        table.row();</span>
+
+<span class="nc" id="L75">        table.add(nameInput).width(150).center();</span>
+<span class="nc" id="L76">        table.row();</span>
+
+<span class="nc" id="L78">        var submitButton = new TextButton(&quot;Submit&quot;, skin);</span>
+<span class="nc" id="L79">        submitButton.addListener(new ChangeListener() {</span>
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">                if (nameInput.getText().isEmpty()) {</span>
+<span class="nc" id="L83">                    return;</span>
+                }
+
+<span class="nc" id="L86">                playerName = nameInput.getText();</span>
+<span class="nc" id="L87">                makeScoreDisplayLayout();</span>
+<span class="nc" id="L88">            }</span>
+        });
+<span class="nc" id="L90">        table.add(submitButton).center();</span>
+<span class="nc" id="L91">    }</span>
+
+    void makeScoreDisplayLayout() {
+<span class="nc" id="L94">        table.clear();</span>
+
+<span class="nc" id="L96">        var isDebug = ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled();</span>
+        // Achievements
+<span class="nc" id="L98">        var achievementsTable = new Table();</span>
+<span class="nc" id="L99">        achievementsTable.setDebug(isDebug);</span>
+
+<span class="nc" id="L101">        var achievementsTitle = new Label(&quot;Achievements&quot;, skin);</span>
+<span class="nc" id="L102">        achievementsTable.add(achievementsTitle).center().padBottom(20).row();</span>
+
+<span class="nc" id="L104">        var achievements = playerStreaks.getAchievements();</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (achievements.isEmpty()) {</span>
+<span class="nc" id="L106">            var label = new Label(&quot;Nothing to see here...&quot;, skin);</span>
+<span class="nc" id="L107">            label.setFontScale(0.7f);</span>
+<span class="nc" id="L108">            achievementsTable.add(label).center().row();</span>
+<span class="nc" id="L109">        } else {</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">            for (var achievement : achievements) {</span>
+<span class="nc" id="L111">                var label = new Label(achievement, skin);</span>
+<span class="nc" id="L112">                label.setFontScale(0.7f);</span>
+<span class="nc" id="L113">                achievementsTable.add(label).center().row();</span>
+<span class="nc" id="L114">            }</span>
+        }
+
+        // Highscores
+<span class="nc" id="L118">        var highScores = ScoreManager.getTop10Scores();</span>
+
+<span class="nc" id="L120">        var highScoresTable = new Table();</span>
+<span class="nc" id="L121">        highScoresTable.setDebug(isDebug);</span>
+
+<span class="nc" id="L123">        var highscoresTitle = new Label(&quot;Highscores&quot;, skin);</span>
+<span class="nc" id="L124">        highScoresTable.add(highscoresTitle).center().padBottom(20).row();</span>
+
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        for (var highScore : highScores) {</span>
+<span class="nc" id="L127">            var label = new Label(String.valueOf(highScore), skin);</span>
+<span class="nc" id="L128">            label.setFontScale(0.7f);</span>
+<span class="nc" id="L129">            highScoresTable.add(label).center().row();</span>
+<span class="nc" id="L130">        }</span>
+
+        // Score
+<span class="nc" id="L133">        var score = ScoreManager.calculateScore(</span>
+<span class="nc" id="L134">                playerMetrics.getStudyLevel().getTotal(),</span>
+<span class="nc" id="L135">                playerMetrics.getStudyLevel().getMaxTotal(),</span>
+<span class="nc" id="L136">                playerMetrics.getHappiness().getTotal(),</span>
+<span class="nc" id="L137">                playerMetrics.getHappiness().getMaxTotal(),</span>
+                playerStreaks);
+<span class="nc" id="L139">        var actualScore = (int) Math.floor(score * 100);</span>
+<span class="nc" id="L140">        ScoreManager.saveScore(playerName, actualScore);</span>
+<span class="nc" id="L141">        var scoreString = ScoreManager.convertScoreToString(score);</span>
+
+<span class="nc" id="L143">        var scoreTable = new Table();</span>
+<span class="nc" id="L144">        scoreTable.setDebug(isDebug);</span>
+
+<span class="nc" id="L146">        var scoreTitle = new Label(</span>
+<span class="nc bnc" id="L147" title="All 4 branches missed.">                highScores.isEmpty() || (actualScore &gt; highScores.get(0).getRight()) ? &quot;NEW HIGHSCORE&quot; : &quot;Final Score:&quot;,</span>
+                skin);
+<span class="nc" id="L149">        scoreTable.add(scoreTitle).center().padBottom(20).row();</span>
+
+<span class="nc" id="L151">        var scoreNumberLabel = new Label(String.valueOf(actualScore), skin);</span>
+<span class="nc" id="L152">        scoreNumberLabel.setFontScale(0.7f);</span>
+<span class="nc" id="L153">        var scoreStringLabel = new Label(scoreString, skin);</span>
+<span class="nc" id="L154">        scoreStringLabel.setFontScale(0.7f);</span>
+
+<span class="nc" id="L156">        scoreTable.add(scoreNumberLabel).center().row();</span>
+<span class="nc" id="L157">        scoreTable.add(scoreStringLabel).center().row();</span>
+
+        // Add sub-tables to root
+<span class="nc" id="L160">        table.add(achievementsTable).center().top().uniformX().space(20);</span>
+<span class="nc" id="L161">        table.add(scoreTable).center().top().uniformX().space(20);</span>
+<span class="nc" id="L162">        table.add(highScoresTable).center().top().uniformX().space(20);</span>
+<span class="nc" id="L163">        table.row();</span>
+
+        // Add UI buttons
+<span class="nc" id="L166">        var mainMenuButton = new TextButton(&quot;Main Menu&quot;, skin);</span>
+<span class="nc" id="L167">        mainMenuButton.addListener(new ChangeListener() {</span>
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L170">                buttonClick.play();</span>
+<span class="nc" id="L171">                game.transitionScreen(Screens.MAIN_MENU);</span>
+<span class="nc" id="L172">            }</span>
+        });
+<span class="nc" id="L174">        var quitButton = new TextButton(&quot;Exit&quot;, skin);</span>
+<span class="nc" id="L175">        quitButton.addListener(new ChangeListener() {</span>
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L178">                buttonClick.play();</span>
+<span class="nc" id="L179">                Gdx.app.exit();</span>
+<span class="nc" id="L180">            }</span>
+        });
+
+<span class="nc" id="L183">        var buttonTable = new Table();</span>
+<span class="nc" id="L184">        buttonTable.setDebug(isDebug);</span>
+
+<span class="nc" id="L186">        buttonTable.add(mainMenuButton).padRight(5);</span>
+<span class="nc" id="L187">        buttonTable.add(quitButton).padLeft(5);</span>
+
+<span class="nc" id="L189">        table.add(buttonTable).padTop(20).center().colspan(3);</span>
+<span class="nc" id="L190">    }</span>
+
+    // CHANGE render method implemented to render end screen
+    @Override
+<span class="nc" id="L194">    public void show() {}</span>
+
+    @Override
+    public void render(float v) {
+<span class="nc" id="L198">        ScreenUtils.clear(Color.BLACK);</span>
+
+<span class="nc" id="L200">        processor.act(v);</span>
+<span class="nc" id="L201">        processor.draw();</span>
+<span class="nc" id="L202">    }</span>
+
+    @Override
+<span class="nc" id="L205">    public void resize(int i, int i1) {}</span>
+
+    @Override
+<span class="nc" id="L208">    public void pause() {}</span>
+
+    @Override
+<span class="nc" id="L211">    public void resume() {}</span>
+
+    // CHANGE hide method implemented
+    @Override
+    public void hide() {
+<span class="nc" id="L216">        processor.clear();</span>
+<span class="nc" id="L217">    }</span>
+
+    // CHANGE dispose method implemented
+    @Override
+    public void dispose() {
+<span class="nc" id="L222">        processor.dispose();</span>
+<span class="nc" id="L223">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

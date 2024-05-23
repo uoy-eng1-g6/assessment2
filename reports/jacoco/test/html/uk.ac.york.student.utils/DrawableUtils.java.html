@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DrawableUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.utils</a> &gt; <span class="el_source">DrawableUtils.java</span></div><h1>DrawableUtils.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.utils;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Utility class for creating {@link Drawable}'s with specific colours.
+ * This class is marked with Lombok's {@link UtilityClass}, which means it has an implicit private constructor.
+ * All methods in this class should be static.
+ */
+@UtilityClass
+<span class="nc" id="L18">public class DrawableUtils {</span>
+    /**
+     * Creates a {@link Drawable} with the specified width, height and colour.
+     *
+     * @param width  The width of the {@link Drawable} to be created.
+     * @param height The height of the {@link Drawable} to be created.
+     * @param color  The colour of the {@link Drawable} to be created.
+     * @return A {@link Drawable} of the specified width, height and colour.
+     */
+    public static @NotNull Drawable getColouredDrawable(int width, int height, Color color) {
+        // Create a new Pixmap with the specified width, height, and format.
+<span class="fc" id="L29">        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);</span>
+
+        // Set the color of the Pixmap to the specified color.
+<span class="fc" id="L32">        pixmap.setColor(color);</span>
+
+        // Fill the Pixmap with the specified color.
+<span class="fc" id="L35">        pixmap.fill();</span>
+
+        // Create a new Texture from the Pixmap, then create a new TextureRegion from the Texture.
+        // Finally, create a new TextureRegionDrawable from the TextureRegion.
+<span class="fc" id="L39">        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));</span>
+
+        // Dispose of the Pixmap to free up memory resources.
+<span class="fc" id="L42">        pixmap.dispose();</span>
+
+        // Return the created TextureRegionDrawable.
+<span class="fc" id="L45">        return drawable;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

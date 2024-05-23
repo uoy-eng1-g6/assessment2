@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ScoreManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.score</a> &gt; <span class="el_source">ScoreManager.java</span></div><h1>ScoreManager.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.score;
+
+import com.badlogic.gdx.Gdx;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.experimental.UtilityClass;
+import uk.ac.york.student.player.PlayerStreaks;
+import uk.ac.york.student.utils.Pair;
+
+/**
+ * Utility class to manage the scores and save them using a local database.
+ */
+// CHANGE new class
+@UtilityClass
+<span class="nc" id="L19">public class ScoreManager {</span>
+    static final String SCHEMA = (&quot;CREATE TABLE IF NOT EXISTS scores (&quot;
+            + &quot;id INTEGER PRIMARY KEY AUTO_INCREMENT,&quot;
+            + &quot;name VARCHAR(12) NOT NULL,&quot;
+            + &quot;score INTEGER NOT NULL&quot;
+            + &quot;);&quot;);
+    static final String SAVE_SCORE = &quot;INSERT INTO scores (name, score) VALUES (?, ?);&quot;;
+    static final String GET_TOP_10_SCORES = &quot;SELECT name, score FROM scores ORDER BY score DESC LIMIT 10;&quot;;
+
+<span class="fc" id="L28">    private static Driver driver = null;</span>
+
+    static String getDatabaseUrl() {
+<span class="nc" id="L31">        return &quot;jdbc:h2:file:&quot;</span>
+                + Gdx.files
+<span class="nc" id="L33">                        .absolute(Gdx.files.getExternalStoragePath())</span>
+<span class="nc" id="L34">                        .child(&quot;LetRonCooke/scores.h2&quot;)</span>
+<span class="nc" id="L35">                        .path();</span>
+    }
+
+    static Connection getConnection() {
+<span class="nc" id="L39">        Gdx.files.external(&quot;LetRonCooke&quot;).mkdirs();</span>
+        try {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            if (driver == null) {</span>
+<span class="nc" id="L42">                driver = DriverManager.getDriver(getDatabaseUrl());</span>
+            }
+
+<span class="nc" id="L45">            var conn = driver.connect(getDatabaseUrl(), null);</span>
+<span class="nc" id="L46">            conn.setAutoCommit(true);</span>
+<span class="nc" id="L47">            return conn;</span>
+<span class="nc" id="L48">        } catch (SQLException e) {</span>
+<span class="nc" id="L49">            throw new RuntimeException(e);</span>
+        }
+    }
+
+    public static void initScoresDatabase() {
+<span class="fc" id="L54">        try (var conn = getConnection()) {</span>
+<span class="fc" id="L55">            conn.prepareStatement(SCHEMA).execute();</span>
+<span class="nc" id="L56">        } catch (SQLException e) {</span>
+<span class="nc" id="L57">            throw new RuntimeException(e);</span>
+<span class="fc" id="L58">        }</span>
+<span class="fc" id="L59">    }</span>
+
+    public static void saveScore(String name, int score) {
+<span class="fc" id="L62">        try (var conn = getConnection()) {</span>
+<span class="fc" id="L63">            var stmt = conn.prepareStatement(SAVE_SCORE);</span>
+<span class="fc" id="L64">            stmt.setString(1, name);</span>
+<span class="fc" id="L65">            stmt.setInt(2, score);</span>
+<span class="fc" id="L66">            stmt.execute();</span>
+<span class="nc" id="L67">        } catch (SQLException e) {</span>
+<span class="nc" id="L68">            throw new RuntimeException(e);</span>
+<span class="fc" id="L69">        }</span>
+<span class="fc" id="L70">    }</span>
+
+    public static List&lt;Pair&lt;String, Integer&gt;&gt; getTop10Scores() {
+<span class="fc" id="L73">        List&lt;Pair&lt;String, Integer&gt;&gt; scores = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L74">        try (var conn = getConnection()) {</span>
+<span class="fc" id="L75">            var results = conn.prepareStatement(GET_TOP_10_SCORES).executeQuery();</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            while (results.next()) {</span>
+<span class="fc" id="L77">                scores.add(Pair.of(results.getString(&quot;name&quot;), results.getInt(&quot;score&quot;)));</span>
+            }
+<span class="nc" id="L79">        } catch (SQLException e) {</span>
+<span class="nc" id="L80">            throw new RuntimeException(e);</span>
+<span class="fc" id="L81">        }</span>
+
+<span class="fc" id="L83">        return scores;</span>
+    }
+
+    /**
+     * Method used to calculate the score of the player.
+     *
+     * @param studyLevel The total study level achieved by the player over their time playing.
+     * @param maxStudyLevel The max study level achievable by the player over their time playing.
+     * @param happiness The total happiness achieved by the player over their time playing.
+     * @param maxHappiness The max happiness achievable by the player over their time playing.
+     * @param streaks PlayerStreaks object with the status of the player's streaks.
+     * @return A score between 0 and 100 deciding how well the player did in their time playing.
+     */
+    public static float calculateScore(
+            float studyLevel, float maxStudyLevel, float happiness, float maxHappiness, PlayerStreaks streaks) {
+<span class="nc" id="L98">        int maxScore = 100;</span>
+<span class="nc" id="L99">        var achievements = streaks.getAchievements();</span>
+<span class="nc" id="L100">        int numOfStreaks = streaks.getStreaks().size();</span>
+        // reserve percentForStreaks% for streaks
+<span class="nc" id="L102">        float percentForStreaks = 24f;</span>
+<span class="nc" id="L103">        float achievementsWeighting = percentForStreaks / numOfStreaks;</span>
+
+<span class="nc" id="L105">        float metricWeighting = (maxScore - percentForStreaks) / (maxHappiness + maxStudyLevel);</span>
+
+<span class="nc" id="L107">        float achievementsScore = achievements.size() * achievementsWeighting;</span>
+<span class="nc" id="L108">        float studyScore = studyLevel * metricWeighting;</span>
+<span class="nc" id="L109">        float happinessScore = happiness * metricWeighting;</span>
+
+<span class="nc" id="L111">        var totalScore = studyScore + happinessScore + achievementsScore;</span>
+<span class="nc" id="L112">        return Math.min(100, Math.max(0, totalScore));</span>
+    }
+
+    /**
+     * Method to convert a score between 0 and 100 to honours.
+     *
+     * @param score A float of the player's score.
+     * @return A String of the player's honours.
+     */
+    public static String convertScoreToString(float score) {
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (score &gt;= 70) {</span>
+<span class="nc" id="L123">            return &quot;First-class Honours&quot;;</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        } else if (score &gt;= 60) {</span>
+<span class="nc" id="L125">            return &quot;Upper second-class Honours&quot;;</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        } else if (score &gt;= 50) {</span>
+<span class="nc" id="L127">            return &quot;Lower second-class Honours&quot;;</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        } else if (score &gt;= 40) {</span>
+<span class="nc" id="L129">            return &quot;Third-class Honours&quot;;</span>
+        } else {
+<span class="nc" id="L131">            return &quot;Fail&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

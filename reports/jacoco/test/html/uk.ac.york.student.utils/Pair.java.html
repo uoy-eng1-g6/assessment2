@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pair.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.utils</a> &gt; <span class="el_source">Pair.java</span></div><h1>Pair.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.utils;
+
+import lombok.Getter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * The {@link Pair} class represents a pair of two objects of any type.
+ * It is a generic class that takes two type parameters: T and U.
+ * The objects are stored in the fields {@link Pair#left} and {@link Pair#right}.
+ *
+ * @param &lt;T&gt; the type of the first object in the pair
+ * @param &lt;U&gt; the type of the second object in the pair
+ */
+@Getter
+public class Pair&lt;T, U&gt; {
+    /**
+     * The first object in the pair.
+     */
+<span class="fc" id="L20">    private final T left;</span>
+
+    /**
+     * The second object in the pair.
+     */
+<span class="fc" id="L25">    private final U right;</span>
+
+    /**
+     * Constructs a new {@link Pair} with the specified objects.
+     *
+     * @param left the first object in the pair
+     * @param right the second object in the pair
+     */
+<span class="fc" id="L33">    public Pair(T left, U right) {</span>
+<span class="fc" id="L34">        this.left = left;</span>
+<span class="fc" id="L35">        this.right = right;</span>
+<span class="fc" id="L36">    }</span>
+
+    /**
+     * Creates a new {@link Pair} with the specified objects.
+     * This is a convenience static factory method.
+     *
+     * @param left the first object in the pair
+     * @param right the second object in the pair
+     * @param &lt;T&gt; the type of the first object in the pair
+     * @param &lt;U&gt; the type of the second object in the pair
+     * @return a new {@link Pair} with the specified objects
+     */
+    @Contract(value = &quot;_, _ -&gt; new&quot;, pure = true)
+    public static &lt;T, U&gt; @NotNull Pair&lt;T, U&gt; of(T left, U right) {
+<span class="fc" id="L50">        return new Pair&lt;&gt;(left, right);</span>
+    }
+
+    /**
+     * Returns a {@link String} representation of the {@link Pair}.
+     * The string representation is of the form &quot;({@link Pair#left}, {@link Pair#right})&quot;.
+     *
+     * @return a {@link String} representation of the {@link Pair}
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L61">        return &quot;(&quot; + left + &quot;, &quot; + right + &quot;)&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameMusic.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.audio.music</a> &gt; <span class="el_source">GameMusic.java</span></div><h1>GameMusic.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.audio.music;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import lombok.Getter;
+import org.jetbrains.annotations.Range;
+
+/**
+ * This abstract class implements the Music interface and serves as a base class for game music.
+ * It provides common functionality for managing game music, such as play, pause, stop, and loop controls.
+ */
+@Getter
+public abstract class GameMusic implements Music {
+    /**
+     * Music object that this GameMusic wraps around
+     */
+<span class="nc" id="L17">    protected final Music music;</span>
+
+    /**
+     * Constructor for the GameMusic class.
+     * It initialises the object with the given path to the music file.
+     * @param path The internal path to the music file (in assets folder)
+     */
+<span class="nc" id="L24">    protected GameMusic(final String path) {</span>
+<span class="nc" id="L25">        music = Gdx.audio.newMusic(Gdx.files.internal(path));</span>
+<span class="nc" id="L26">    }</span>
+
+    /**
+     * Starts playing the music.
+     */
+    @Override
+    public void play() {
+<span class="nc" id="L33">        music.play();</span>
+<span class="nc" id="L34">    }</span>
+
+    /**
+     * Pauses the music.
+     */
+    @Override
+    public void pause() {
+<span class="nc" id="L41">        music.pause();</span>
+<span class="nc" id="L42">    }</span>
+
+    /**
+     * Stops the music.
+     */
+    @Override
+    public void stop() {
+<span class="nc" id="L49">        music.stop();</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     * Checks if the music is currently playing.
+     * @return True if the music is playing, false otherwise
+     */
+    @Override
+    public boolean isPlaying() {
+<span class="nc" id="L58">        return music.isPlaying();</span>
+    }
+
+    /**
+     * Sets whether the music should loop.
+     * @param isLooping whether to loop the stream
+     */
+    @Override
+    public void setLooping(final boolean isLooping) {
+<span class="nc" id="L67">        music.setLooping(isLooping);</span>
+<span class="nc" id="L68">    }</span>
+
+    /**
+     * Checks if the music is currently looping.
+     * @return True if the music is looping, false otherwise
+     */
+    @Override
+    public boolean isLooping() {
+<span class="nc" id="L76">        return music.isLooping();</span>
+    }
+
+    /**
+     * Sets the volume of the music.
+     * @param volume The volume in range [0.0, 1.0]
+     */
+    @Override
+    public void setVolume(@Range(from = 0, to = 1) final float volume) {
+<span class="nc" id="L85">        music.setVolume(volume);</span>
+<span class="nc" id="L86">    }</span>
+
+    /**
+     * Gets the volume of the music.
+     * @return The volume in range [0.0, 1.0]
+     */
+    @Override
+    public @Range(from = 0, to = 1) float getVolume() {
+<span class="nc" id="L94">        return music.getVolume();</span>
+    }
+
+    /**
+     * Sets the panning and volume of the music.
+     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position.
+     * @param volume the volume in the range [0,1].
+     */
+    @Override
+    public void setPan(@Range(from = -1, to = 1) final float pan, @Range(from = 0, to = 1) final float volume) {
+<span class="nc" id="L104">        music.setPan(pan, volume);</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Sets the playback position in seconds.
+     * @param position the position in seconds
+     */
+    @Override
+    public void setPosition(final float position) {
+<span class="nc" id="L113">        music.setPosition(position);</span>
+<span class="nc" id="L114">    }</span>
+
+    /**
+     * Gets the playback position in seconds.
+     * @return the position in seconds
+     */
+    @Override
+    public float getPosition() {
+<span class="nc" id="L122">        return music.getPosition();</span>
+    }
+
+    /**
+     * Disposes of the music.
+     * Needs to be called when the Music is no longer needed.
+     */
+    @Override
+    public void dispose() {
+<span class="nc" id="L131">        music.dispose();</span>
+<span class="nc" id="L132">    }</span>
+
+    /**
+     * Registers a callback to be invoked when the end of a music stream has been reached during playback.
+     * @param listener the callback that will be run.
+     */
+    @Override
+    public void setOnCompletionListener(final OnCompletionListener listener) {
+<span class="nc" id="L140">        music.setOnCompletionListener(listener);</span>
+<span class="nc" id="L141">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

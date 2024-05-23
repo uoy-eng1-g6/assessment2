@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AnimatedInteractable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.interactables</a> &gt; <span class="el_source">AnimatedInteractable.java</span></div><h1>AnimatedInteractable.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.interactables;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * The AnimatedInteractable class extends the Interactable class, adding functionality for animations.
+ */
+// CHANGE new class
+@Getter
+public class AnimatedInteractable extends Interactable {
+<span class="nc" id="L18">    private final float frameDuration;</span>
+<span class="nc" id="L19">    private Animation&lt;TextureRegion&gt; animation;</span>
+<span class="nc" id="L20">    private float stateTime;</span>
+
+<span class="nc" id="L22">    @Setter</span>
+<span class="nc" id="L23">    private boolean animating;</span>
+
+    /**
+     * Constructor for the AnimatedInteractable class.
+     *
+     * @param interactInfo A list of the interactInfo from Tiled. Must be of 4 items: x, y, width, height. This
+     *                     information is stored in Tiled as a string as so: interactInfo: x,y,width,height
+     */
+    public AnimatedInteractable(List&lt;Float&gt; interactInfo) {
+<span class="nc" id="L32">        super(interactInfo);</span>
+        // the duration for the animations, since there are three frames and the fade time is 0.5, 0.5/3=0.167.
+<span class="nc" id="L34">        this.frameDuration = 0.167f;</span>
+<span class="nc" id="L35">        stateTime = 0f;</span>
+<span class="nc" id="L36">        animating = false;</span>
+<span class="nc" id="L37">    }</span>
+
+    /**
+     * Sets the atlas regions for the animation of the AnimatedInteractable.
+     *
+     * @param animationRegions An {@link Array&lt;&gt;} of {@link TextureAtlas.AtlasRegion}.
+     */
+    public void setAnimationRegions(Array&lt;TextureAtlas.AtlasRegion&gt; animationRegions) {
+<span class="nc" id="L45">        this.animation = new Animation&lt;&gt;(frameDuration, animationRegions, Animation.PlayMode.NORMAL);</span>
+<span class="nc" id="L46">        super.setRegion(animation.getKeyFrame(stateTime));</span>
+<span class="nc" id="L47">    }</span>
+
+    /**
+     * Activates the animation.
+     */
+    public void animate() {
+<span class="nc" id="L53">        stateTime += Gdx.graphics.getDeltaTime();</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (stateTime &gt; animation.getFrameDuration() * animation.getKeyFrames().length) {</span>
+<span class="nc" id="L55">            stateTime = 0;</span>
+<span class="nc" id="L56">            animating = false;</span>
+        }
+<span class="nc" id="L58">        TextureRegion currentFrame = animation.getKeyFrame(stateTime, false);</span>
+<span class="nc" id="L59">        super.setRegion(currentFrame);</span>
+<span class="nc" id="L60">        super.draw();</span>
+<span class="nc" id="L61">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

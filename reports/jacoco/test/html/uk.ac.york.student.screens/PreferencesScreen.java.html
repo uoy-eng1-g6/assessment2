@@ -1,0 +1,915 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PreferencesScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.screens</a> &gt; <span class="el_source">PreferencesScreen.java</span></div><h1>PreferencesScreen.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.screens;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import java.util.function.Supplier;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.york.student.GdxGame;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
+import uk.ac.york.student.audio.music.MusicManager;
+import uk.ac.york.student.audio.sound.GameSound;
+import uk.ac.york.student.audio.sound.SoundManager;
+import uk.ac.york.student.audio.sound.Sounds;
+import uk.ac.york.student.settings.*;
+
+/**
+ * This class represents the preferences screen of the game. It extends the {@link BaseScreen} class.
+ * The preferences screen allows the user to adjust various settings of the game such as music volume,
+ * sound volume, enabling/disabling music, enabling/disabling sound, enabling/disabling debug screen,
+ * enabling/disabling main menu clouds, and adjusting the speed of the clouds.
+ * The screen also provides a back button for the user to return to the main menu.
+ * The screen is designed using the libGDX framework and uses a {@link Stage} to manage and render the UI elements.
+ * The UI elements are organized in a {@link Table} for layout purposes.
+ * The class also uses the Singleton pattern for the {@link MusicManager} and {@link SoundManager} classes.
+ */
+public class PreferencesScreen extends BaseScreen {
+    /**
+     * The main processor for the stage where the UI elements are drawn and managed.
+     */
+<span class="nc" id="L41">    @Getter</span>
+    private final Stage processor;
+
+    /**
+     * A flag indicating whether the screen should fade in when shown.
+     */
+    private final boolean shouldFadeIn;
+
+    /**
+     * The time it takes for the screen to fade in, in seconds.
+     * This variable is only used if {@link PreferencesScreen#shouldFadeIn} is true.
+     */
+    private final float fadeInTime;
+
+    /**
+     * An instance of the {@link ScreenData} class that holds references to the UI elements.
+     */
+<span class="nc" id="L58">    private final ScreenData screenData = new ScreenData();</span>
+
+    /**
+     * The main table where the UI elements are laid out.
+     */
+<span class="nc" id="L63">    private final Table table = new Table();</span>
+
+    /**
+     * The sound that is played when a button is clicked.
+     * By default, this is {@link Sounds#BUTTON_CLICK} from {@link SoundManager}
+     */
+    // CHANGE fix logic for changes to SoundManager
+<span class="nc" id="L70">    private final GameSound buttonClick = SoundManager.getInstance().getSound(Sounds.BUTTON_CLICK);</span>
+
+    /**
+     * The texture used for the background of the screen.
+     */
+<span class="nc" id="L75">    private final Texture stoneWallTexture = new Texture(Gdx.files.internal(&quot;images/StoneWall.png&quot;));</span>
+
+    /**
+     * The texture used for the gradient at the bottom of the screen.
+     */
+<span class="nc" id="L80">    private final Texture bottomUpBlackGradient = new Texture(Gdx.files.internal(&quot;images/BottomUpBlackGradient.png&quot;));</span>
+
+    /**
+     * The skin used for the UI.
+     */
+    // CHANGE fix logic for changes to SkinManager
+<span class="nc" id="L86">    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);</span>
+
+    /**
+     * This is an enumeration of labels used in the {@link PreferencesScreen} class.
+     * Each label is associated with a {@link Supplier&lt;String&gt;} that provides the label's text.
+     * The labels are used for various UI elements in the {@link PreferencesScreen}, such as buttons and sliders.
+     * The labels can also include placeholders (e.g. &quot;{0}&quot;) that can be replaced with specific values using the {@link Labels#getLabel(String...)} method.
+     */
+<span class="nc" id="L94">    private enum Labels {</span>
+        /**
+         * The label for the back button.
+         */
+<span class="nc" id="L98">        BACK_BUTTON(&quot;Head Back&quot;),</span>
+
+        /**
+         * The label for the title of the settings screen.
+         */
+<span class="nc" id="L103">        TITLE(&quot;Settings&quot;),</span>
+
+        /**
+         * The label for the music volume control. It includes a placeholder for the current volume level.
+         */
+<span class="nc" id="L108">        MUSIC_VOLUME(&quot;Music Volume {0}&quot;),</span>
+
+        /**
+         * The label for the music toggle button. It includes a placeholder for the current state (ON/OFF).
+         */
+<span class="nc" id="L113">        MUSIC_ENABLED(&quot;Music Toggle: {0}&quot;),</span>
+
+        /**
+         * The label for the sound toggle button. It includes a placeholder for the current state (ON/OFF).
+         */
+<span class="nc" id="L118">        SOUND_ENABLED(&quot;Sound Toggle: {0}&quot;),</span>
+
+        /**
+         * The label for the sound volume control. It includes a placeholder for the current volume level.
+         */
+<span class="nc" id="L123">        SOUND_VOLUME(&quot;Sound Volume {0}&quot;),</span>
+
+        /**
+         * The label for the debug screen toggle button. It includes a placeholder for the current state (ON/OFF).
+         */
+<span class="nc" id="L128">        DEBUG_SCREEN_ENABLED(&quot;Debug Screen Toggle: {0}&quot;),</span>
+
+        /**
+         * The label for the main menu clouds toggle button. It includes a placeholder for the current state (ON/OFF).
+         */
+<span class="nc" id="L133">        MAIN_MENU_CLOUDS_ENABLED(&quot;Main Menu Clouds Toggle: {0}&quot;),</span>
+
+        /**
+         * The label for the clouds speed control. It includes a placeholder for the current speed level.
+         */
+<span class="nc" id="L138">        MAIN_MENU_CLOUDS_SPEED(&quot;Clouds Speed {0}&quot;);</span>
+
+        /**
+         * The supplier that provides the text for the label.
+         */
+        private final Supplier&lt;String&gt; label;
+
+        /**
+         * Calls the supplier to get the text of the label.
+         *
+         * @return The text of the label.
+         */
+        public String getLabel() {
+<span class="nc" id="L151">            return label.get();</span>
+        }
+
+        /**
+         * Returns the text of the label, replacing any placeholders with the provided values.
+         *
+         * @param placeholders The values to replace the placeholders in the label text.
+         * @return The text of the label with placeholders replaced.
+         */
+        public String getLabel(String @NotNull ... placeholders) {
+<span class="nc" id="L161">            String localLabel = this.label.get();</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            for (int i = 0; i &lt; placeholders.length; i++) {</span>
+<span class="nc" id="L163">                localLabel = localLabel.replace(&quot;{&quot; + i + &quot;}&quot;, placeholders[i]);</span>
+            }
+<span class="nc" id="L165">            return localLabel;</span>
+        }
+
+        /**
+         * Constructs a new Labels enumeration value with the given label text.
+         *
+         * @param label The text of the label.
+         */
+<span class="nc" id="L173">        Labels(String label) {</span>
+<span class="nc" id="L174">            this.label = () -&gt; label;</span>
+<span class="nc" id="L175">        }</span>
+    }
+    /**
+     * This is a private static class within the {@link PreferencesScreen} class.
+     * It is used to hold references to the various UI elements that are used in the {@link PreferencesScreen}.
+     * Each field in this class represents a UI element such as a button, slider, or label.
+     * The UI elements are created and initialized in the {@link PreferencesScreen} class and their references are stored in an instance of this class for easy access.
+     * TODO: think of a better name for this class
+     */
+    private static class ScreenData {
+        /**
+         * The toggle button for enabling/disabling music.
+         */
+        private TextButton musicToggleButton;
+
+        /**
+         * The slider for adjusting the music volume.
+         */
+        private Slider musicVolumeSlider;
+
+        /**
+         * The label for displaying the current music volume.
+         */
+        private Label musicVolumeLabel;
+
+        /**
+         * The toggle button for enabling/disabling sound.
+         */
+        private TextButton soundToggleButton;
+
+        /**
+         * The slider for adjusting the sound volume.
+         */
+        private Slider soundVolumeSlider;
+
+        /**
+         * The label for displaying the current sound volume.
+         */
+        private Label soundVolumeLabel;
+
+        /**
+         * The toggle button for enabling/disabling the debug screen.
+         */
+        private TextButton debugScreenToggleButton;
+
+        /**
+         * The toggle button for enabling/disabling the main menu clouds.
+         */
+        private TextButton cloudsToggleButton;
+
+        /**
+         * The slider for adjusting the speed of the clouds.
+         */
+        private Slider cloudsSpeedSlider;
+
+        /**
+         * The label for displaying the current speed of the clouds.
+         */
+        private Label cloudsSpeedLabel;
+
+        /**
+         * The back button for returning to the main menu.
+         */
+        private TextButton backButton;
+    }
+
+    // CHANGE remove unused overloaded constructors
+
+    /**
+     * Constructor for the {@link PreferencesScreen} class.
+     * This constructor initializes a new {@link PreferencesScreen} with the given game instance, fade-in flag, and fade-in time.
+     * If the fade-in flag is true, the screen will fade in when shown with the given fade-in time.
+     * The constructor also initializes the {@link Stage} for the screen and sets it as the {@link Gdx} input processor.
+     *
+     * @param game The {@link GdxGame} game instance to associate with this screen.
+     * @param shouldFadeIn A flag indicating whether the screen should fade in when shown.
+     * @param fadeInTime The time it takes for the screen to fade in, in seconds.
+     */
+    public PreferencesScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime) {
+<span class="nc" id="L254">        super(game);</span>
+<span class="nc" id="L255">        this.shouldFadeIn = shouldFadeIn;</span>
+<span class="nc" id="L256">        this.fadeInTime = fadeInTime;</span>
+<span class="nc" id="L257">        processor = new Stage(new ScreenViewport());</span>
+<span class="nc" id="L258">        Gdx.input.setInputProcessor(processor);</span>
+<span class="nc" id="L259">    }</span>
+
+    /**
+     * This method is called when the {@link PreferencesScreen} is shown.
+     * It initializes the UI elements and sets up the listeners for the UI elements.
+     * If the {@link PreferencesScreen#shouldFadeIn} flag is true, it also sets up a fade-in animation for the screen.
+     */
+    @Override
+    public void show() {
+        // If the screen should fade in when shown, set the alpha of the root actor to 0 and add a fade-in action.
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        if (shouldFadeIn) {</span>
+<span class="nc" id="L270">            processor.getRoot().getColor().a = 0;</span>
+<span class="nc" id="L271">            processor.getRoot().addAction(fadeIn(fadeInTime));</span>
+        }
+
+        // Create and initialize the music toggle button and its listener.
+<span class="nc" id="L275">        createMusicToggleButton();</span>
+<span class="nc" id="L276">        listenMusicToggle();</span>
+
+        // Create and initialize the music volume slider and its label, and set up the listener for the slider.
+<span class="nc" id="L279">        createMusicVolumeSlider();</span>
+<span class="nc" id="L280">        createMusicVolumeLabel();</span>
+<span class="nc" id="L281">        listenMusicVolume();</span>
+
+        // Create and initialize the sound toggle button and its listener.
+<span class="nc" id="L284">        createSoundToggleButton();</span>
+<span class="nc" id="L285">        listenSoundToggle();</span>
+
+        // Create and initialize the sound volume slider and its label, and set up the listener for the slider.
+<span class="nc" id="L288">        createSoundVolumeSlider();</span>
+<span class="nc" id="L289">        createSoundVolumeLabel();</span>
+<span class="nc" id="L290">        listenSoundVolume();</span>
+
+        // Create and initialize the debug screen toggle button and its listener.
+<span class="nc" id="L293">        createDebugScreenToggleButton();</span>
+<span class="nc" id="L294">        listenDebugScreenToggle();</span>
+
+        // Create and initialize the clouds toggle button and its listener.
+<span class="nc" id="L297">        createCloudsToggleButton();</span>
+<span class="nc" id="L298">        listenCloudsToggle();</span>
+
+        // Create and initialize the clouds speed slider and its label, and set up the listener for the slider.
+<span class="nc" id="L301">        createCloudsSpeedSlider();</span>
+<span class="nc" id="L302">        createCloudsSpeedLabel();</span>
+<span class="nc" id="L303">        listenCloudsSpeed();</span>
+
+        // Create and initialize the back button and its listener.
+<span class="nc" id="L306">        createBackButton();</span>
+<span class="nc" id="L307">        listenBackButton();</span>
+
+        // Set up the layout of the UI elements in the table.
+<span class="nc" id="L310">        setupTable();</span>
+<span class="nc" id="L311">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#cloudsSpeedSlider}
+     * When the slider value changes, it updates the speed of the main menu clouds in the {@link MainMenuCloudsPreferences} in the {@link GamePreferences},
+     * and updates the {@link ScreenData#cloudsSpeedLabel} to reflect the current speed using {@link Labels#MAIN_MENU_CLOUDS_SPEED}.
+     * The speed is displayed as a percentage, rounded to the nearest whole number.
+     */
+    private void listenCloudsSpeed() {
+        // Get the slider and label from the screen data
+<span class="nc" id="L321">        Slider cloudsSpeedSlider = screenData.cloudsSpeedSlider;</span>
+<span class="nc" id="L322">        Label cloudsSpeedLabel = screenData.cloudsSpeedLabel;</span>
+
+        // Add a listener to the slider
+<span class="nc" id="L325">        cloudsSpeedSlider.addListener(event -&gt; {</span>
+            // Get the main menu clouds preferences
+<span class="nc" id="L327">            MainMenuCloudsPreferences preference =</span>
+<span class="nc" id="L328">                    (MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference();</span>
+
+            // Update the speed in the preferences
+<span class="nc" id="L331">            preference.setSpeed(cloudsSpeedSlider.getValue());</span>
+
+            // Update the label text with the current speed
+<span class="nc" id="L334">            cloudsSpeedLabel.setText(</span>
+<span class="nc" id="L335">                    Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(cloudsSpeedSlider.getValue() * 100) + &quot;%&quot;));</span>
+
+            // Return true to indicate the event has been handled successfully
+<span class="nc" id="L338">            return true;</span>
+        });
+<span class="nc" id="L340">    }</span>
+
+    /**
+     * This method creates a label for the clouds speed control.
+     * The label text is obtained from the {@link Labels#MAIN_MENU_CLOUDS_SPEED} label in the {@link Labels} enumeration,
+     * and includes the current speed of the clouds as a percentage (rounded to the nearest whole number).
+     * The label is created with the {@link PreferencesScreen#skin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
+     */
+    private void createCloudsSpeedLabel() {
+<span class="nc" id="L349">        screenData.cloudsSpeedLabel = new Label(</span>
+<span class="nc" id="L350">                Labels.MAIN_MENU_CLOUDS_SPEED.getLabel(Math.round(screenData.cloudsSpeedSlider.getValue() * 100) + &quot;%&quot;),</span>
+                skin);
+<span class="nc" id="L352">    }</span>
+
+    /**
+     * This method creates a slider for controlling the speed of the clouds in the main menu.
+     * The slider is created with the following parameters:
+     * - The minimum value is 0 (the clouds are stationary).
+     * - The maximum value is 3 (the clouds move at maximum speed).
+     * - The step size is 0.01 (the smallest change in speed that can be made by moving the slider).
+     * - The slider is horizontal (not vertical).
+     * - The slider uses the {@link PreferencesScreen#skin} skin.
+     * The slider's visual position and value are set to the current speed of the main menu clouds, which is obtained from the {@link GamePreferences#MAIN_MENU_CLOUDS}.
+     * The reference to the slider is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createCloudsSpeedSlider() {
+<span class="nc" id="L366">        screenData.cloudsSpeedSlider = new Slider(0f, 3f, 0.01f, false, skin);</span>
+<span class="nc" id="L367">        screenData.cloudsSpeedSlider.setVisualPercent(</span>
+<span class="nc" id="L368">                ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());</span>
+<span class="nc" id="L369">        screenData.cloudsSpeedSlider.setValue(</span>
+<span class="nc" id="L370">                ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).getSpeed());</span>
+<span class="nc" id="L371">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#cloudsToggleButton}.
+     * When the toggle button is clicked, it plays a button click sound, retrieves the current state of the main menu clouds from the {@link GamePreferences#MAIN_MENU_CLOUDS},
+     * toggles the enabled state of the main menu clouds, and updates the text of the toggle button to reflect the new state.
+     * The new state is obtained by negating the current state (i.e., if the clouds were enabled, they are now disabled, and vice versa).
+     * The text of the toggle button is obtained from the {@link Labels#MAIN_MENU_CLOUDS_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the new state of the clouds (either &quot;ON&quot; or &quot;OFF&quot;).
+     */
+    private void listenCloudsToggle() {
+<span class="nc" id="L382">        TextButton cloudsToggleButton = screenData.cloudsToggleButton;</span>
+<span class="nc" id="L383">        cloudsToggleButton.addListener(new ChangeListener() {</span>
+            /**
+             * This method is triggered when the {@link ScreenData#cloudsToggleButton} is clicked.
+             * It plays a button click sound, retrieves the current state of the {@link GamePreferences#MAIN_MENU_CLOUDS} from the {@link GamePreferences},
+             * toggles the enabled state of the {@link GamePreferences#MAIN_MENU_CLOUDS}, and updates the text of the {@link ScreenData#cloudsToggleButton} to reflect the new state.
+             * The new state is obtained by negating the current state (i.e., if the clouds were enabled, they are now disabled, and vice versa).
+             * The text of the toggle button is obtained from the {@link Labels} enumeration,
+             * and includes the new state of the clouds (either &quot;ON&quot; or &quot;OFF&quot;).
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L397">                buttonClick.play();</span>
+<span class="nc" id="L398">                MainMenuCloudsPreferences preference =</span>
+<span class="nc" id="L399">                        (MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference();</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">                boolean nowEnabled = !preference.isEnabled();</span>
+<span class="nc" id="L401">                preference.setEnabled(nowEnabled);</span>
+<span class="nc bnc" id="L402" title="All 2 branches missed.">                cloudsToggleButton.setText(Labels.MAIN_MENU_CLOUDS_ENABLED.getLabel(nowEnabled ? &quot;ON&quot; : &quot;OFF&quot;));</span>
+<span class="nc" id="L403">            }</span>
+        });
+<span class="nc" id="L405">    }</span>
+
+    /**
+     * This method creates a toggle button for enabling/disabling the main menu clouds.
+     * The button's initial text is obtained from the {@link Labels#MAIN_MENU_CLOUDS_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the current state of the main menu clouds (either &quot;ON&quot; or &quot;OFF&quot;).
+     * The current state of the main menu clouds is obtained from the {@link GamePreferences#MAIN_MENU_CLOUDS}.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
+     * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createCloudsToggleButton() {
+<span class="nc" id="L416">        screenData.cloudsToggleButton = new TextButton(</span>
+<span class="nc" id="L417">                Labels.MAIN_MENU_CLOUDS_ENABLED.getLabel(</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">                        ((MainMenuCloudsPreferences) GamePreferences.MAIN_MENU_CLOUDS.getPreference()).isEnabled()</span>
+<span class="nc" id="L419">                                ? &quot;ON&quot;</span>
+<span class="nc" id="L420">                                : &quot;OFF&quot;),</span>
+                skin);
+<span class="nc" id="L422">    }</span>
+
+    /**
+     * This method creates a back button for the preferences screen.
+     * The button's text is obtained from the {@link Labels#BACK_BUTTON} label in the {@link Labels} enumeration.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
+     * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createBackButton() {
+<span class="nc" id="L431">        screenData.backButton = new TextButton(Labels.BACK_BUTTON.getLabel(), skin);</span>
+<span class="nc" id="L432">    }</span>
+
+    /**
+     * This method creates a toggle button for enabling/disabling the debug screen.
+     * The button's initial text is obtained from the {@link Labels#DEBUG_SCREEN_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the current state of the debug screen (either &quot;ON&quot; or &quot;OFF&quot;).
+     * The current state of the debug screen is obtained from the {@link GamePreferences#DEBUG_SCREEN}.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
+     * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createDebugScreenToggleButton() {
+<span class="nc" id="L443">        screenData.debugScreenToggleButton = new TextButton(</span>
+<span class="nc" id="L444">                Labels.DEBUG_SCREEN_ENABLED.getLabel(</span>
+<span class="nc bnc" id="L445" title="All 2 branches missed.">                        ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled()</span>
+<span class="nc" id="L446">                                ? &quot;ON&quot;</span>
+<span class="nc" id="L447">                                : &quot;OFF&quot;),</span>
+                skin);
+<span class="nc" id="L449">    }</span>
+
+    /**
+     * This method creates a label for the sound volume control.
+     * The label text is obtained from the {@link Labels#SOUND_VOLUME} label in the {@link Labels} enumeration,
+     * and includes the current sound volume as a percentage (rounded to the nearest whole number).
+     * The current sound volume is obtained from the {@link ScreenData#soundVolumeSlider}.
+     * The label is created with the {@link PreferencesScreen#skin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
+     */
+    private void createSoundVolumeLabel() {
+<span class="nc" id="L459">        screenData.soundVolumeLabel = new Label(</span>
+<span class="nc" id="L460">                Labels.SOUND_VOLUME.getLabel(Math.round(screenData.soundVolumeSlider.getValue() * 100) + &quot;%&quot;), skin);</span>
+<span class="nc" id="L461">    }</span>
+
+    /**
+     * This method creates a slider for controlling the sound volume.
+     * The slider is created with the following parameters:
+     * - The minimum value is 0 (no sound).
+     * - The maximum value is 1 (maximum volume).
+     * - The step size is 0.01 (the smallest change in volume that can be made by moving the slider).
+     * - The slider is horizontal (not vertical).
+     * - The slider uses the {@link PreferencesScreen#skin} skin.
+     * The slider's visual position and value are set to the current sound volume, which is obtained from the {@link GamePreferences#SOUND}.
+     * The reference to the slider is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createSoundVolumeSlider() {
+<span class="nc" id="L475">        screenData.soundVolumeSlider = new Slider(0f, 1f, 0.01f, false, skin);</span>
+<span class="nc" id="L476">        screenData.soundVolumeSlider.setVisualPercent(</span>
+<span class="nc" id="L477">                ((SoundPreferences) GamePreferences.SOUND.getPreference()).getVolume());</span>
+<span class="nc" id="L478">    }</span>
+
+    /**
+     * This method creates a toggle button for enabling/disabling the game sound.
+     * The button's initial text is obtained from the {@link Labels#SOUND_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the current state of the game sound (either &quot;ON&quot; or &quot;OFF&quot;).
+     * The current state of the game sound is obtained from the {@link GamePreferences#SOUND}.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
+     * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createSoundToggleButton() {
+<span class="nc" id="L489">        screenData.soundToggleButton = new TextButton(</span>
+<span class="nc" id="L490">                Labels.SOUND_ENABLED.getLabel(</span>
+<span class="nc bnc" id="L491" title="All 2 branches missed.">                        ((SoundPreferences) GamePreferences.SOUND.getPreference()).isEnabled() ? &quot;ON&quot; : &quot;OFF&quot;),</span>
+                skin);
+<span class="nc" id="L493">    }</span>
+
+    /**
+     * This method creates a label for the music volume control.
+     * The label text is obtained from the {@link Labels#MUSIC_VOLUME} label in the {@link Labels} enumeration,
+     * and includes the current music volume as a percentage (rounded to the nearest whole number).
+     * The current music volume is obtained from the {@link ScreenData#musicVolumeSlider}.
+     * The label is created with the {@link PreferencesScreen#skin} skin and its reference is stored in the {@link PreferencesScreen#screenData} object.
+     */
+    private void createMusicVolumeLabel() {
+<span class="nc" id="L503">        screenData.musicVolumeLabel = new Label(</span>
+<span class="nc" id="L504">                Labels.MUSIC_VOLUME.getLabel(Math.round(screenData.musicVolumeSlider.getValue() * 100) + &quot;%&quot;), skin);</span>
+<span class="nc" id="L505">    }</span>
+
+    /**
+     * This method creates a slider for controlling the music volume.
+     * The slider is created with the following parameters:
+     * - The minimum value is 0 (no music).
+     * - The maximum value is 1 (maximum volume).
+     * - The step size is 0.01 (the smallest change in volume that can be made by moving the slider).
+     * - The slider is horizontal (not vertical).
+     * - The slider uses the {@link PreferencesScreen#skin} skin.
+     * The slider's visual position and value are set to the current music volume, which is obtained from the {@link GamePreferences#MUSIC}.
+     * The reference to the slider is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createMusicVolumeSlider() {
+<span class="nc" id="L519">        screenData.musicVolumeSlider = new Slider(0f, 1f, 0.01f, false, skin);</span>
+<span class="nc" id="L520">        screenData.musicVolumeSlider.setVisualPercent(</span>
+<span class="nc" id="L521">                ((MusicPreferences) GamePreferences.MUSIC.getPreference()).getVolume());</span>
+<span class="nc" id="L522">    }</span>
+
+    /**
+     * This method creates a toggle button for enabling/disabling the game music.
+     * The button's initial text is obtained from the {@link Labels#MUSIC_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the current state of the game music (either &quot;ON&quot; or &quot;OFF&quot;).
+     * The current state of the game music is obtained from the {@link GamePreferences#MUSIC}.
+     * The button is created with the {@link PreferencesScreen#skin} skin.
+     * The reference to the button is stored in the {@link PreferencesScreen#screenData} object for later use.
+     */
+    private void createMusicToggleButton() {
+<span class="nc" id="L533">        screenData.musicToggleButton = new TextButton(</span>
+<span class="nc" id="L534">                Labels.MUSIC_ENABLED.getLabel(</span>
+<span class="nc bnc" id="L535" title="All 2 branches missed.">                        ((MusicPreferences) GamePreferences.MUSIC.getPreference()).isEnabled() ? &quot;ON&quot; : &quot;OFF&quot;),</span>
+                skin);
+<span class="nc" id="L537">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#backButton}.
+     * When the back button is clicked, it plays a button click sound and transitions the game to the main menu screen.
+     * The transition to the main menu screen is performed by calling the {@link GdxGame#transitionScreen(Class)} method with the {@link Screens#MAIN_MENU} parameter.
+     */
+    private void listenBackButton() {
+<span class="nc" id="L545">        TextButton backButton = screenData.backButton;</span>
+<span class="nc" id="L546">        backButton.addListener(new ChangeListener() {</span>
+            /**
+             * This method is triggered when the back button is clicked.
+             * It plays a button click sound and transitions the game to the main menu screen.
+             * The button click sound is obtained from the {@link SoundManager#getSound(Sounds)} method with the {@link Sounds#BUTTON_CLICK} parameter.
+             * The transition to the main menu screen is performed by calling the {@link GdxGame#transitionScreen(Class)} method with the {@link Screens#MAIN_MENU} parameter.
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L558">                buttonClick.play();</span>
+<span class="nc" id="L559">                game.transitionScreen(Screens.MAIN_MENU);</span>
+<span class="nc" id="L560">            }</span>
+        });
+<span class="nc" id="L562">    }</span>
+
+    /**
+     * This method sets up the layout of the UI elements in the table.
+     * It creates a grid layout and adds the UI elements to the grid.
+     * The UI elements are retrieved from the {@link PreferencesScreen#screenData} object.
+     * The table is set to fill the parent actor and its skin is set to {@link PreferencesScreen#skin}.
+     * If the debug screen is enabled in the {@link GamePreferences#DEBUG_SCREEN}, the table's debug lines are shown.
+     * The table is then added to the {@link PreferencesScreen#processor} {@link Stage}.
+     * The UI elements are added to the table in a specific order and layout to create the desired appearance for the {@link PreferencesScreen}.
+     * The method also sets up some properties for the UI elements, such as the alignment of the labels and the touchable state of the sliders.
+     */
+    private void setupTable() {
+        // Retrieve the UI elements from the screen data
+<span class="nc" id="L576">        TextButton musicToggleButton = screenData.musicToggleButton;</span>
+<span class="nc" id="L577">        Slider musicVolumeSlider = screenData.musicVolumeSlider;</span>
+<span class="nc" id="L578">        Label musicVolumeLabel = screenData.musicVolumeLabel;</span>
+<span class="nc" id="L579">        TextButton soundToggleButton = screenData.soundToggleButton;</span>
+<span class="nc" id="L580">        Slider soundVolumeSlider = screenData.soundVolumeSlider;</span>
+<span class="nc" id="L581">        Label soundVolumeLabel = screenData.soundVolumeLabel;</span>
+<span class="nc" id="L582">        TextButton debugScreenToggleButton = screenData.debugScreenToggleButton;</span>
+<span class="nc" id="L583">        TextButton backButton = screenData.backButton;</span>
+<span class="nc" id="L584">        TextButton cloudsToggleButton = screenData.cloudsToggleButton;</span>
+<span class="nc" id="L585">        Slider cloudsSpeedSlider = screenData.cloudsSpeedSlider;</span>
+<span class="nc" id="L586">        Label cloudsSpeedLabel = screenData.cloudsSpeedLabel;</span>
+
+        // Set the table to fill the parent actor and set its skin
+<span class="nc" id="L589">        table.setFillParent(true);</span>
+        // If the debug screen is enabled, show the table's debug lines
+<span class="nc bnc" id="L591" title="All 2 branches missed.">        if (((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled()) {</span>
+<span class="nc" id="L592">            table.setDebug(true);</span>
+        }
+<span class="nc" id="L594">        table.setSkin(skin);</span>
+        // Add the table to the stage
+<span class="nc" id="L596">        processor.addActor(table);</span>
+
+        // Add the title label to the table
+<span class="nc" id="L599">        Cell&lt;Label&gt; titleCell = table.add(Labels.TITLE.getLabel()).colspan(2).pad(0, 0, 100, 0);</span>
+        // Set the font scale of the title label
+<span class="nc" id="L601">        titleCell.getActor().setFontScale(1.5f);</span>
+
+        // Add a new row to the table
+<span class="nc" id="L604">        table.row();</span>
+        // Add the music toggle button to the table
+<span class="nc" id="L606">        table.add(musicToggleButton).fillX().uniformX();</span>
+        // Add the clouds toggle button to the table
+<span class="nc" id="L608">        table.add(cloudsToggleButton)</span>
+<span class="nc" id="L609">                .fillX()</span>
+<span class="nc" id="L610">                .minWidth(cloudsToggleButton.getWidth() * 1.1f)</span>
+<span class="nc" id="L611">                .uniformX()</span>
+<span class="nc" id="L612">                .pad(0, 50, 0, 0);</span>
+        // Add a new row to the table
+<span class="nc" id="L614">        table.row();</span>
+
+        // Create a stack for the music volume slider and label
+<span class="nc" id="L617">        Stack stack = new Stack();</span>
+        // Add the music volume slider to the stack
+<span class="nc" id="L619">        stack.add(musicVolumeSlider);</span>
+        // Centre the music volume label
+<span class="nc" id="L621">        musicVolumeLabel.setAlignment(1);</span>
+        // Make it so the music volume label is not interactable
+<span class="nc" id="L623">        musicVolumeLabel.setTouchable(Touchable.disabled);</span>
+        // Add the music volume label to the stack
+<span class="nc" id="L625">        stack.add(musicVolumeLabel);</span>
+        // Add the stack to the table
+<span class="nc" id="L627">        table.add(stack).center().fillX().uniformX().pad(0, 0, 25, 0);</span>
+
+        // Create a stack for the clouds speed slider and label
+<span class="nc" id="L630">        stack = new Stack();</span>
+        // Add the clouds speed slider to the stack
+<span class="nc" id="L632">        stack.add(cloudsSpeedSlider);</span>
+        // Centre the clouds speed label
+<span class="nc" id="L634">        cloudsSpeedLabel.setAlignment(1);</span>
+        // Make it so the clouds speed label is not interactable
+<span class="nc" id="L636">        cloudsSpeedLabel.setTouchable(Touchable.disabled);</span>
+        // Add the clouds speed label to the stack
+<span class="nc" id="L638">        stack.add(cloudsSpeedLabel);</span>
+        // Add the stack to the table
+<span class="nc" id="L640">        table.add(stack).center().fillX().uniformX().pad(0, 50, 25, 0);</span>
+
+        // Add a new row to the table
+<span class="nc" id="L643">        table.row();</span>
+        // Add the sound toggle button to the table
+<span class="nc" id="L645">        table.add(soundToggleButton).fillX().uniformX();</span>
+        // Add a new row to the table
+<span class="nc" id="L647">        table.row();</span>
+
+        // Create a stack for the sound volume slider and label
+<span class="nc" id="L650">        stack = new Stack();</span>
+        // Add the sound volume slider to the stack
+<span class="nc" id="L652">        stack.add(soundVolumeSlider);</span>
+        // Centre the sound volume label
+<span class="nc" id="L654">        soundVolumeLabel.setAlignment(1);</span>
+        // Make it so the sound volume label is not interactable
+<span class="nc" id="L656">        soundVolumeLabel.setTouchable(Touchable.disabled);</span>
+        // Add the sound volume label to the stack
+<span class="nc" id="L658">        stack.add(soundVolumeLabel);</span>
+        // Add the stack to the table
+<span class="nc" id="L660">        table.add(stack).center().fillX().uniformX().pad(0, 0, 25, 0);</span>
+
+        // Add a new row to the table
+<span class="nc" id="L663">        table.row();</span>
+        // Add the debug screen toggle button to the table
+<span class="nc" id="L665">        table.add(debugScreenToggleButton).fillX().uniformX().pad(0, 0, 25, 0);</span>
+        // Add a new row to the table
+<span class="nc" id="L667">        table.row();</span>
+
+        // Add a large gap before the back button
+<span class="nc" id="L670">        table.row().pad(150, 0, 0, 0);</span>
+        // Add the back button to the table, spanning across both columns
+<span class="nc" id="L672">        table.add(backButton).colspan(2).fillX().uniformX();</span>
+<span class="nc" id="L673">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#debugScreenToggleButton}.
+     * When the debug screen toggle button is clicked, it plays a button click sound, retrieves the current state of the debug screen from the {@link GamePreferences#DEBUG_SCREEN},
+     * toggles the enabled state of the debug screen, and transitions the game to the preferences screen.
+     * The new state is obtained by negating the current state (i.e., if the debug screen was enabled, it is now disabled, and vice versa).
+     * The transition to the preferences screen is performed by calling the {@link GdxGame#setScreen(Class)} method with the {@link Screens#PREFERENCES} parameter.
+     */
+    private void listenDebugScreenToggle() {
+<span class="nc" id="L683">        TextButton debugScreenToggleButton = screenData.debugScreenToggleButton;</span>
+<span class="nc" id="L684">        debugScreenToggleButton.addListener(new ChangeListener() {</span>
+            /**
+             * This method is triggered when the debug screen toggle button is clicked.
+             * It plays a button click sound, retrieves the current state of the debug screen from the {@link GamePreferences#DEBUG_SCREEN},
+             * toggles the enabled state of the debug screen, and transitions the game to the preferences screen.
+             * The new state is obtained by negating the current state (i.e., if the debug screen was enabled, it is now disabled, and vice versa).
+             * The transition to the preferences screen is performed by calling the {@link GdxGame#setScreen(Class)} method with the {@link Screens#PREFERENCES} parameter.
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L697">                buttonClick.play();</span>
+<span class="nc" id="L698">                DebugScreenPreferences preference =</span>
+<span class="nc" id="L699">                        (DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference();</span>
+<span class="nc bnc" id="L700" title="All 2 branches missed.">                boolean nowEnabled = !preference.isEnabled();</span>
+<span class="nc" id="L701">                preference.setEnabled(nowEnabled);</span>
+                // CHANGE set the screen with new parameters added
+<span class="nc" id="L703">                game.setScreen(Screens.PREFERENCES, false, 0);</span>
+<span class="nc" id="L704">            }</span>
+        });
+<span class="nc" id="L706">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#soundVolumeSlider}.
+     * When the slider value changes, it updates the volume of the game sound in the {@link GamePreferences#SOUND},
+     * and updates the {@link ScreenData#soundVolumeLabel} to reflect the current volume using {@link Labels#SOUND_VOLUME}.
+     * The volume is displayed as a percentage, rounded to the nearest whole number.
+     */
+    private void listenSoundVolume() {
+<span class="nc" id="L715">        Slider soundVolumeSlider = screenData.soundVolumeSlider;</span>
+<span class="nc" id="L716">        Label soundVolumeLabel = screenData.soundVolumeLabel;</span>
+<span class="nc" id="L717">        soundVolumeSlider.addListener(event -&gt; {</span>
+<span class="nc" id="L718">            SoundPreferences preference = (SoundPreferences) GamePreferences.SOUND.getPreference();</span>
+<span class="nc" id="L719">            preference.setVolume(soundVolumeSlider.getValue());</span>
+<span class="nc" id="L720">            soundVolumeLabel.setText(</span>
+<span class="nc" id="L721">                    Labels.SOUND_VOLUME.getLabel(Math.round(soundVolumeSlider.getValue() * 100) + &quot;%&quot;));</span>
+<span class="nc" id="L722">            return false;</span>
+        });
+<span class="nc" id="L724">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#soundToggleButton}.
+     * When the sound toggle button is clicked, it plays a button click sound, retrieves the current state of the game sound from the {@link GamePreferences#SOUND},
+     * toggles the enabled state of the game sound, and updates the text of the toggle button to reflect the new state.
+     * The new state is obtained by negating the current state (i.e., if the sound was enabled, it is now disabled, and vice versa).
+     * The text of the toggle button is obtained from the {@link Labels#SOUND_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the new state of the sound (either &quot;ON&quot; or &quot;OFF&quot;).
+     */
+    private void listenSoundToggle() {
+<span class="nc" id="L735">        TextButton soundToggleButton = screenData.soundToggleButton;</span>
+<span class="nc" id="L736">        soundToggleButton.addListener(new ChangeListener() {</span>
+            /**
+             * This method is triggered when the sound toggle button is clicked.
+             * It retrieves the current state of the game sound from the {@link GamePreferences#SOUND},
+             * toggles the enabled state of the game sound, and updates the text of the toggle button to reflect the new state.
+             * The new state is obtained by negating the current state (i.e., if the sound was enabled, it is now disabled, and vice versa).
+             * The text of the toggle button is obtained from the {@link Labels#SOUND_ENABLED} label in the {@link Labels} enumeration,
+             * and includes the new state of the sound (either &quot;ON&quot; or &quot;OFF&quot;).
+             * After these operations, it plays a button click sound.
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L751">                SoundPreferences preference = (SoundPreferences) GamePreferences.SOUND.getPreference();</span>
+<span class="nc bnc" id="L752" title="All 2 branches missed.">                boolean nowEnabled = !preference.isEnabled();</span>
+<span class="nc" id="L753">                preference.setEnabled(nowEnabled);</span>
+<span class="nc bnc" id="L754" title="All 2 branches missed.">                soundToggleButton.setText(Labels.SOUND_ENABLED.getLabel(nowEnabled ? &quot;ON&quot; : &quot;OFF&quot;));</span>
+<span class="nc" id="L755">                buttonClick.play();</span>
+<span class="nc" id="L756">            }</span>
+        });
+<span class="nc" id="L758">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#musicVolumeSlider}.
+     * When the slider value changes, it updates the volume of the game music in the {@link GamePreferences#MUSIC},
+     * and updates the {@link MusicManager} background music volume to match the slider value.
+     * It also updates the {@link ScreenData#musicVolumeLabel} to reflect the current volume using {@link Labels#MUSIC_VOLUME}.
+     * The volume is displayed as a percentage, rounded to the nearest whole number.
+     */
+    private void listenMusicVolume() {
+<span class="nc" id="L768">        Slider musicVolumeSlider = screenData.musicVolumeSlider;</span>
+<span class="nc" id="L769">        Label musicVolumeLabel = screenData.musicVolumeLabel;</span>
+<span class="nc" id="L770">        musicVolumeSlider.addListener(event -&gt; {</span>
+<span class="nc" id="L771">            MusicPreferences preference = (MusicPreferences) GamePreferences.MUSIC.getPreference();</span>
+<span class="nc" id="L772">            preference.setVolume(musicVolumeSlider.getValue());</span>
+<span class="nc" id="L773">            MusicManager.getInstance().setBackgroundMusicVolume(musicVolumeSlider.getValue());</span>
+<span class="nc" id="L774">            musicVolumeLabel.setText(</span>
+<span class="nc" id="L775">                    Labels.MUSIC_VOLUME.getLabel(Math.round(musicVolumeSlider.getValue() * 100) + &quot;%&quot;));</span>
+<span class="nc" id="L776">            return false;</span>
+        });
+<span class="nc" id="L778">    }</span>
+
+    /**
+     * This method sets up a listener for the {@link ScreenData#musicToggleButton}.
+     * When the music toggle button is clicked, it plays a button click sound, retrieves the current state of the game music from the {@link GamePreferences#MUSIC},
+     * toggles the enabled state of the game music, and updates the text of the toggle button to reflect the new state.
+     * The new state is obtained by negating the current state (i.e., if the music was enabled, it is now disabled, and vice versa).
+     * The text of the toggle button is obtained from the {@link Labels#MUSIC_ENABLED} label in the {@link Labels} enumeration,
+     * and includes the new state of the music (either &quot;ON&quot; or &quot;OFF&quot;).
+     * If the music is now enabled, it calls the {@link MusicManager#onEnable()} method, otherwise it calls the {@link MusicManager#onDisable()} method.
+     */
+    private void listenMusicToggle() {
+<span class="nc" id="L790">        TextButton musicToggleButton = screenData.musicToggleButton;</span>
+<span class="nc" id="L791">        musicToggleButton.addListener(new ChangeListener() {</span>
+            /**
+             * This method is triggered when the music toggle button is clicked.
+             * It plays a button click sound, retrieves the current state of the game music from the {@link GamePreferences#MUSIC},
+             * toggles the enabled state of the game music, and updates the text of the toggle button to reflect the new state.
+             * The new state is obtained by negating the current state (i.e., if the music was enabled, it is now disabled, and vice versa).
+             * The text of the toggle button is obtained from the {@link Labels#MUSIC_ENABLED} label in the {@link Labels} enumeration,
+             * and includes the new state of the music (either &quot;ON&quot; or &quot;OFF&quot;).
+             * If the music is now enabled, it calls the {@link MusicManager#onEnable()} method, otherwise it calls the {@link MusicManager#onDisable()} method.
+             *
+             * @param event The {@link com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent} triggered by the click.
+             * @param actor The {@link Actor} that was clicked.
+             *
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+<span class="nc" id="L807">                buttonClick.play();</span>
+<span class="nc" id="L808">                MusicPreferences preference = (MusicPreferences) GamePreferences.MUSIC.getPreference();</span>
+<span class="nc bnc" id="L809" title="All 2 branches missed.">                boolean nowEnabled = !preference.isEnabled();</span>
+<span class="nc" id="L810">                preference.setEnabled(nowEnabled);</span>
+<span class="nc bnc" id="L811" title="All 2 branches missed.">                musicToggleButton.setText(Labels.MUSIC_ENABLED.getLabel(nowEnabled ? &quot;ON&quot; : &quot;OFF&quot;));</span>
+<span class="nc bnc" id="L812" title="All 2 branches missed.">                if (nowEnabled) {</span>
+<span class="nc" id="L813">                    MusicManager.getInstance().onEnable();</span>
+                } else {
+<span class="nc" id="L815">                    MusicManager.getInstance().onDisable();</span>
+                }
+<span class="nc" id="L817">            }</span>
+        });
+<span class="nc" id="L819">    }</span>
+
+    /**
+     * This method is responsible for rendering the game screen.
+     * It first clears the screen with a black color using {@link Gdx#gl}
+     * Then, it begins a new batch of drawing commands using the {@link PreferencesScreen#processor}'s batch.
+     * It draws the {@link PreferencesScreen#stoneWallTexture} in a grid pattern across the entire screen.
+     * The size of each tile in the grid is determined by dividing the width and height of the texture by 6.
+     * After that, it draws a gradient texture at the bottom of the screen using the {@link PreferencesScreen#bottomUpBlackGradient}.
+     * The gradient texture is stretched to cover the entire width and height of the screen.
+     * It then ends the batch of drawing commands.
+     * Finally, it updates and draws the stage with {@link Stage#act(float)} and {@link Stage#draw()} respectively. The {@link Stage} is updated with the minimum of the time since the last render and 1/30 seconds.
+     *
+     * @param v The time in seconds since the last render.
+     */
+    @Override
+    public void render(float v) {
+        // Clears the screen with a black color
+<span class="nc" id="L837">        Gdx.gl.glClearColor(0, 0, 0, 1);</span>
+<span class="nc" id="L838">        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);</span>
+
+        // Begins a new batch of drawing commands
+<span class="nc" id="L841">        Batch batch = processor.getBatch();</span>
+<span class="nc" id="L842">        batch.begin();</span>
+
+        // Draws the stone wall texture in a grid pattern across the entire screen
+        // The size of each tile in the grid is determined by dividing the width and height of the texture by 6
+<span class="nc" id="L846">        int width = stoneWallTexture.getWidth() / 6;</span>
+<span class="nc" id="L847">        int height = stoneWallTexture.getHeight() / 6;</span>
+<span class="nc bnc" id="L848" title="All 2 branches missed.">        for (int x = 0; x &lt; Gdx.graphics.getWidth(); x += width) {</span>
+<span class="nc bnc" id="L849" title="All 2 branches missed.">            for (int y = 0; y &lt; Gdx.graphics.getHeight(); y += height) {</span>
+<span class="nc" id="L850">                batch.draw(stoneWallTexture, x, y, width, height);</span>
+            }
+        }
+
+        // Draws a gradient texture at the bottom of the screen
+        // The gradient texture is stretched to cover the entire width and height of the screen
+<span class="nc" id="L856">        batch.draw(bottomUpBlackGradient, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());</span>
+
+        // Ends the batch of drawing commands
+<span class="nc" id="L859">        batch.end();</span>
+
+        // Updates and draws the stage
+        // The stage is updated with a fixed time step, which is the smaller of the actual time passed and 1/30 seconds
+<span class="nc" id="L863">        processor.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));</span>
+<span class="nc" id="L864">        processor.draw();</span>
+<span class="nc" id="L865">    }</span>
+
+    /**
+     * This method is called when the game window is resized.
+     * It updates the viewport of the {@link PreferencesScreen#processor} {@link Stage} to match the new window size.
+     * The viewport is updated to maintain the aspect ratio of the game, which may result in black bars on the sides or top and bottom of the game window.
+     * The viewport's camera is also updated to ensure that the game is centered in the window.
+     *
+     * @param width The new width of the game window, in pixels.
+     * @param height The new height of the game window, in pixels.
+     */
+    @Override
+    public void resize(int width, int height) {
+<span class="nc" id="L878">        processor.getViewport().update(width, height, true);</span>
+<span class="nc" id="L879">    }</span>
+
+    /**
+     * This method is called when the game is paused.
+     * Currently, this method is empty and does not perform any actions when the game is paused.
+     */
+    @Override
+<span class="nc" id="L886">    public void pause() {}</span>
+
+    /**
+     * This method is called when the game is resumed from a paused state.
+     * Currently, this method is empty and does not perform any actions when the game is resumed.
+     */
+    @Override
+<span class="nc" id="L893">    public void resume() {}</span>
+
+    /**
+     * This method is called when the game screen is hidden.
+     * Currently, this method is empty and does not perform any actions when the game screen is hidden.
+     */
+    @Override
+<span class="nc" id="L900">    public void hide() {}</span>
+
+    /**
+     * This method is called when the game screen is disposed.
+     * It disposes of the resources that were created in the {@link PreferencesScreen} class to free up memory.
+     * The resources that are disposed of include:
+     * - The {@link PreferencesScreen#processor} {@link Stage}, which is used to manage and render the UI elements.
+     * - The {@link PreferencesScreen#skin} {@link Skin}, which is used for the UI elements.
+     * - The {@link PreferencesScreen#buttonClick} {@link GameSound}, which is the sound that is played when a button is clicked.
+     */
+    @Override
+    public void dispose() {
+<span class="nc" id="L912">        processor.dispose();</span>
+<span class="nc" id="L913">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

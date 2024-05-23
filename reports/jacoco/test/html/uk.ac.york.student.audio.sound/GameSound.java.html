@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameSound.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.audio.sound</a> &gt; <span class="el_source">GameSound.java</span></div><h1>GameSound.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.audio.sound;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import org.jetbrains.annotations.Range;
+import uk.ac.york.student.settings.GamePreferences;
+import uk.ac.york.student.settings.SoundPreferences;
+
+/**
+ * This abstract class implements the Sound interface and serves as a base class for game sounds.
+ * It provides common functionality for managing game sounds, such as play, pause, stop, loop controls, and sound settings.
+ */
+public abstract class GameSound implements Sound {
+    /**
+     * Sound object that this GameSound wraps around
+     */
+    protected final Sound sound;
+
+    /**
+     * Constructor for the GameSound class.
+     * It initialises the object with the given path to the sound file.
+     * @param path The internal path to the sound file (in assets folder)
+     */
+<span class="nc" id="L24">    protected GameSound(final String path) {</span>
+<span class="nc" id="L25">        sound = Gdx.audio.newSound(Gdx.files.internal(path));</span>
+<span class="nc" id="L26">    }</span>
+
+    /**
+     * Plays the sound with the volume set in the game preferences.
+     * @return The sound id
+     */
+    @Override
+    public long play() {
+<span class="nc" id="L34">        return sound.play(((SoundPreferences) GamePreferences.SOUND.getPreference()).getVolume());</span>
+    }
+
+    /**
+     * Plays the sound with the given volume.
+     * @param volume The volume to play the sound at [0, 1]
+     * @return The sound id
+     */
+    @Override
+    public long play(@Range(from = 0, to = 1) final float volume) {
+<span class="nc" id="L44">        return sound.play(volume);</span>
+    }
+
+    /** Plays the sound. If the sound is already playing, it will be played again, concurrently.
+     * @param volume the volume in the range [0,1]
+     * @param pitch the pitch multiplier, 1 == default, &gt;1 == faster, &lt;1 == slower, the value has to be between 0.5 and 2.0
+     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position.
+     * @return the id of the sound instance if successful, or -1 on failure.
+     */
+    @Override
+    public long play(
+            @Range(from = 0, to = 1) final float volume, final float pitch, @Range(from = -1, to = 1) final float pan) {
+<span class="nc" id="L56">        return sound.play(volume, pitch, pan);</span>
+    }
+
+    /**
+     * Loops the sound with the volume set in the game preferences.
+     * @return The sound id
+     */
+    @Override
+    public long loop() {
+<span class="nc" id="L65">        return sound.loop(((SoundPreferences) GamePreferences.SOUND.getPreference()).getVolume());</span>
+    }
+
+    /**
+     * Loops the sound with the given volume.
+     * @param volume The volume to play the sound at [0, 1]
+     * @return The sound id
+     */
+    @Override
+    public long loop(@Range(from = 0, to = 1) final float volume) {
+<span class="nc" id="L75">        return sound.loop(volume);</span>
+    }
+
+    /**
+     * Loops the sound with the given volume, pitch and pan.
+     * @param volume The volume to play the sound at
+     * @param pitch The pitch to play the sound at
+     * @param pan The pan to play the sound at
+     * @return The sound id
+     */
+    @Override
+    public long loop(
+            @Range(from = 0, to = 1) final float volume, final float pitch, @Range(from = -1, to = 1) final float pan) {
+<span class="nc" id="L88">        return sound.loop(volume, pitch, pan);</span>
+    }
+
+    /**
+     * Stops the sound.
+     */
+    @Override
+    public void stop() {
+<span class="nc" id="L96">        sound.stop();</span>
+<span class="nc" id="L97">    }</span>
+
+    /**
+     * Pauses the sound.
+     */
+    @Override
+    public void pause() {
+<span class="nc" id="L104">        sound.pause();</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Resumes the sound.
+     */
+    @Override
+    public void resume() {
+<span class="nc" id="L112">        sound.resume();</span>
+<span class="nc" id="L113">    }</span>
+
+    /**
+     * Disposes of the sound.
+     * Needs to be called when the Sound is no longer needed.
+     */
+    @Override
+    public void dispose() {
+<span class="nc" id="L121">        sound.dispose();</span>
+<span class="nc" id="L122">    }</span>
+
+    /**
+     * Sets whether the sound should loop.
+     * @param soundId The sound id
+     * @param looping Whether the sound should loop
+     */
+    @Override
+    public void setLooping(final long soundId, final boolean looping) {
+<span class="nc" id="L131">        sound.setLooping(soundId, looping);</span>
+<span class="nc" id="L132">    }</span>
+
+    /**
+     * Sets the pitch of the sound.
+     * @param soundId The sound id
+     * @param pitch The pitch to set the sound to
+     */
+    @Override
+    public void setPitch(final long soundId, final float pitch) {
+<span class="nc" id="L141">        sound.setPitch(soundId, pitch);</span>
+<span class="nc" id="L142">    }</span>
+
+    /**
+     * Sets the volume of the sound.
+     * @param soundId The sound id
+     * @param volume The volume to set the sound to [0, 1]
+     */
+    @Override
+    public void setVolume(final long soundId, @Range(from = 0, to = 1) final float volume) {
+<span class="nc" id="L151">        sound.setVolume(soundId, volume);</span>
+<span class="nc" id="L152">    }</span>
+
+    /**
+     * Sets the pan and volume of the sound.
+     * @param soundId The sound id
+     * @param pan The pan to set the sound to
+     * @param volume The volume to set the sound to
+     */
+    @Override
+    public void setPan(
+            final long soundId,
+            @Range(from = -1, to = 1) final float pan,
+            @Range(from = 0, to = 1) final float volume) {
+<span class="nc" id="L165">        sound.setPan(soundId, pan, volume);</span>
+<span class="nc" id="L166">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DebugScreenPreferences.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.settings</a> &gt; <span class="el_source">DebugScreenPreferences.java</span></div><h1>DebugScreenPreferences.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.settings;
+
+/**
+ * The {@link DebugScreenPreferences} class implements the {@link Preference} interface.
+ * This class is used to manage the preferences related to screen debugging.
+ * It provides methods to enable or disable screen debugging and to get the current status of screen debugging.
+ * The preferences are stored using the {@link GamePreferences} class.
+ */
+public class DebugScreenPreferences implements Preference {
+    /**
+     * The constant string {@link DebugScreenPreferences#ENABLED} is used as a key to store and retrieve the preference related to the enabled status of screen debugging.
+     */
+    private static final String ENABLED = &quot;enabled&quot;;
+
+    /**
+     * The constant boolean {@link DebugScreenPreferences#DEFAULT_ENABLED} is used to set the default value for the enabled status of screen debugging. By default, screen debugging is disabled.
+     */
+    private static final boolean DEFAULT_ENABLED = false;
+
+    /**
+     * Constructor for the {@link DebugScreenPreferences} class.
+     * It initializes the preferences related to screen debugging.
+     * The enabled status of screen debugging is set to the default value ({@link DebugScreenPreferences#DEFAULT_ENABLED}) using the {@link GamePreferences} class.
+     * The preferences are then saved to the persistent storage.
+     */
+<span class="nc" id="L26">    public DebugScreenPreferences() {</span>
+<span class="nc" id="L27">        GamePreferences.getPreferences().putBoolean(getKey(ENABLED), DEFAULT_ENABLED);</span>
+<span class="nc" id="L28">        GamePreferences.getPreferences().flush();</span>
+<span class="nc" id="L29">    }</span>
+
+    /**
+     * This method is used to check if screen debugging is enabled.
+     * It retrieves the preference related to the enabled status of screen debugging using the key {@link DebugScreenPreferences#ENABLED}.
+     * The preference is retrieved using the {@link GamePreferences} class.
+     * The method returns a boolean value indicating whether screen debugging is enabled.
+     *
+     * @return A boolean value indicating whether screen debugging is enabled.
+     */
+    public boolean isEnabled() {
+<span class="nc" id="L40">        return GamePreferences.getPreferences().getBoolean(getKey(ENABLED));</span>
+    }
+
+    /**
+     * This method is used to enable or disable screen debugging.
+     * It takes a boolean parameter 'b' which indicates the desired status of screen debugging.
+     * The method stores the preference related to the enabled status of screen debugging using the key {@link DebugScreenPreferences#ENABLED}.
+     * The preference is stored using the {@link GamePreferences} class.
+     * After storing the preference, the method saves the changes to the persistent storage.
+     *
+     * @param b A boolean value indicating the desired status of screen debugging.
+     */
+    public void setEnabled(boolean b) {
+<span class="nc" id="L53">        GamePreferences.getPreferences().putBoolean(getKey(ENABLED), b);</span>
+<span class="nc" id="L54">        GamePreferences.getPreferences().flush();</span>
+<span class="nc" id="L55">    }</span>
+
+    /**
+     * This method is used to generate a key for the preferences related to screen debugging.
+     * It takes a string parameter 'key' which is the base key.
+     * The method returns a string which is a concatenation of the string &quot;debug_screen.&quot; and the base key.
+     * This key is used to store and retrieve the preferences related to screen debugging.
+     *
+     * @param key A string value which is the base key.
+     * @return A string value which is the key for the preferences related to screen debugging.
+     */
+    @Override
+    public String getKey(String key) {
+<span class="nc" id="L68">        return &quot;debug_screen.&quot; + key;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

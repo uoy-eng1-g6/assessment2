@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InteractableManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.interactables</a> &gt; <span class="el_source">InteractableManager.java</span></div><h1>InteractableManager.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.interactables;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import java.util.*;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.york.student.assets.map.MapManager;
+
+/**
+ * The Interactable Manager class serves as the place where interactable objects are created, stored and accessed from.
+ */
+// CHANGE new class
+public class InteractableManager {
+    private final TextureAtlas interactableAtlas;
+    private final Color defaultOutlineColor;
+
+<span class="fc" id="L21">    @Getter</span>
+    private final Map&lt;String, Interactable&gt; interactableMap;
+
+    private final OrthographicCamera camera;
+
+<span class="nc" id="L26">    @Getter</span>
+    private Interactable currentInteractable;
+
+<span class="fc" id="L29">    public InteractableManager(OrthographicCamera camera, TextureAtlas interactableAtlas) {</span>
+<span class="fc" id="L30">        this.camera = camera;</span>
+<span class="fc" id="L31">        this.interactableAtlas = interactableAtlas;</span>
+<span class="fc" id="L32">        this.defaultOutlineColor = new Color(1f, 1f, 1f, 1f);</span>
+<span class="fc" id="L33">        this.interactableMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L34">        this.currentInteractable = null;</span>
+<span class="fc" id="L35">    }</span>
+
+    /**
+     * Constructor for the InteractableManager class.
+     *
+     * @param camera The OrthographicCamera for the interactable objects to be drawn using
+     */
+    public InteractableManager(OrthographicCamera camera) {
+<span class="nc" id="L43">        this(camera, new TextureAtlas(Gdx.files.internal(&quot;sprite-atlases/interactable.atlas&quot;)));</span>
+<span class="nc" id="L44">    }</span>
+
+    public void onEnable() {
+        // Set up interactable objects.
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (String mapName : MapManager.MAP_NAMES) {</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">            if (!Objects.equals(mapName, &quot;blankMap&quot;)) {</span>
+<span class="nc" id="L50">                setupInteractables(mapName);</span>
+            }
+<span class="nc" id="L52">        }</span>
+<span class="nc" id="L53">    }</span>
+
+    /**
+     * Sets the current interactable object to match the current action.
+     *
+     * @param currentActionStr A {@link String} of the current action. This is the key in interactableMap.
+     */
+    public void setCurrentInteractable(@NotNull String currentActionStr) {
+<span class="nc" id="L61">        currentInteractable = interactableMap.get(currentActionStr);</span>
+<span class="nc" id="L62">    }</span>
+
+    /**
+     * Sets up the interactable objects.
+     * @param mapName A {@link String} of the map name to get the interactable objects from.
+     */
+    void setupInteractables(String mapName) {
+<span class="fc" id="L69">        var map = MapManager.getMap(mapName);</span>
+<span class="fc" id="L70">        var mapLayer = map.getLayers().get(&quot;gameObjects&quot;);</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        for (var object : mapLayer.getObjects()) {</span>
+<span class="fc" id="L72">            var properties = object.getProperties();</span>
+<span class="fc" id="L73">            var isActivity = properties.get(&quot;isActivity&quot;, Boolean.class);</span>
+<span class="fc" id="L74">            var interactInfo = properties.get(&quot;interactInfo&quot;, String.class);</span>
+
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if (interactInfo == null) {</span>
+<span class="nc" id="L77">                continue;</span>
+            }
+
+<span class="fc" id="L80">            var interactList = Arrays.stream(interactInfo.split(&quot;,&quot;))</span>
+<span class="fc" id="L81">                    .map(Float::parseFloat)</span>
+<span class="fc" id="L82">                    .collect(Collectors.toUnmodifiableList());</span>
+
+            Interactable interact;
+            String key;
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if (Boolean.TRUE.equals(isActivity)) {</span>
+<span class="fc" id="L88">                key = properties.get(&quot;activityStr&quot;, String.class);</span>
+<span class="fc" id="L89">                interact = new Interactable(interactList);</span>
+<span class="fc" id="L90">                interact.setRegion(interactableAtlas.findRegion(key));</span>
+            } else { // if not an activity, but has an interactList, must be a door
+<span class="fc" id="L92">                key = properties.get(&quot;newMapStr&quot;, String.class);</span>
+<span class="fc" id="L93">                interact = new AnimatedInteractable(interactList);</span>
+<span class="fc" id="L94">                ((AnimatedInteractable) interact).setAnimationRegions(interactableAtlas.findRegions(key));</span>
+            }
+<span class="fc" id="L96">            interact.setCamera(camera);</span>
+<span class="fc" id="L97">            interact.setDefaultOutlineColor(defaultOutlineColor);</span>
+<span class="fc" id="L98">            interact.setMap(mapName);</span>
+<span class="fc" id="L99">            interactableMap.put(key, interact);</span>
+<span class="fc" id="L100">        }</span>
+<span class="fc" id="L101">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayerMetrics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.player</a> &gt; <span class="el_source">PlayerMetrics.java</span></div><h1>PlayerMetrics.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.player;
+
+import java.util.List;
+import lombok.Getter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+
+/**
+ * The PlayerMetrics class encapsulates the metrics related to a player.
+ * It includes metrics such as energy, happiness, and study level.
+ * It also provides methods to get these metrics and to dispose them when they are no longer needed.
+ */
+@Getter
+<span class="fc" id="L15">public final class PlayerMetrics {</span>
+
+    /**
+     * The {@link MetricType} enum represents the types of metrics related to a player.
+     * It includes {@link MetricType#ENERGY}, {@link MetricType#HAPPINESS}, and {@link MetricType#STUDY_LEVEL}.
+     */
+<span class="nc" id="L21">    @Getter</span>
+    public enum MetricType {
+<span class="nc" id="L23">        ENERGY, // Represents the energy level of the player</span>
+<span class="nc" id="L24">        HAPPINESS, // Represents the happiness level of the player</span>
+<span class="nc" id="L25">        STUDY_LEVEL; // Represents the study level of the player</span>
+    }
+
+    /**
+     * The {@link MetricEffect} enum represents the possible effects on a player's metrics.
+     * It includes {@link MetricEffect#INCREASE}, {@link MetricEffect#DECREASE}, and {@link MetricEffect#RESET}.
+     */
+<span class="nc" id="L32">    public enum MetricEffect {</span>
+<span class="nc" id="L33">        INCREASE, // Represents an increase in a player's metric</span>
+<span class="nc" id="L34">        DECREASE, // Represents a decrease in a player's metric</span>
+<span class="nc" id="L35">        RESET; // Represents resetting a player's metric to its initial value</span>
+    }
+
+    /**
+     * The energy metric of the player.
+     */
+<span class="pc" id="L41">    private final PlayerEnergy energy = new PlayerEnergy();</span>
+
+    /**
+     * The happiness metric of the player.
+     */
+<span class="pc" id="L46">    private final PlayerHappiness happiness = new PlayerHappiness();</span>
+
+    /**
+     * The study level metric of the player.
+     */
+<span class="pc" id="L51">    private final PlayerStudyLevel studyLevel = new PlayerStudyLevel();</span>
+
+    /**
+     * Changes the specified player metric based on the given effect and change amount.
+     *
+     * @param type The type of the player metric to change. This should be one of the values from the {@link MetricType} enum.
+     * @param effect The effect to apply to the player metric. This should be one of the values from the {@link MetricEffect} enum.
+     * @param changeAmount The amount by which to change the player metric. This is used when the effect is either {@link MetricEffect#INCREASE} or {@link MetricEffect#DECREASE}.
+     * @throws IllegalArgumentException If an invalid metric type or effect is provided.
+     */
+    public void changeMetric(@NotNull MetricType type, MetricEffect effect, float changeAmount)
+            throws IllegalArgumentException {
+        PlayerMetric metric;
+        // Determine the metric to change based on the provided type
+<span class="nc bnc" id="L65" title="All 4 branches missed.">        switch (type) {</span>
+            case ENERGY:
+<span class="nc" id="L67">                metric = energy;</span>
+<span class="nc" id="L68">                break;</span>
+            case HAPPINESS:
+<span class="nc" id="L70">                metric = happiness;</span>
+<span class="nc" id="L71">                break;</span>
+            case STUDY_LEVEL:
+<span class="nc" id="L73">                metric = studyLevel;</span>
+<span class="nc" id="L74">                break;</span>
+            default:
+<span class="nc" id="L76">                throw new IllegalArgumentException(&quot;Invalid metric type: &quot; + type);</span>
+        }
+
+        // Apply the specified effect to the determined metric
+<span class="nc bnc" id="L80" title="All 4 branches missed.">        switch (effect) {</span>
+            case INCREASE:
+<span class="nc" id="L82">                metric.increase(changeAmount);</span>
+<span class="nc" id="L83">                break;</span>
+            case DECREASE:
+<span class="nc" id="L85">                metric.decrease(changeAmount);</span>
+<span class="nc" id="L86">                break;</span>
+            case RESET:
+<span class="nc" id="L88">                metric.set(metric.getDefault());</span>
+<span class="nc" id="L89">                break;</span>
+            default:
+<span class="nc" id="L91">                throw new IllegalArgumentException(&quot;Invalid metric effect: &quot; + effect);</span>
+        }
+<span class="nc" id="L93">    }</span>
+
+    /**
+     * Returns the player metric of the specified type.
+     *
+     * @param type The type of the player metric to return. This should be one of the values from the {@link MetricType} enum.
+     * @return The player metric of the specified type.
+     * @throws IllegalArgumentException If an invalid metric type is provided.
+     */
+    public PlayerMetric getMetric(@NotNull MetricType type) throws IllegalArgumentException {
+<span class="nc bnc" id="L103" title="All 4 branches missed.">        switch (type) {</span>
+            case ENERGY:
+<span class="nc" id="L105">                return energy;</span>
+            case HAPPINESS:
+<span class="nc" id="L107">                return happiness;</span>
+            case STUDY_LEVEL:
+<span class="nc" id="L109">                return studyLevel;</span>
+            default:
+<span class="nc" id="L111">                throw new IllegalArgumentException(&quot;Invalid metric type: &quot; + type);</span>
+        }
+    }
+
+    /**
+     * Get the list of all player metrics.
+     * @return An unmodifiable list of PlayerMetric objects.
+     */
+    @Contract(value = &quot; -&gt; new&quot;, pure = true)
+    public @Unmodifiable List&lt;PlayerMetric&gt; getMetrics() {
+<span class="nc" id="L121">        return List.of(energy, happiness, studyLevel);</span>
+    }
+
+    // CHANGE remove dispose from PlayerMetrics
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameTime.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.game</a> &gt; <span class="el_source">GameTime.java</span></div><h1>GameTime.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.game;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import uk.ac.york.student.utils.DrawableUtils;
+
+/**
+ * The {@link GameTime} class represents the concept of time in the game.
+ * It includes methods for managing the progression of time, such as incrementing the hour or the day.
+ * It also includes a progress bar to visually represent the progression of time.
+ * This class is final and cannot be subclassed.
+ */
+@Getter
+public final class GameTime {
+    // The total number of days in the game
+    private static final int DAYS = 7;
+
+    // The length of a day in the game, in hours
+    private static final int DAY_LENGTH = 16;
+
+    // The width of the progress bar representing the progression of time
+    private static final int WIDTH = 50;
+
+    // The height of the progress bar representing the progression of time
+    private static final int HEIGHT = 5;
+
+    // The ProgressBar instance used to visually represent the progression of time in the game
+    private final ProgressBar progressBar;
+
+    /**
+     * Constructor for the {@link GameTime} class.
+     * It initializes the progress bar with the given scale.
+     *
+     */
+<span class="fc" id="L37">    public GameTime() {</span>
+        // CHANGE calculate the width and height of progress bar in getProgressBar() instead, relevant lines removed
+<span class="fc" id="L39">        progressBar = getProgressBar();</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * This method is used to get the length of a day in the game.
+     *
+     * @return The length of a day in the game, in hours.
+     */
+    public static int getDayLength() {
+<span class="fc" id="L48">        return DAY_LENGTH;</span>
+    }
+
+    /**
+     * This method is used to get the total number of days in the game.
+     *
+     * @return The total number of days in the game.
+     */
+    public static int getDays() {
+<span class="nc" id="L57">        return DAYS;</span>
+    }
+
+    /**
+     * This method is used to create a new {@link ProgressBar} instance with the given dimensions.
+     * The {@link ProgressBar} is styled and its initial value is set to the current hour.
+     *
+     * @return A new {@link ProgressBar} instance.
+     */
+    @NotNull public ProgressBar getProgressBar() {
+        // CHANGE calculate the width and height of progress bar in getProgressBar() instead, rename variables
+<span class="fc" id="L68">        var width = 100;</span>
+<span class="fc" id="L69">        var height = 10;</span>
+
+        // Create a new ProgressBarStyle instance
+<span class="fc" id="L72">        ProgressBar.ProgressBarStyle style = new ProgressBar.ProgressBarStyle();</span>
+
+        // Create a new ProgressBar instance with the given parameters
+<span class="fc" id="L75">        final ProgressBar progressBar = new ProgressBar(0, DAY_LENGTH, 1, false, style);</span>
+
+        // Get the ProgressBar's style
+<span class="fc" id="L78">        ProgressBar.ProgressBarStyle barStyle = progressBar.getStyle();</span>
+
+        // Set the background of the ProgressBar to a gray color
+<span class="fc" id="L81">        barStyle.background = DrawableUtils.getColouredDrawable(width, height, Color.GRAY);</span>
+
+        // Set the color of the ProgressBar before the knob to green
+<span class="fc" id="L84">        barStyle.knobBefore = DrawableUtils.getColouredDrawable(width, height, Color.GREEN);</span>
+
+        // Set the color of the knob of the ProgressBar to green
+<span class="fc" id="L87">        barStyle.knob = DrawableUtils.getColouredDrawable(0, height, Color.GREEN);</span>
+
+        // Apply the style to the ProgressBar
+<span class="fc" id="L90">        progressBar.setStyle(barStyle);</span>
+
+        // Set the width and height of the ProgressBar
+<span class="fc" id="L93">        progressBar.setWidth(width);</span>
+<span class="fc" id="L94">        progressBar.setHeight(height);</span>
+
+        // Set the duration of the animation of the ProgressBar
+<span class="fc" id="L97">        progressBar.setAnimateDuration(0.25f);</span>
+
+        // Set the initial value of the ProgressBar to the current hour
+<span class="fc" id="L100">        progressBar.setValue(currentHour);</span>
+
+        // Return the configured ProgressBar instance
+<span class="fc" id="L103">        return progressBar;</span>
+    }
+
+    // CHANGE remove unused methods relating to progress bar scale
+
+    /**
+     * The current hour in the game. It ranges from 0 to {@link GameTime#DAY_LENGTH}
+     */
+<span class="pc" id="L111">    private int currentHour = 0;</span>
+    /**
+     * This method is used to set the current hour in the game.
+     * It also updates the {@link ProgressBar}'s value to reflect the new current hour.
+     *
+     * @param hour The new current hour in the game. It should be within the range [0, {@link GameTime#DAY_LENGTH}].
+     */
+    private void setCurrentHour(int hour) {
+<span class="fc" id="L119">        currentHour = hour;</span>
+<span class="fc" id="L120">        progressBar.setValue(currentHour);</span>
+<span class="fc" id="L121">    }</span>
+
+    /**
+     * This method is used to increment the current hour in the game by a given amount.
+     * The new current hour is the minimum of the sum of the current hour and the given amount, and the length of a day.
+     * This ensures that the current hour does not exceed the length of a day.
+     *
+     * @param amount The amount by which the current hour is to be incremented.
+     */
+    public void incrementHour(int amount) {
+<span class="fc" id="L131">        setCurrentHour(Math.min(DAY_LENGTH, currentHour + amount));</span>
+<span class="fc" id="L132">    }</span>
+
+    /**
+     * This method is used to reset the current hour in the game to 0.
+     * It calls the {@link GameTime#setCurrentHour(int)} method with 0 as the argument.
+     */
+    public void resetHour() {
+<span class="fc" id="L139">        setCurrentHour(0);</span>
+<span class="fc" id="L140">    }</span>
+
+    /**
+     * This method is used to check if the current hour equals the length of a day.
+     * It returns true if the current hour is equal {@link GameTime#DAY_LENGTH}, indicating the end of the day.
+     *
+     * @return A boolean value indicating whether the current hour equals the length of a day.
+     */
+    public boolean isEndOfDay() {
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        return currentHour == DAY_LENGTH;</span>
+    }
+
+    /**
+     * The current day in the game. It ranges from 0 to {@link GameTime#DAYS}-1
+     */
+<span class="pc" id="L155">    private int currentDay = 0;</span>
+
+    /**
+     * This method is used to increment the current day in the game by 1.
+     * It calls the {@link GameTime#incrementDay(int)} method with 1 as the argument, and then resets the current hour by calling the {@link GameTime#resetHour()} method.
+     */
+    public void incrementDay() {
+<span class="fc" id="L162">        incrementDay(1);</span>
+<span class="fc" id="L163">        resetHour();</span>
+<span class="fc" id="L164">    }</span>
+
+    /**
+     * This method is used to increment the current day in the game by a given amount.
+     * The new current day is the minimum of the sum of the current day and the given amount, and one less than the total number of days.
+     * This ensures that the current day does not exceed the total number of days.
+     * After incrementing the day, it resets the current hour by calling the resetHour method.
+     *
+     * @param amount The amount by which the current day is to be incremented.
+     */
+    public void incrementDay(int amount) {
+<span class="fc" id="L175">        currentDay = Math.min(DAYS - 1, currentDay + amount);</span>
+<span class="fc" id="L176">        resetHour();</span>
+<span class="fc" id="L177">    }</span>
+
+    /**
+     * This method is used to reset the current day in the game to 0.
+     * It sets the current day to 0 and then resets the current hour by calling the {@link GameTime#resetHour()} method.
+     */
+    public void resetDay() {
+<span class="nc" id="L184">        currentDay = 0;</span>
+<span class="nc" id="L185">        resetHour();</span>
+<span class="nc" id="L186">    }</span>
+
+    /**
+     * This method is used to check if the current day equals {@link GameTime#DAYS}-1.
+     * It returns true if the current day is equal to {@link GameTime#DAYS}-1, indicating the end of the game.
+     *
+     * @return A boolean value indicating whether the current day equals {@link GameTime#DAYS}-1.
+     */
+    public boolean isEndOfDays() {
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        return currentDay == DAYS - 1;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

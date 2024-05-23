@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Skins.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.assets.skins</a> &gt; <span class="el_source">Skins.java</span></div><h1>Skins.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.assets.skins;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import java.util.function.Supplier;
+import lombok.Getter;
+
+/**
+ * This enum represents the different types of skins that can be used in the game.
+ */
+// CHANGE extend so enum stores skin name instead of hardcoding directly in SkinManager
+<span class="fc" id="L12">public enum Skins {</span>
+<span class="fc" id="L13">    CRAFTACULAR(() -&gt; Gdx.files.internal(&quot;skins/craftacular/skin/craftacular-ui.json&quot;));</span>
+
+<span class="fc" id="L15">    @Getter</span>
+    private final Supplier&lt;FileHandle&gt; handleSupplier;
+
+<span class="fc" id="L18">    Skins(final Supplier&lt;FileHandle&gt; handleSupplier) {</span>
+<span class="fc" id="L19">        this.handleSupplier = handleSupplier;</span>
+<span class="fc" id="L20">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

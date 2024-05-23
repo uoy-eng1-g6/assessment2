@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayerEnergy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.player</a> &gt; <span class="el_source">PlayerEnergy.java</span></div><h1>PlayerEnergy.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.player;
+
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import org.jetbrains.annotations.Range;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
+import uk.ac.york.student.game.GameTime;
+
+/**
+ * The PlayerEnergy class represents the energy level of a player in the game.
+ * It implements the PlayerMetric interface, indicating that it is a type of metric used for the player.
+ * The energy level is represented as a float value between 0 and 1, where 0 is no energy and 1 is full energy.
+ * The class also includes a ProgressBar to visually represent the energy level.
+ */
+public class PlayerEnergy implements PlayerMetric {
+    /**
+     * The ProgressBar instance for the PlayerEnergy class.
+     * This ProgressBar represents the energy level of the player in the game.
+     * The minimum value is 0 (no energy), the maximum value is 1 (full energy), and the step size is 0.1.
+     * The ProgressBar does not have a vertical orientation (false), and uses the Craftacular skin.
+     */
+    // CHANGE update progress bar initialization to fit with changes
+<span class="fc" id="L23">    private final ProgressBar progressBar = new ProgressBar(0, 1, 0.1f, false, SkinManager.getSkin(Skins.CRAFTACULAR));</span>
+
+    /**
+     * Constructor for the PlayerEnergy class.
+     * This constructor initializes the ProgressBar that represents the player's energy level.
+     */
+<span class="fc" id="L29">    public PlayerEnergy() {</span>
+        // CHANGE set progress bar size instead of width and height
+<span class="fc" id="L31">        progressBar.setSize(100, 20);</span>
+<span class="fc" id="L32">        progressBar.setAnimateDuration(0.25f); // Set the animation duration of the ProgressBar to 0.25 seconds</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * The energy level of the player.
+     * This is a float value between 0 and 1, where 0 represents no energy and 1 represents full energy.
+     * By default, the energy level is set to 1 (full energy).
+     */
+<span class="fc" id="L40">    private @Range(from = 0, to = 1) float energy = getDefault();</span>
+    /**
+     * The total amount of energy accumulated by the player across all days of the game.
+     * This is a float value that starts at 0 and increases as the player gains more energy.
+     * This value is incremented when the player sleeps based on what their energy level is at that given time.
+     */
+<span class="fc" id="L46">    private float totalEnergy = 0f;</span>
+
+    /**
+     * Returns the maximum total energy that a player can accumulate.
+     * This is equivalent to the number of days in the game, as represented by {@link GameTime#getDays()}.
+     *
+     * @return the maximum total energy that a player can accumulate
+     */
+    public float getMaxTotal() {
+<span class="nc" id="L55">        return GameTime.getDays();</span>
+    }
+
+    /**
+     * Returns the total amount of energy accumulated by the player.
+     *
+     * @return the total amount of energy accumulated by the player
+     */
+    public float getTotal() {
+<span class="nc" id="L64">        return totalEnergy;</span>
+    }
+
+    /**
+     * Sets the total amount of energy accumulated by the player.
+     *
+     * @param total the new total amount of energy accumulated by the player
+     */
+    public void setTotal(float total) {
+<span class="nc" id="L73">        this.totalEnergy = total;</span>
+<span class="nc" id="L74">    }</span>
+
+    /**
+     * Increases the total amount of energy accumulated by the player by a specified amount.
+     *
+     * @param amount the amount of energy to add to the total
+     */
+    public void increaseTotal(float amount) {
+<span class="nc" id="L82">        this.totalEnergy += amount;</span>
+<span class="nc" id="L83">    }</span>
+    /**
+     * Returns the default energy level for the player.
+     * This is a float value of 1, representing full energy.
+     *
+     * @return the default energy level of the player
+     */
+    @Override
+    public float getDefault() {
+<span class="fc" id="L92">        return 1f;</span>
+    }
+    /**
+     * Get the energy level of the player.
+     * This is a float value between 0 and 1, where 0 represents no energy and 1 represents full energy.
+     * @return the energy level of the player
+     */
+    @Override
+    public @Range(from = 0, to = 1) float get() {
+<span class="fc" id="L101">        return energy;</span>
+    }
+
+    /**
+     * Set the energy level of the player.
+     * This method takes a float value between 0 and 1 as an argument, where 0 represents no energy and 1 represents full energy.
+     * The energy level is then set to the maximum of the minimum energy level ({@link PlayerMetric#PROGRESS_BAR_MINIMUM}) and the minimum of 1 and the provided energy level.
+     * This ensures that the energy level is always within the valid range.
+     * @param energy the new energy level of the player
+     */
+    @Override
+    public void set(@Range(from = 0, to = 1) float energy) {
+<span class="fc" id="L113">        this.energy = Math.max(PROGRESS_BAR_MINIMUM, Math.min(1, energy));</span>
+<span class="fc" id="L114">        this.progressBar.setValue(this.energy);</span>
+<span class="fc" id="L115">    }</span>
+
+    /**
+     * Increase the energy level of the player.
+     * This method takes a float value as an argument, which represents the amount of energy to be added to the player's current energy level.
+     * The new energy level is then set to the minimum of 1 and the sum of the current energy level and the provided amount.
+     * This ensures that the energy level does not exceed 1 (full energy).
+     * @param amount the amount of energy to be added to the player's current energy level
+     */
+    @Override
+    public void increase(float amount) {
+<span class="fc" id="L126">        set(Math.min(1, energy + amount));</span>
+<span class="fc" id="L127">    }</span>
+
+    /**
+     * Decrease the energy level of the player.
+     * This method takes a float value as an argument, which represents the amount of energy to be subtracted from the player's current energy level.
+     * The new energy level is then set to the maximum of the minimum energy level ({@link PlayerMetric#PROGRESS_BAR_MINIMUM}) and the difference between the current energy level and the provided amount.
+     * This ensures that the energy level does not go below the minimum energy level.
+     * @param amount the amount of energy to be subtracted from the player's current energy level
+     */
+    @Override
+    public void decrease(float amount) {
+<span class="fc" id="L138">        set(Math.max(PROGRESS_BAR_MINIMUM, energy - amount));</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * Get the ProgressBar representing the player's energy level.
+     * This method first sets the value of the ProgressBar to the current energy level of the player.
+     * It then returns the ProgressBar.
+     * @return the ProgressBar representing the player's energy level
+     */
+    @Override
+    public ProgressBar getProgressBar() {
+<span class="nc" id="L149">        progressBar.setValue(get());</span>
+<span class="nc" id="L150">        return progressBar;</span>
+    }
+
+    /**
+     * Get the label used to display on the screen for the player's energy level.
+     * @return the label for the player's energy level
+     */
+    @Override
+    public String getLabel() {
+<span class="nc" id="L159">        return &quot;Energy&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

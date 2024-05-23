@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Interactable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.interactables</a> &gt; <span class="el_source">Interactable.java</span></div><h1>Interactable.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.interactables;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.Range;
+
+/**
+ * The Interactable class represents an object the player can interact with. It helps make it clearer what is
+ * interactable by giving it an outline, and allowing that outline to be changed depending on events.
+ */
+// CHANGE new class
+@Getter
+public class Interactable {
+<span class="nc" id="L21">    private final SpriteBatch batch;</span>
+<span class="nc" id="L22">    private final ShaderProgram shaderProgram;</span>
+<span class="nc" id="L23">    private Color shaderColor;</span>
+<span class="nc" id="L24">    private final float x;</span>
+<span class="nc" id="L25">    private final float y;</span>
+<span class="nc" id="L26">    private final float width;</span>
+<span class="nc" id="L27">    private final float height;</span>
+<span class="nc" id="L28">    private final Color color;</span>
+
+<span class="nc" id="L30">    @Setter</span>
+<span class="nc" id="L31">    private TextureRegion region;</span>
+
+<span class="nc" id="L33">    @Setter</span>
+<span class="nc" id="L34">    private OrthographicCamera camera;</span>
+
+<span class="nc" id="L36">    @Setter</span>
+<span class="nc" id="L37">    private String map;</span>
+
+    /**
+     * Constructor for the Interactable class.
+     *
+     * @param interactInfo A list of the interactInfo from Tiled. Must be of 4 items: x, y, width, height. This
+     *                     information is stored in Tiled as a string as so: interactInfo: x,y,width,height
+     */
+<span class="nc" id="L45">    public Interactable(List&lt;Float&gt; interactInfo) {</span>
+<span class="nc" id="L46">        this.batch = new SpriteBatch();</span>
+<span class="nc" id="L47">        this.x = interactInfo.get(0);</span>
+<span class="nc" id="L48">        this.y = interactInfo.get(1);</span>
+<span class="nc" id="L49">        this.width = interactInfo.get(2);</span>
+<span class="nc" id="L50">        this.height = interactInfo.get(3);</span>
+<span class="nc" id="L51">        this.color = batch.getColor();</span>
+
+        // Uses a custom shader to add an outline to the object.
+<span class="nc" id="L54">        String vertexShader = Gdx.files.internal(&quot;shaders/vertex.glsl&quot;).readString();</span>
+<span class="nc" id="L55">        String fragmentShader = Gdx.files.internal(&quot;shaders/fragment.glsl&quot;).readString();</span>
+<span class="nc" id="L56">        shaderProgram = new ShaderProgram(vertexShader, fragmentShader);</span>
+<span class="nc" id="L57">        batch.setShader(shaderProgram);</span>
+<span class="nc" id="L58">    }</span>
+
+    /**
+     * Sets the color of the object's outline.
+     *
+     * @param outlineColor A {@link Color} containing red, green, blue, alpha of the outline.
+     */
+    public void setOutlineColor(Color outlineColor) {
+<span class="nc" id="L66">        batch.begin();</span>
+<span class="nc" id="L67">        batch.setColor(color);</span>
+<span class="nc" id="L68">        shaderProgram.setUniformf(&quot;u_color&quot;, outlineColor);</span>
+<span class="nc" id="L69">        redraw();</span>
+<span class="nc" id="L70">        batch.end();</span>
+<span class="nc" id="L71">    }</span>
+
+    /**
+     * Sets the default color of the object's outline.
+     *
+     * @param outlineColor A {@link Color} containing red, green, blue, alpha of the default outline.
+     */
+    public void setDefaultOutlineColor(Color outlineColor) {
+<span class="nc" id="L79">        shaderColor = outlineColor;</span>
+<span class="nc" id="L80">    }</span>
+
+    public void draw() {
+<span class="nc" id="L83">        batch.setProjectionMatrix(camera.combined);</span>
+<span class="nc" id="L84">        batch.begin();</span>
+<span class="nc" id="L85">        batch.setColor(color);</span>
+<span class="nc" id="L86">        shaderProgram.setUniformf(&quot;u_color&quot;, shaderColor);</span>
+<span class="nc" id="L87">        redraw();</span>
+<span class="nc" id="L88">        batch.end();</span>
+<span class="nc" id="L89">    }</span>
+
+    /**
+     * Sets the alpha, or opacity, of the object.
+     * @param a The alpha.
+     */
+    public void setAlpha(@Range(from = 0, to = 1) float a) {
+<span class="nc" id="L96">        color.a = a;</span>
+<span class="nc" id="L97">        shaderColor.a = a;</span>
+<span class="nc" id="L98">    }</span>
+
+    /**
+     * Calls batch.draw(), therefore should only be used in between batch.begin() and batch.end().
+     */
+    private void redraw() {
+<span class="nc" id="L104">        batch.draw(region, x, y, 0f, 0f, width, height, 1, 1, 0);</span>
+<span class="nc" id="L105">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

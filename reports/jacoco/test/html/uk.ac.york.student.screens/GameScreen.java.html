@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.screens</a> &gt; <span class="el_source">GameScreen.java</span></div><h1>GameScreen.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.screens;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.maps.*;
+import com.badlogic.gdx.maps.tiled.*;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import uk.ac.york.student.GdxGame;
+import uk.ac.york.student.assets.map.ActionMapObject;
+import uk.ac.york.student.assets.map.ActivityMapObject;
+import uk.ac.york.student.assets.map.MapManager;
+import uk.ac.york.student.assets.map.TransitionMapObject;
+import uk.ac.york.student.assets.skins.SkinManager;
+import uk.ac.york.student.assets.skins.Skins;
+import uk.ac.york.student.debug.DebugRenderer;
+import uk.ac.york.student.game.GameTime;
+import uk.ac.york.student.game.activities.Activity;
+import uk.ac.york.student.interactables.AnimatedInteractable;
+import uk.ac.york.student.interactables.Interactable;
+import uk.ac.york.student.interactables.InteractableManager;
+import uk.ac.york.student.player.Player;
+import uk.ac.york.student.player.PlayerMetric;
+import uk.ac.york.student.player.PlayerMetrics;
+import uk.ac.york.student.settings.DebugScreenPreferences;
+import uk.ac.york.student.settings.GamePreferences;
+import uk.ac.york.student.utils.Pair;
+
+/**
+ * The {@link GameScreen} class extends the {@link BaseScreen} class and implements the {@link InputProcessor} interface.
+ * This class is responsible for handling the game screen and its related functionalities.
+ * It includes methods for rendering the game screen, handling user inputs, managing game activities, and more.
+ */
+public class GameScreen extends BaseScreen implements InputProcessor {
+    /**
+     * The key code for the action key. This is used to trigger actions in the game.
+     */
+    private static final int ACTION_KEY = Input.Keys.E;
+
+    /**
+     * The stage for this game screen. This is where all the actors for the game are added.
+     */
+<span class="nc" id="L73">    @Getter</span>
+    private final Stage processor;
+
+    /**
+     * The player of the game. This is the main character that the user controls.
+     */
+    private final Player player;
+
+    /**
+     * The name of the map which is currently active.
+     */
+    // CHANGE this attribute is new
+    private String currentMapName;
+
+    /**
+     * The interactable manager. This is what creates and stores the information for the interactable objects.
+     */
+    // CHANGE this attribute is new
+    private final InteractableManager interactableManager;
+
+    /**
+     * The game time. This keeps track of the current time in the game.
+     */
+    private final GameTime gameTime;
+
+    /**
+     * The map for the game. This is loaded from the {@link MapManager} with {@link MapManager#getMap(String)}.
+     */
+    private TiledMap map;
+
+    /**
+     * The scale of the map. This is used to adjust the size of the map to fit the screen.
+     */
+    private float mapScale;
+
+    /**
+     * The renderer for the map. This is used to draw the map on the screen.
+     */
+    private TiledMapRenderer renderer;
+
+    /**
+     * The skin for the game. This is used to style the game's UI elements.
+     */
+    // CHANGE use better name for skin attribute and use improved method in SkinManager
+<span class="nc" id="L117">    private final Skin skin = SkinManager.getSkin(Skins.CRAFTACULAR);</span>
+
+    /**
+     * The table for the action UI. This is where the action label is added.
+     */
+<span class="nc" id="L122">    private final Table actionTable = new Table(skin);</span>
+
+    /**
+     * The table for the metrics UI. This is where the metrics labels and progress bars are added.
+     */
+<span class="nc" id="L127">    private final Table metricsTable = new Table();</span>
+
+    /**
+     * The table for the time UI. This is where the time label and progress bar are added.
+     */
+<span class="nc" id="L132">    private final Table timeTable = new Table();</span>
+
+    /**
+     * The label for the action UI. This displays the current action that the player can perform.
+     */
+<span class="nc" id="L137">    private final Label actionLabel = new Label(&quot;ENG1 Project. Super cool. (You will never see this)&quot;, skin);</span>
+
+    /**
+     * The label for the time UI. This displays the current time in the game.
+     */
+<span class="nc" id="L142">    private final Label timeLabel = new Label(&quot;You exist outside of the space-time continuum.&quot;, skin);</span>
+
+    // CHANGE below attributes are new
+    /**
+     * The box2d world for managing physics.
+     */
+    private World world;
+
+    private final OrthographicCamera gameCamera;
+    private final Viewport gameViewport;
+
+    /**
+     * Boolean for whether the game's debug mode is enabled or not.
+     */
+    private final Boolean debugEnabled;
+    /**
+     * box2d debug renderer for rendering collision boxes in debug mode.
+     */
+    private final Box2DDebugRenderer box2dDebugRenderer;
+
+    /**
+     * debug renderer for all other bounding boxes in debug mode.
+     */
+    private final DebugRenderer debugRenderer;
+
+    /**
+     * boolean for whether the GameScreen should fade in or not.
+     */
+    private final boolean shouldFadeIn;
+    /**
+     * float for how long the fade in should last if shouldFadeIn is true.
+     */
+    private final float fadeInTime;
+
+    /**
+     * Constructor for the {@link GameScreen} class.
+     *
+     * @param game The {@link GdxGame} instance that this screen is part of.
+     */
+    // CHANGE added parameters shouldFadeIn and fadeInTime
+    public GameScreen(GdxGame game, boolean shouldFadeIn, float fadeInTime) {
+<span class="nc" id="L183">        super(game);</span>
+
+        // CHANGE remove code for setting up tilemap from the constructor of GameScreen
+
+<span class="nc" id="L187">        this.shouldFadeIn = shouldFadeIn;</span>
+<span class="nc" id="L188">        this.fadeInTime = fadeInTime;</span>
+
+        // Initialize the game time
+<span class="nc" id="L191">        gameTime = new GameTime();</span>
+
+        // Initialize the current map name. CHANGE new attribute to initialize
+<span class="nc" id="L194">        currentMapName = &quot;map&quot;;</span>
+
+        // CHANGE new attribute to initialize
+<span class="nc" id="L197">        world = new World(new Vector2(0, 0), true);</span>
+
+        // Initialize the player CHANGE to work with the box2d world
+<span class="nc" id="L200">        player = new Player(world);</span>
+
+        // Initialize the stage and set it as the input processor CHANGE new attributes to initialize
+<span class="nc" id="L203">        gameCamera = new OrthographicCamera();</span>
+<span class="nc" id="L204">        gameViewport = new FitViewport(1, 1, gameCamera);</span>
+
+<span class="nc" id="L206">        var stageViewport = new FitViewport(1, 1);</span>
+<span class="nc" id="L207">        processor = new Stage(stageViewport);</span>
+
+<span class="nc" id="L209">        Gdx.input.setInputProcessor(processor);</span>
+
+        // CHANGE new attribute to initialize
+<span class="nc" id="L212">        interactableManager = new InteractableManager((OrthographicCamera) processor.getCamera());</span>
+<span class="nc" id="L213">        interactableManager.onEnable();</span>
+
+        // Add a listener to the stage to handle key events
+<span class="nc" id="L216">        processor.addListener(new InputListener() {</span>
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+<span class="nc" id="L219">                return GameScreen.this.keyDown(keycode);</span>
+            }
+
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+<span class="nc" id="L224">                return GameScreen.this.keyUp(keycode);</span>
+            }
+        });
+
+        // CHANGE new attributes to initialize
+<span class="nc" id="L229">        debugEnabled = ((DebugScreenPreferences) GamePreferences.DEBUG_SCREEN.getPreference()).isEnabled();</span>
+<span class="nc" id="L230">        debugRenderer = new DebugRenderer(player, processor.getBatch());</span>
+<span class="nc" id="L231">        box2dDebugRenderer = new Box2DDebugRenderer();</span>
+
+        // CHANGE set up tile map in changeMap function
+<span class="nc" id="L234">        changeMap(&quot;map&quot;, true);</span>
+<span class="nc" id="L235">    }</span>
+
+    /**
+     * Changes the current map to a new map specified by the mapName parameter.
+     * The screen fades out to black, then the new map is loaded and the screen fades back in.
+     *
+     * @param mapName The name of the new map to load.
+     */
+    // CHANGE refactor method to implement collisions with box2d
+    public void changeMap(String mapName, boolean immediate) {
+<span class="nc" id="L245">        Runnable mapChangeFn = () -&gt; {</span>
+            // Load the new map
+<span class="nc" id="L247">            map = MapManager.getMap(mapName);</span>
+<span class="nc" id="L248">            debugRenderer.setMap(map);</span>
+
+            // Clear collision objects from world
+<span class="nc" id="L251">            var bodies = new Array&lt;Body&gt;();</span>
+<span class="nc" id="L252">            world.getBodies(bodies);</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">            for (int i = 0; i &lt; bodies.size; i++) {</span>
+<span class="nc" id="L254">                world.destroyBody(bodies.get(i));</span>
+            }
+
+<span class="nc" id="L257">            player.setMap(mapName, map);</span>
+
+            // Get the first layer of the map
+<span class="nc" id="L260">            TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);</span>
+            // Get the width and height of map tiles and the map background
+<span class="nc" id="L262">            var mapWidth = layer.getWidth();</span>
+<span class="nc" id="L263">            var mapHeight = layer.getHeight();</span>
+<span class="nc" id="L264">            var tileWidth = layer.getTileWidth();</span>
+
+<span class="nc" id="L266">            mapScale = (float) 1 / tileWidth;</span>
+
+            // Initialize the map renderer for the new map
+<span class="nc" id="L269">            renderer = new OrthogonalTiledMapRenderer(map, mapScale);</span>
+
+<span class="nc bnc" id="L271" title="All 2 branches missed.">            for (var collidable : MapManager.getMapObjectData(mapName).getCollisionObjects()) {</span>
+<span class="nc" id="L272">                var bodyDef = new BodyDef();</span>
+<span class="nc" id="L273">                bodyDef.type = BodyDef.BodyType.StaticBody;</span>
+<span class="nc" id="L274">                bodyDef.position.set(collidable.getX(), collidable.getY());</span>
+
+<span class="nc" id="L276">                var body = world.createBody(bodyDef);</span>
+<span class="nc" id="L277">                var shape = new PolygonShape();</span>
+<span class="nc" id="L278">                shape.set(collidable.getVertices());</span>
+
+<span class="nc" id="L280">                body.createFixture(shape, 0f);</span>
+<span class="nc" id="L281">                shape.dispose();</span>
+<span class="nc" id="L282">            }</span>
+
+<span class="nc" id="L284">            gameCamera.setToOrtho(false, mapWidth, mapHeight);</span>
+<span class="nc" id="L285">            gameViewport.setWorldSize(mapWidth, mapHeight);</span>
+<span class="nc" id="L286">            processor.getViewport().setWorldSize(mapWidth * tileWidth, mapHeight * tileWidth);</span>
+
+            // Set the view of the map renderer to the camera of the stage
+<span class="nc" id="L289">            renderer.setView(gameCamera);</span>
+
+            // Set the input processor to the stage
+<span class="nc" id="L292">            Gdx.input.setInputProcessor(processor);</span>
+
+            // set currentMapName to mapName
+<span class="nc" id="L295">            currentMapName = mapName;</span>
+<span class="nc" id="L296">        };</span>
+
+<span class="nc bnc" id="L298" title="All 2 branches missed.">        if (immediate) {</span>
+<span class="nc" id="L299">            mapChangeFn.run();</span>
+<span class="nc" id="L300">            return;</span>
+        }
+
+        // make the screen black slowly
+<span class="nc" id="L304">        processor.getRoot().getColor().a = 1;</span>
+<span class="nc" id="L305">        SequenceAction sequenceAction = new SequenceAction();</span>
+<span class="nc" id="L306">        sequenceAction.addAction(Actions.fadeOut(0.5f));</span>
+<span class="nc" id="L307">        sequenceAction.addAction(Actions.run(mapChangeFn));</span>
+        // Fade the screen back in
+<span class="nc" id="L309">        sequenceAction.addAction(Actions.fadeIn(0.5f));</span>
+        // Add the sequence action to the root of the stage
+<span class="nc" id="L311">        processor.getRoot().addAction(sequenceAction);</span>
+<span class="nc" id="L312">    }</span>
+
+    /**
+     * This method is called when this screen becomes the current screen for the {@link GdxGame}.
+     * It sets up the game UI, including the action table, metrics table, and timetable.
+     * It also updates the viewport of the stage.
+     */
+    @Override
+    public void show() {
+        // CHANGE check if shouldFadeIn before fading in
+<span class="nc bnc" id="L322" title="All 2 branches missed.">        if (shouldFadeIn) {</span>
+<span class="nc" id="L323">            processor.getRoot().getColor().a = 0;</span>
+<span class="nc" id="L324">            processor.getRoot().addAction(fadeIn(fadeInTime));</span>
+        }
+
+        // Get the width and height of the screen
+<span class="nc" id="L328">        float width = Gdx.graphics.getWidth();</span>
+<span class="nc" id="L329">        float height = Gdx.graphics.getHeight();</span>
+
+        // Set up the action table
+<span class="nc" id="L332">        actionTable.setFillParent(true);</span>
+<span class="nc" id="L333">        processor.addActor(actionTable);</span>
+<span class="nc" id="L334">        actionLabel.setFontScale(0.3f); // CHANGE set the font scale</span>
+<span class="nc" id="L335">        actionTable.add(actionLabel);</span>
+<span class="nc" id="L336">        actionTable.bottom();</span>
+<span class="nc" id="L337">        actionTable.padBottom(10);</span>
+
+        // CHANGE set debug mode to the debugEnabled Boolean
+<span class="nc" id="L340">        actionTable.setDebug(debugEnabled);</span>
+<span class="nc" id="L341">        metricsTable.setDebug(debugEnabled);</span>
+
+        // Set up the metrics table
+<span class="nc" id="L344">        metricsTable.setFillParent(true);</span>
+<span class="nc" id="L345">        processor.addActor(metricsTable);</span>
+<span class="nc" id="L346">        PlayerMetrics metrics = player.getMetrics();</span>
+
+        // CHANGE use a map instead of two separate lists for related variables
+<span class="nc" id="L349">        var metricComponents = metrics.getMetrics().stream()</span>
+<span class="nc" id="L350">                .map(metric -&gt; Pair.of(metric.getLabel(), metric.getProgressBar()))</span>
+<span class="nc" id="L351">                .collect(Collectors.toList());</span>
+
+        // CHANGE iterate through components instead of iterator
+<span class="nc bnc" id="L354" title="All 2 branches missed.">        for (var component : metricComponents) {</span>
+<span class="nc" id="L355">            var label = new Label(component.getLeft(), skin);</span>
+<span class="nc" id="L356">            label.setFontScale(0.25f);</span>
+<span class="nc" id="L357">            metricsTable.add(label).padRight(2);</span>
+<span class="nc" id="L358">            metricsTable.add(component.getRight()).width(100).height(30).row();</span>
+<span class="nc" id="L359">        }</span>
+
+<span class="nc" id="L361">        metricsTable.bottom().right();</span>
+<span class="nc" id="L362">        metricsTable.padBottom(2); // CHANGE padding value</span>
+<span class="nc" id="L363">        metricsTable.padRight(2); // CHANGE padding value</span>
+
+        // Set up the timetable
+<span class="nc" id="L366">        ProgressBar timeBar = gameTime.getProgressBar();</span>
+<span class="nc" id="L367">        String currentHour = getCurrentHourString();</span>
+<span class="nc" id="L368">        String currentDay = &quot;Day &quot; + (gameTime.getCurrentDay() + 1);</span>
+<span class="nc" id="L369">        String time = currentDay + &quot; &quot; + currentHour;</span>
+<span class="nc" id="L370">        timeTable.setFillParent(true);</span>
+<span class="nc" id="L371">        processor.addActor(timeTable);</span>
+<span class="nc" id="L372">        timeTable.setWidth(500);</span>
+<span class="nc" id="L373">        timeLabel.setText(time);</span>
+<span class="nc" id="L374">        timeLabel.setFontScale(0.5f);</span>
+<span class="nc" id="L375">        timeTable.add(timeLabel);</span>
+<span class="nc" id="L376">        timeTable.row();</span>
+<span class="nc" id="L377">        timeTable.add(timeBar); // CHANGE remove .width(500)</span>
+<span class="nc" id="L378">        timeTable.top();</span>
+<span class="nc" id="L379">        timeTable.padTop(10);</span>
+
+        // Update the viewport of the stage
+<span class="nc" id="L382">        processor.getViewport().update((int) width, (int) height);</span>
+<span class="nc" id="L383">    }</span>
+
+    /**
+     * This method returns a string representation of the current hour in the game.
+     * The game starts at 8 AM and ends at 12 AM (midnight). The time is formatted as HH:MM AM/PM.
+     * However, MM is always 00 because the game progresses in hourly increments.
+     * If the game is at the end of the day, the method returns &quot;00:00 - Time to sleep!&quot;.
+     *
+     * @return A string representing the current hour in the game.
+     */
+    @NotNull private String getCurrentHourString() {
+<span class="nc" id="L394">        int currentHourNum = gameTime.getCurrentHour(); // Get the current hour number from the game time</span>
+<span class="nc" id="L395">        final int startHour = 8; // Define the start hour of the game</span>
+<span class="nc" id="L396">        final int midday = 12 - startHour; // Calculate the hour number for midday</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">        boolean isAm = currentHourNum &lt; (12 - startHour); // Determine if the current time is AM</span>
+        String currentHour; // Initialize the string to hold the current hour
+<span class="nc bnc" id="L399" title="All 2 branches missed.">        if (!gameTime.isEndOfDay()) { // If it's not the end of the day</span>
+            // Calculate the current hour based on whether it's AM or PM
+<span class="nc" id="L401">            currentHour = String.valueOf(</span>
+<span class="nc bnc" id="L402" title="All 4 branches missed.">                    isAm || currentHourNum == midday</span>
+<span class="nc" id="L403">                            ? currentHourNum + startHour</span>
+<span class="nc" id="L404">                            : currentHourNum - (12 - startHour)); // 9am start</span>
+<span class="nc bnc" id="L405" title="All 2 branches missed.">            if (currentHour.length() == 1)</span>
+<span class="nc" id="L406">                currentHour = &quot;0&quot; + currentHour; // Add a leading zero if the hour is a single digit</span>
+<span class="nc" id="L407">            currentHour += &quot;:00&quot;; // Add the minutes (always 00)</span>
+<span class="nc bnc" id="L408" title="All 2 branches missed.">            if (isAm) { // If it's AM</span>
+<span class="nc" id="L409">                currentHour += &quot; AM&quot;; // Add &quot; AM&quot; to the current hour</span>
+            } else { // If it's PM
+<span class="nc" id="L411">                currentHour += &quot; PM&quot;; // Add &quot; PM&quot; to the current hour</span>
+            }
+        } else { // If it's the end of the day
+<span class="nc" id="L414">            currentHour = &quot;00:00 - Time to sleep!&quot;; // Set the current hour to &quot;00:00 - Time to sleep!&quot;</span>
+        }
+<span class="nc" id="L416">        return currentHour; // Return the current hour</span>
+    }
+
+    /**
+     * An {@link AtomicReference} to an {@link ActionMapObject}. This object represents the current action that the player can perform.
+     * It is nullable, meaning it can be null if there is no current action.
+     * {@link AtomicReference} is used to ensure thread-safety when accessing and updating this variable.
+     */
+<span class="nc" id="L424">    private final AtomicReference&lt;@Nullable ActionMapObject&gt; currentActionMapObject = new AtomicReference&lt;&gt;(null);</span>
+    /**
+     * This method is called every frame to render the game screen.
+     * It clears the screen, updates the player's position, sets the opacity of the player and map layers,
+     * calculates and sets the camera's position, updates the positions of the UI tables, renders the map,
+     * draws the player, updates the action label, and updates and draws the stage.
+     *
+     * @param v The time in seconds since the last frame.
+     */
+    // CHANGE refactor this function to improve rendering logic and add functionality
+    @Override
+    public void render(float v) {
+        // Set the blend function for the OpenGL context. This determines how new pixels are combined with existing
+        // pixels.
+<span class="nc" id="L438">        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);</span>
+
+        // Clear the screen. This wipes out all previous drawings and sets the screen to a blank state.
+<span class="nc" id="L441">        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);</span>
+
+        // Set the active texture unit to texture unit 0. This is the default and most commonly used texture unit.
+<span class="nc" id="L444">        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);</span>
+
+        // Set the clear color to black. This is the color that the screen is cleared to when glClear is called.
+<span class="nc" id="L447">        Gdx.gl.glClearColor(0, 0, 0, 1);</span>
+
+<span class="nc bnc" id="L449" title="All 2 branches missed.">        if (renderer != null) {</span>
+            // Move the player. This updates the player's position based on their current velocity and the elapsed time
+            // since the last frame.
+<span class="nc" id="L452">            player.move();</span>
+
+            // Set the opacity of the player. This determines how transparent the player is. A value of 1 means fully
+            // opaque, and a value of 0 means fully transparent.
+<span class="nc" id="L456">            player.setOpacity(processor.getRoot().getColor().a);</span>
+
+            // Set the opacity of all layers in the map. This determines how transparent the layers are. A value of 1
+            // means
+            // fully opaque, and a value of 0 means fully transparent.
+            // CHANGE use better logic for this part
+<span class="nc" id="L462">            map.getLayers()</span>
+<span class="nc" id="L463">                    .forEach(layer -&gt; layer.setOpacity(processor.getRoot().getColor().a));</span>
+
+            // Set the view of the map renderer to the camera. This determines what part of the map is drawn to the
+            // screen.
+<span class="nc" id="L467">            renderer.setView(gameCamera);</span>
+
+            // Render the map. This draws the map to the screen.
+<span class="nc" id="L470">            renderer.render();</span>
+
+            // Draw interactable objects.
+            for (Interactable interactable :
+<span class="nc bnc" id="L474" title="All 2 branches missed.">                    interactableManager.getInteractableMap().values()) {</span>
+<span class="nc bnc" id="L475" title="All 2 branches missed.">                if (Objects.equals(interactable.getMap(), currentMapName)) {</span>
+<span class="nc" id="L476">                    interactable.draw();</span>
+                }
+<span class="nc" id="L478">                interactable.setAlpha(processor.getRoot().getColor().a);</span>
+<span class="nc" id="L479">            }</span>
+            // Animate the currentInteractable if it is animated and should currently be animating.
+<span class="nc bnc" id="L481" title="All 2 branches missed.">            if (interactableManager.getCurrentInteractable() instanceof AnimatedInteractable) {</span>
+<span class="nc" id="L482">                AnimatedInteractable animatedInteractable =</span>
+<span class="nc" id="L483">                        (AnimatedInteractable) interactableManager.getCurrentInteractable();</span>
+<span class="nc bnc" id="L484" title="All 2 branches missed.">                if (Objects.equals(currentMapName, animatedInteractable.getMap())</span>
+<span class="nc bnc" id="L485" title="All 2 branches missed.">                        &amp;&amp; animatedInteractable.isAnimating()) {</span>
+<span class="nc" id="L486">                    animatedInteractable.animate();</span>
+                }
+            }
+
+            // Check if the player is in a transition tile. If they are, update the action label to reflect the possible
+            // action.
+<span class="nc" id="L492">            Player.Transition transitionTile = player.isInTransitionTile();</span>
+<span class="nc bnc" id="L493" title="All 2 branches missed.">            if (transitionTile != null) {</span>
+<span class="nc" id="L494">                setActionLabel(transitionTile);</span>
+            } else {
+                // If the player is not in a transition tile, hide the action label.
+<span class="nc" id="L497">                currentActionMapObject.set(null);</span>
+<span class="nc" id="L498">                actionLabel.setVisible(false);</span>
+            }
+
+            // Get the batch for the stage. This is used to draw the player and other game objects.
+<span class="nc" id="L502">            Batch batch = processor.getBatch();</span>
+<span class="nc" id="L503">            batch.begin();</span>
+
+<span class="nc bnc" id="L505" title="All 2 branches missed.">            if (debugEnabled) {</span>
+<span class="nc" id="L506">                debugRenderer.render();</span>
+            }
+
+<span class="nc" id="L509">            var rawPosition = player.getTilePosition();</span>
+<span class="nc" id="L510">            batch.draw(</span>
+<span class="nc" id="L511">                    player.getSprite(),</span>
+<span class="nc" id="L512">                    (rawPosition.x * 16) - (player.getSprite().getWidth() / 2),</span>
+<span class="nc" id="L513">                    (rawPosition.y * 16) - (player.getSprite().getHeight() / 4));</span>
+<span class="nc" id="L514">            batch.end();</span>
+
+<span class="nc bnc" id="L516" title="All 2 branches missed.">            if (debugEnabled) {</span>
+<span class="nc" id="L517">                box2dDebugRenderer.render(world, gameCamera.combined);</span>
+            }
+        }
+
+        // Draw the stage. This renders all actors added to the stage, including the player and UI elements.
+<span class="nc" id="L522">        processor.draw();</span>
+
+        // Update the stage. This updates the state of all actors added to the stage, including the player and UI
+        // elements.
+<span class="nc" id="L526">        processor.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));</span>
+        // Step the world. This updates the position of all physics objects on the map (just the player).
+<span class="nc bnc" id="L528" title="All 2 branches missed.">        if (world != null) {</span>
+<span class="nc" id="L529">            world.step(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f), 8, 3);</span>
+        }
+<span class="nc" id="L531">    }</span>
+
+    /**
+     * This method sets the action label based on the player's current transition tile.
+     * It first gets the {@link ActionMapObject} associated with the transition tile and the player's current map object.
+     * Then it constructs the action text based on the type of the {@link ActionMapObject}.
+     * If the {@link ActionMapObject} is an {@link ActivityMapObject}, it checks if the player has enough time and resources to perform the activity.
+     * If the player does not have enough time or resources, the action text is updated to reflect this.
+     * Finally, the action text is set as the text of the action label, and the action label is made visible.
+     *
+     * @param transitionTile The player's current transition tile.
+     */
+    private void setActionLabel(Player.Transition transitionTile) {
+        // Get the ActionMapObject associated with the transition tile and the player's current map object
+<span class="nc" id="L545">        var actionMapObject = getActionMapObject(transitionTile, player.getCurrentMapObject());</span>
+<span class="nc" id="L546">        currentActionMapObject.set(actionMapObject);</span>
+
+        // Construct the action text based on the type of the ActionMapObject
+<span class="nc" id="L549">        StringBuilder actionText = new StringBuilder(getActionText(actionMapObject));</span>
+
+        // Initialize the vector for the outline color. CHANGE new variable
+<span class="nc" id="L552">        Color outlineColor = new Color(0.0F, 255.0F, 0F, processor.getRoot().getColor().a);</span>
+
+        // Check if the ActionMapObject is an instance of ActivityMapObject
+<span class="nc bnc" id="L555" title="All 2 branches missed.">        if (actionMapObject instanceof ActivityMapObject) {</span>
+            // Set the outline color to red by default, and we will make it green if it passes checks.
+            // CHANGE new functionality
+<span class="nc" id="L558">            outlineColor.r = 255.0F;</span>
+<span class="nc" id="L559">            outlineColor.g = 0.0F;</span>
+            // Cast the ActionMapObject to an ActivityMapObject
+<span class="nc" id="L561">            ActivityMapObject activityMapObject = (ActivityMapObject) actionMapObject;</span>
+
+            // Get the required time for the activity
+<span class="nc" id="L564">            int requiredTime = activityMapObject.getTime();</span>
+
+            // Get the type of the activity
+<span class="nc" id="L567">            Activity activity = activityMapObject.getType();</span>
+
+            // Get a list of negative effects from the activity's effects
+            // Negative effects are those that decrease a player metric
+<span class="nc" id="L571">            List&lt;Pair&lt;PlayerMetrics.MetricType, PlayerMetrics.MetricEffect&gt;&gt; negativeEffects =</span>
+<span class="nc" id="L572">                    activity.getEffects().stream()</span>
+<span class="nc" id="L573">                            .filter(x -&gt; x.getRight().equals(PlayerMetrics.MetricEffect.DECREASE))</span>
+<span class="nc" id="L574">                            .collect(Collectors.toList());</span>
+
+            // Initialize a boolean to track if the player has enough resources for the activity
+<span class="nc" id="L577">            boolean hasEnough = true;</span>
+
+            // Initialize a list to store the names of the metrics that the player does not have enough of
+<span class="nc" id="L580">            List&lt;String&gt; negativeEffectNames = new ArrayList&lt;&gt;();</span>
+
+            // Iterate over the negative effects
+<span class="nc bnc" id="L583" title="All 2 branches missed.">            for (Pair&lt;PlayerMetrics.MetricType, PlayerMetrics.MetricEffect&gt; negativeEffect : negativeEffects) {</span>
+                // Get the type of the metric
+<span class="nc" id="L585">                PlayerMetrics.MetricType metricType = negativeEffect.getLeft();</span>
+
+                // Get the amount by which the activity changes the metric
+<span class="nc" id="L588">                float changeAmount = activityMapObject.getChangeAmount(metricType);</span>
+
+                // Get the current value of the metric for the player
+<span class="nc" id="L591">                PlayerMetric metric = player.getMetrics().getMetric(metricType);</span>
+<span class="nc" id="L592">                float currentMetric = metric.get();</span>
+
+                // Check if the player has enough of the metric for the activity
+<span class="nc bnc" id="L595" title="All 2 branches missed.">                boolean tempEnough = currentMetric &gt;= changeAmount;</span>
+
+                // Update the hasEnough boolean if the player does not have enough of the metric
+<span class="nc bnc" id="L598" title="All 2 branches missed.">                if (hasEnough) {</span>
+<span class="nc" id="L599">                    hasEnough = tempEnough;</span>
+                }
+
+                // If the player does not have enough of the metric, add the metric's label to the list of negative
+                // effect names
+<span class="nc bnc" id="L604" title="All 2 branches missed.">                if (!tempEnough) {</span>
+<span class="nc" id="L605">                    negativeEffectNames.add(metric.getLabel());</span>
+                }
+<span class="nc" id="L607">            }</span>
+
+            // Check if the player does not have enough time or resources to perform the activity
+            // If it's the end of the day and the activity is not sleeping, set the action text to &quot;Night owl, it's time
+            // to sleep!&quot;
+<span class="nc bnc" id="L612" title="All 4 branches missed.">            if (gameTime.isEndOfDay() &amp;&amp; !activity.equals(Activity.SLEEP)) {</span>
+<span class="nc" id="L613">                actionText = new StringBuilder(&quot;Night owl, it's time to sleep!&quot;);</span>
+            }
+            // If the current hour plus the required time for the activity is greater than the length of the day and the
+            // activity is not sleeping,
+            // set the action text to &quot;You don't have enough time to do this activity.&quot;
+<span class="nc bnc" id="L618" title="All 2 branches missed.">            else if (gameTime.getCurrentHour() + requiredTime &gt; GameTime.getDayLength()</span>
+<span class="nc bnc" id="L619" title="All 2 branches missed.">                    &amp;&amp; !activity.equals(Activity.SLEEP)) {</span>
+<span class="nc" id="L620">                actionText = new StringBuilder(&quot;You don't have enough time to do this activity.&quot;);</span>
+            }
+            // If there are negative effects and the player does not have enough resources and the activity is not
+            // sleeping,
+            // set the action text to &quot;You don't have enough [resource] to do this activity.&quot;
+<span class="nc bnc" id="L625" title="All 6 branches missed.">            else if (!negativeEffects.isEmpty() &amp;&amp; !hasEnough &amp;&amp; !activity.equals(Activity.SLEEP)) {</span>
+<span class="nc" id="L626">                actionText = new StringBuilder(&quot;You don't have enough &quot;);</span>
+                // If there is only one resource the player does not have enough of, append the name of that resource to
+                // the action text
+<span class="nc bnc" id="L629" title="All 2 branches missed.">                if (negativeEffectNames.size() == 1) {</span>
+<span class="nc" id="L630">                    actionText.append(negativeEffectNames.get(0));</span>
+                }
+                // If there are multiple resources the player does not have enough of, append each resource name to the
+                // action text,
+                // separated by commas and an &quot;and&quot; before the last resource
+                else {
+<span class="nc bnc" id="L636" title="All 2 branches missed.">                    for (int i = 0; i &lt; negativeEffectNames.size(); i++) {</span>
+<span class="nc" id="L637">                        actionText.append(negativeEffectNames.get(i));</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">                        if (i == negativeEffectNames.size() - 2) {</span>
+<span class="nc" id="L639">                            actionText.append(&quot; and &quot;);</span>
+<span class="nc bnc" id="L640" title="All 2 branches missed.">                        } else if (i &lt; negativeEffectNames.size() - 2) {</span>
+<span class="nc" id="L641">                            actionText.append(&quot;, &quot;);</span>
+                        }
+                    }
+<span class="nc" id="L644">                    actionText.append(&quot; to do this activity.&quot;);</span>
+                }
+            } else {
+                // Checks passed, set the outline color to green. CHANGE new functionality
+<span class="nc" id="L648">                outlineColor.r = 0.0F;</span>
+<span class="nc" id="L649">                outlineColor.g = 255.0F;</span>
+                // If the player has enough resources and time to perform the activity
+<span class="nc bnc" id="L651" title="All 2 branches missed.">                if (!activity.equals(Activity.SLEEP)) {</span>
+                    // If the activity is not sleeping, append the required time for the activity to the action text
+<span class="nc" id="L653">                    actionText.append(&quot; (&quot;).append(requiredTime).append(&quot; hours)&quot;);</span>
+
+                } else {
+                    // If the activity is sleeping CHANGE refactor with ? operator
+<span class="nc bnc" id="L657" title="All 2 branches missed.">                    actionText.append(gameTime.isEndOfDays() ? &quot; (End of the game!)&quot; : &quot; (End of the day)&quot;);</span>
+                }
+            }
+        }
+        // Set the action text as the text of the action label, and make the action label visible
+<span class="nc" id="L662">        actionLabel.setText(actionText.toString());</span>
+<span class="nc" id="L663">        actionLabel.setVisible(true);</span>
+
+        // CHANGE new functionality
+<span class="nc" id="L666">        interactableManager.setCurrentInteractable(</span>
+<span class="nc" id="L667">                Objects.requireNonNull(currentActionMapObject.get()).getStr());</span>
+<span class="nc" id="L668">        var currentInteractable = interactableManager.getCurrentInteractable();</span>
+<span class="nc bnc" id="L669" title="All 4 branches missed.">        if (currentInteractable != null &amp;&amp; Objects.equals(currentInteractable.getMap(), currentMapName)) {</span>
+<span class="nc" id="L670">            currentInteractable.setOutlineColor(outlineColor);</span>
+        }
+<span class="nc" id="L672">    }</span>
+
+    /**
+     * This method constructs a string that represents the action text for a given {@link ActionMapObject}.
+     * The action text is a string that instructs the player to press a certain key to perform an action.
+     * The action is determined by the string representation of the {@link ActionMapObject}.
+     *
+     * @param actionMapObject The {@link ActionMapObject} for which to construct the action text.
+     * @return A {@link String} representing the action text for the given {@link ActionMapObject}.
+     */
+    @NotNull private String getActionText(@NotNull ActionMapObject actionMapObject) {
+<span class="nc" id="L683">        String actionText = &quot;Press &quot; + Input.Keys.toString(ACTION_KEY) + &quot; to &quot;;</span>
+<span class="nc" id="L684">        actionText += actionMapObject.getStr();</span>
+<span class="nc" id="L685">        return actionText;</span>
+    }
+
+    /**
+     * This method returns an {@link ActionMapObject} based on the player's current transition tile and the associated map object.
+     * If the transition tile is an {@link Player.Transition#ACTIVITY}, it returns an {@link ActivityMapObject}.
+     * If the transition tile is a {@link Player.Transition#NEW_MAP}, it returns a {@link TransitionMapObject}.
+     * If the transition tile is neither an {@link Player.Transition#ACTIVITY} nor a {@link Player.Transition#NEW_MAP}, it throws an {@link IllegalStateException}.
+     *
+     * @param transitionTile The player's current transition tile.
+     * @param tileObject The map object associated with the transition tile.
+     * @return An {@link ActionMapObject} based on the transition tile and map object.
+     * @throws IllegalStateException If the transition tile is neither an {@link Player.Transition#ACTIVITY} nor a {@link Player.Transition#NEW_MAP}.
+     */
+    @NotNull private static ActionMapObject getActionMapObject(Player.@NotNull Transition transitionTile, MapObject tileObject) {
+        ActionMapObject actionMapObject;
+<span class="nc bnc" id="L701" title="All 2 branches missed.">        if (transitionTile.equals(Player.Transition.ACTIVITY)) {</span>
+<span class="nc" id="L702">            actionMapObject = new ActivityMapObject(tileObject);</span>
+<span class="nc bnc" id="L703" title="All 2 branches missed.">        } else if (transitionTile.equals(Player.Transition.NEW_MAP)) {</span>
+<span class="nc" id="L704">            actionMapObject = new TransitionMapObject(tileObject);</span>
+        } else {
+<span class="nc" id="L706">            throw new IllegalStateException(&quot;Unexpected value: &quot; + transitionTile);</span>
+        }
+<span class="nc" id="L708">        return actionMapObject;</span>
+    }
+
+    /**
+     * This method is called when the screen size changes. It resizes the game screen to fit the new screen size.
+     * It recalculates the scale of the map based on the new screen size and tile size, and initializes the map renderer with the new map scale.
+     * It also updates the viewport of the stage with the new screen width and height, and sets the camera's position to the player's position,
+     * but constrained within the minimum and maximum x and y coordinates. Finally, it sets the view of the map renderer to the camera.
+     *
+     * @param screenWidth The new width of the screen.
+     * @param screenHeight The new height of the screen.
+     */
+    // CHANGE refactor a lot of this functionality out to simplify logic and fix issues
+    @Override
+    public void resize(int screenWidth, int screenHeight) {
+<span class="nc" id="L723">        gameViewport.update(screenWidth, screenHeight);</span>
+<span class="nc" id="L724">        processor.getViewport().update(screenWidth, screenHeight, true);</span>
+
+<span class="nc bnc" id="L726" title="All 2 branches missed.">        if (renderer != null) {</span>
+            // Set the view of the map renderer to the camera
+<span class="nc" id="L728">            renderer.setView(gameCamera);</span>
+        }
+<span class="nc" id="L730">    }</span>
+
+    /**
+     * This method is called when the game is paused.
+     * Currently, it does not perform any actions when the game is paused.
+     */
+    @Override
+<span class="nc" id="L737">    public void pause() {}</span>
+
+    /**
+     * This method is called when the game is resumed from a paused state.
+     * Currently, it does not perform any actions when the game is resumed.
+     */
+    @Override
+<span class="nc" id="L744">    public void resume() {}</span>
+
+    /**
+     * This method is called when the game screen is hidden or minimized.
+     * Currently, it does not perform any actions when the game screen is hidden.
+     */
+    @Override
+<span class="nc" id="L751">    public void hide() {}</span>
+
+    /**
+     * This method is called when the game screen is being disposed of.
+     * It disposes of the {@link GameScreen#map}, {@link GameScreen#processor},
+     * {@link GameScreen#skin}, {@link GameScreen#player}, and {@link GameScreen#world}
+     * to free up resources and prevent memory leaks.
+     */
+    @Override
+    public void dispose() {
+<span class="nc" id="L761">        processor.dispose();</span>
+<span class="nc" id="L762">        player.dispose();</span>
+
+<span class="nc" id="L764">        world.dispose();</span>
+<span class="nc" id="L765">        world = null;</span>
+<span class="nc" id="L766">    }</span>
+
+    /**
+     * This method is called when a key is pressed down.
+     * It first checks if the key pressed is the action key (defined as a constant).
+     * If it is, it retrieves the current {@link ActionMapObject} (which represents the current action that the player can perform).
+     * If the {@link ActionMapObject} is not null, it checks if it is an instance of {@link ActivityMapObject} or {@link TransitionMapObject}.
+     * If it's an {@link ActivityMapObject}, it calls the {@link GameScreen#doActivity(ActivityMapObject)} method and returns its result.
+     * If it's a {@link TransitionMapObject}, it calls the {@link GameScreen#doMapChange(TransitionMapObject)} method and returns its result.
+     * If the {@link ActionMapObject} is neither an {@link ActivityMapObject} nor a {@link TransitionMapObject}, it throws an {@link IllegalStateException}.
+     * If the key pressed is not the action key, it calls the {@link Player#keyDown(int)} method of the {@link Player} and returns its result.
+     *
+     * @param keycode The key code of the key that was pressed down.
+     * @return A boolean indicating whether the key press was handled.
+     * @throws IllegalStateException If the {@link ActionMapObject} is neither an {@link ActivityMapObject} nor a {@link TransitionMapObject}.
+     */
+    @Override
+    public boolean keyDown(int keycode) {
+<span class="nc" id="L784">        boolean playerKeyDown = player.keyDown(keycode);</span>
+<span class="nc bnc" id="L785" title="All 2 branches missed.">        if (keycode == ACTION_KEY) {</span>
+<span class="nc" id="L786">            ActionMapObject actionMapObject = currentActionMapObject.get();</span>
+<span class="nc bnc" id="L787" title="All 2 branches missed.">            if (actionMapObject != null) {</span>
+<span class="nc bnc" id="L788" title="All 2 branches missed.">                if (actionMapObject instanceof ActivityMapObject) {</span>
+<span class="nc" id="L789">                    return doActivity((ActivityMapObject) actionMapObject);</span>
+<span class="nc bnc" id="L790" title="All 2 branches missed.">                } else if (actionMapObject instanceof TransitionMapObject) {</span>
+<span class="nc" id="L791">                    return doMapChange((TransitionMapObject) actionMapObject);</span>
+                } else {
+<span class="nc" id="L793">                    throw new IllegalStateException(&quot;Unexpected value: &quot; + actionMapObject);</span>
+                }
+            }
+        }
+<span class="nc" id="L797">        return playerKeyDown;</span>
+    }
+
+    /**
+     * This method is used to change the current map to a new map.
+     * The new map is specified by the type of the provided {@link TransitionMapObject}.
+     * After changing the map, it returns true to indicate that the map change was successful.
+     *
+     * @param actionMapObject The {@link TransitionMapObject} that contains the type of the new map.
+     * @return A boolean indicating whether the map change was successful.
+     */
+    private boolean doMapChange(@NotNull TransitionMapObject actionMapObject) {
+<span class="nc" id="L809">        changeMap(actionMapObject.getType(), false);</span>
+
+        // Trigger the current interactable object's animation if it is animated. CHANGE new functionality
+<span class="nc bnc" id="L812" title="All 2 branches missed.">        if (interactableManager.getCurrentInteractable() instanceof AnimatedInteractable) {</span>
+<span class="nc" id="L813">            ((AnimatedInteractable) interactableManager.getCurrentInteractable()).setAnimating(true);</span>
+        }
+
+<span class="nc" id="L816">        return true;</span>
+    }
+
+    /**
+     * This method is used to perform an activity in the game.
+     * The activity is specified by the provided {@link ActivityMapObject}.
+     * It first checks if the game is at the end of the day and if the activity is not sleeping, if so it returns false.
+     * Then it checks if the current hour plus the required time for the activity is greater than the length of the day and if the activity is not sleeping, if so it returns false.
+     * It then checks if the player has enough resources to perform the activity, if not it returns false.
+     * If all checks pass, it performs the activity by changing the player's metrics based on the effects of the activity.
+     * If the activity is sleeping, it resets the game time to the start of the next day.
+     * Finally, it updates the time label with the current day and hour, and returns true to indicate that the activity was performed successfully.
+     *
+     * @param actionMapObject The {@link ActivityMapObject} that represents the activity to be performed.
+     * @return A boolean indicating whether the activity was performed successfully.
+     */
+    private boolean doActivity(@NotNull ActivityMapObject actionMapObject) {
+        // Get the type of the activity from the ActivityMapObject
+<span class="nc" id="L834">        Activity type = actionMapObject.getType();</span>
+
+        // Check if the game is at the end of the day and if the activity is not sleeping
+        // If it is, return false to indicate that the activity cannot be performed
+<span class="nc bnc" id="L838" title="All 4 branches missed.">        if (gameTime.isEndOfDay() &amp;&amp; !type.equals(Activity.SLEEP)) return false;</span>
+
+        // Get the required time for the activity from the ActivityMapObject
+<span class="nc" id="L841">        int requiredTime = actionMapObject.getTime();</span>
+
+        // Check if the current hour plus the required time for the activity is greater than the length of the day
+        // and if the activity is not sleeping
+        // If it is, return false to indicate that the activity cannot be performed
+<span class="nc bnc" id="L846" title="All 4 branches missed.">        if (gameTime.getCurrentHour() + requiredTime &gt; GameTime.getDayLength() &amp;&amp; !type.equals(Activity.SLEEP))</span>
+<span class="nc" id="L847">            return false;</span>
+
+        // Get the effects of the activity from the ActivityMapObject
+        // These effects represent how the activity will change the player's metrics
+<span class="nc" id="L851">        List&lt;Pair&lt;PlayerMetrics.MetricType, PlayerMetrics.MetricEffect&gt;&gt; effects = type.getEffects();</span>
+
+        // Filter the effects to get only the negative effects
+        // Negative effects are those that decrease a player metric
+<span class="nc" id="L855">        List&lt;Pair&lt;PlayerMetrics.MetricType, PlayerMetrics.MetricEffect&gt;&gt; negativeEffects = effects.stream()</span>
+<span class="nc" id="L856">                .filter(x -&gt; x.getRight().equals(PlayerMetrics.MetricEffect.DECREASE))</span>
+<span class="nc" id="L857">                .collect(Collectors.toList());</span>
+
+        // Get the player's current metrics
+<span class="nc" id="L860">        PlayerMetrics metrics = player.getMetrics();</span>
+        // Check if there are any negative effects from the activity
+<span class="nc bnc" id="L862" title="All 2 branches missed.">        if (!negativeEffects.isEmpty()) {</span>
+            // Initialize a boolean to track if the player has enough resources for the activity
+<span class="nc" id="L864">            boolean hasEnough = true;</span>
+
+            // Iterate over the negative effects
+<span class="nc bnc" id="L867" title="All 2 branches missed.">            for (Pair&lt;PlayerMetrics.MetricType, PlayerMetrics.MetricEffect&gt; negativeEffect : negativeEffects) {</span>
+                // Get the type of the metric
+<span class="nc" id="L869">                PlayerMetrics.MetricType metricType = negativeEffect.getLeft();</span>
+
+                // Get the amount by which the activity changes the metric
+<span class="nc" id="L872">                float changeAmount = actionMapObject.getChangeAmount(metricType);</span>
+
+                // Get the current value of the metric for the player
+<span class="nc" id="L875">                PlayerMetric metric = metrics.getMetric(metricType);</span>
+<span class="nc" id="L876">                float currentMetric = metric.get();</span>
+
+                // Check if the player has enough of the metric for the activity
+<span class="nc bnc" id="L879" title="All 2 branches missed.">                hasEnough = currentMetric &gt;= changeAmount;</span>
+
+                // If the player does not have enough of the metric, break the loop
+<span class="nc bnc" id="L882" title="All 2 branches missed.">                if (!hasEnough) break;</span>
+<span class="nc" id="L883">            }</span>
+
+            // If the player does not have enough resources to perform the activity, return false
+<span class="nc bnc" id="L886" title="All 2 branches missed.">            if (!hasEnough) return false;</span>
+        }
+        // Check if the activity is sleeping
+<span class="nc bnc" id="L889" title="All 2 branches missed.">        if (type.equals(Activity.SLEEP)) {</span>
+            // Get all player metrics
+<span class="nc" id="L891">            List&lt;PlayerMetric&gt; allMetrics = metrics.getMetrics();</span>
+            // Iterate over all player metrics
+<span class="nc bnc" id="L893" title="All 2 branches missed.">            for (PlayerMetric m : allMetrics) {</span>
+                // Increase the total of each metric by its current value
+<span class="nc" id="L895">                m.increaseTotal(m.get());</span>
+<span class="nc" id="L896">            }</span>
+            // Check if the current day plus one equals the total number of days
+<span class="nc bnc" id="L898" title="All 2 branches missed.">            if (gameTime.isEndOfDays()) {</span>
+                // If it does, transition the screen to the end screen and return true CHANGE pass arguments
+<span class="nc" id="L900">                game.transitionScreen(Screens.END, player.getMetrics(), player.getStreaks());</span>
+<span class="nc" id="L901">                return true;</span>
+            } else {
+                // If it doesn't, increment the current day
+<span class="nc" id="L904">                gameTime.incrementDay();</span>
+<span class="nc" id="L905">                player.getStreaks().nextDay();</span>
+            }
+<span class="nc" id="L907">        } else {</span>
+            // If the activity is not sleeping, increment the current hour by the required time for the activity
+<span class="nc" id="L909">            gameTime.incrementHour(requiredTime);</span>
+        }
+        // Iterate over the effects of the activity CHANGE move this to fix a bug with score calculation
+<span class="nc bnc" id="L912" title="All 2 branches missed.">        for (Pair&lt;PlayerMetrics.MetricType, PlayerMetrics.MetricEffect&gt; effect : effects) {</span>
+            // Get the type of the metric from the effect
+<span class="nc" id="L914">            PlayerMetrics.MetricType metricType = effect.getLeft();</span>
+            // Get the effect on the metric (increase or decrease)
+<span class="nc" id="L916">            PlayerMetrics.MetricEffect metricEffect = effect.getRight();</span>
+            // Get the amount by which the activity changes the metric
+<span class="nc" id="L918">            float changeAmount = actionMapObject.getChangeAmount(metricType);</span>
+            // Apply the effect to the metric
+<span class="nc" id="L920">            metrics.changeMetric(metricType, metricEffect, changeAmount);</span>
+<span class="nc" id="L921">        }</span>
+        // Increment the streak CHANGE new functionality
+<span class="nc bnc" id="L923" title="All 2 branches missed.">        player.getStreaks().increaseStreak(type == Activity.STUDY ? &quot;study&quot; : actionMapObject.getStr());</span>
+        // Get the current hour as a string using the getCurrentHourString method
+<span class="nc" id="L925">        String currentHour = getCurrentHourString();</span>
+
+        // Construct a string representing the current day by adding 1 to the current day from gameTime
+<span class="nc" id="L928">        String currentDay = &quot;Day &quot; + (gameTime.getCurrentDay() + 1);</span>
+
+        // Construct a string representing the current time by concatenating the current day and current hour
+<span class="nc" id="L931">        String time = currentDay + &quot; &quot; + currentHour;</span>
+
+        // Set the text of the timeLabel to the constructed time string
+<span class="nc" id="L934">        timeLabel.setText(time);</span>
+
+        // Return true indicating the operation was successful
+<span class="nc" id="L937">        return true;</span>
+    }
+
+    // spotless:off
+    /* === UNUSED INPUT METHODS === */
+    @Override
+    public boolean keyUp(int keycode) {
+<span class="nc" id="L944">        return player.keyUp(keycode);</span>
+    }
+    @Override
+    public boolean keyTyped(char character) {
+<span class="nc" id="L948">        return false;</span>
+    }
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+<span class="nc" id="L952">        return false;</span>
+    }
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+<span class="nc" id="L956">        return false;</span>
+    }
+    @Override
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+<span class="nc" id="L960">        return false;</span>
+    }
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+<span class="nc" id="L964">        return false;</span>
+    }
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+<span class="nc" id="L968">        return false;</span>
+    }
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+<span class="nc" id="L972">        return false;</span>
+    }
+    // spotless:on
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

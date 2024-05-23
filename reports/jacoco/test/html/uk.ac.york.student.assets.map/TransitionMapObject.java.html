@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransitionMapObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.assets.map</a> &gt; <span class="el_source">TransitionMapObject.java</span></div><h1>TransitionMapObject.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.assets.map;
+
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapProperties;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * This class extends MapObject and implements ActionMapObject.
+ * It represents a transition to a different map on the GameScreen with specific properties.
+ */
+public class TransitionMapObject extends MapObject implements ActionMapObject {
+    /**
+     * MapProperties object to store the properties of the transition
+     */
+    private final MapProperties properties;
+
+    /**
+     * String representing the transition to display on the screen on the action label
+     */
+<span class="nc" id="L21">    @Getter</span>
+    private final String str;
+
+    /**
+     * String representing the map name
+     */
+<span class="nc" id="L27">    @Getter</span>
+    private final String type;
+
+    /**
+     * Constructor for the TransitionMapObject class.
+     * It initialises the object with the properties of the given MapObject.
+     *
+     * @param object The MapObject to initialize the TransitionMapObject with.
+     */
+    public TransitionMapObject(@NotNull MapObject object) {
+        // Calls the superclass constructor
+<span class="nc" id="L38">        super();</span>
+
+        // Sets the name of the TransitionMapObject to the name of the given MapObject
+<span class="nc" id="L41">        setName(object.getName());</span>
+
+        // Sets the color of the TransitionMapObject to the color of the given MapObject
+<span class="nc" id="L44">        setColor(object.getColor());</span>
+
+        // Sets the opacity of the TransitionMapObject to the opacity of the given MapObject
+<span class="nc" id="L47">        setOpacity(object.getOpacity());</span>
+
+        // Sets the visibility of the TransitionMapObject to the visibility of the given MapObject
+<span class="nc" id="L50">        setVisible(object.isVisible());</span>
+
+        // Retrieves the properties of the given MapObject and assigns them to the properties of the TransitionMapObject
+<span class="nc" id="L53">        properties = object.getProperties();</span>
+
+        // Retrieves the &quot;newMap&quot; property from the properties of the TransitionMapObject and assigns it to the type
+        // field
+<span class="nc" id="L57">        type = properties.get(&quot;newMap&quot;, String.class);</span>
+
+        // Retrieves the &quot;newMapStr&quot; property from the properties of the TransitionMapObject and assigns it to the str
+        // field
+<span class="nc" id="L61">        str = properties.get(&quot;newMapStr&quot;, String.class);</span>
+<span class="nc" id="L62">    }</span>
+
+    /**
+     * Getter for the properties of the TransitionMapObject.
+     * @return The properties of the TransitionMapObject.
+     */
+    @Override
+    public MapProperties getProperties() {
+<span class="nc" id="L70">        return properties;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

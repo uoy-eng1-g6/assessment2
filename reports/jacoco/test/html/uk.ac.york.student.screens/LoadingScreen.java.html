@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoadingScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">uk.ac.york.student.screens</a> &gt; <span class="el_source">LoadingScreen.java</span></div><h1>LoadingScreen.java</h1><pre class="source lang-java linenums">package uk.ac.york.student.screens;
+
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import lombok.Getter;
+import uk.ac.york.student.GdxGame;
+import uk.ac.york.student.score.ScoreManager;
+
+/**
+ * The LoadingScreen class extends the BaseScreen class and represents the loading screen of the game.
+ * It contains a Stage object, which is used to handle input events and draw the elements of the screen.
+ * The class overrides the methods of the Screen interface, which are called at different points in the game's lifecycle.
+ */
+@Getter
+public class LoadingScreen extends BaseScreen {
+    /**
+     * The Stage instance for the LoadingScreen class.
+     * This instance is used to handle input events and draw the elements of the screen.
+     */
+<span class="nc" id="L20">    private final Stage processor;</span>
+
+    /**
+     * Constructor for the LoadingScreen class.
+     * This constructor initializes the BaseScreen with the provided game and creates a new Stage with a ScreenViewport.
+     * @param game the GdxGame instance representing the game
+     */
+    public LoadingScreen(GdxGame game) {
+<span class="nc" id="L28">        super(game);</span>
+<span class="nc" id="L29">        processor = new Stage(new ScreenViewport());</span>
+
+        // CHANGE new functionality for scores
+<span class="nc" id="L32">        ScoreManager.initScoresDatabase();</span>
+<span class="nc" id="L33">    }</span>
+
+    /**
+     * This method is called when the screen becomes the current screen for the game.
+     * It is empty in the LoadingScreen class.
+     */
+    @Override
+<span class="nc" id="L40">    public void show() {}</span>
+
+    /**
+     * This method is called by the game's render loop.
+     * In the LoadingScreen class, it sets the current screen of the game to the main menu screen.
+     * @param v the time in seconds since the last render
+     */
+    @Override
+    public void render(float v) {
+<span class="nc" id="L49">        game.setScreen(Screens.MAIN_MENU, true);</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     * This method is called when the screen should resize itself.
+     * It is empty in the LoadingScreen class.
+     * @param i the new width in pixels
+     * @param i1 the new height in pixels
+     */
+    @Override
+<span class="nc" id="L59">    public void resize(int i, int i1) {}</span>
+
+    /**
+     * This method is called when the game is paused.
+     * It is empty in the LoadingScreen class.
+     */
+    @Override
+<span class="nc" id="L66">    public void pause() {}</span>
+
+    /**
+     * This method is called when the game is resumed from a paused state.
+     * It is empty in the LoadingScreen class.
+     */
+    @Override
+<span class="nc" id="L73">    public void resume() {}</span>
+
+    /**
+     * This method is called when the screen is no longer the current screen for the game.
+     * It is empty in the LoadingScreen class.
+     */
+    @Override
+<span class="nc" id="L80">    public void hide() {}</span>
+
+    /**
+     * This method is called when the screen should release all resources.
+     * It is empty in the LoadingScreen class.
+     */
+    @Override
+<span class="nc" id="L87">    public void dispose() {}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
